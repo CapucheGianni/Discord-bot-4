@@ -5,10 +5,10 @@ module.exports = {
 		.setName('ping')
 		.setDescription('Affiche le ping du bot'),
 	async execute(client, interaction) {
-		const msg = new client.methods.MessageEmbed()
+		const embed = new client.methods.MessageEmbed()
       .setDescription(`Client Latency: ${client.ws.ping}ms`)
       .setColor(`#ffc800`)
       .setTitle("Pinged Successfully 🏓");
-    return interaction.reply({ embeds: [msg] });
+    return interaction.reply({ embeds: [embed] });
   },
 };
