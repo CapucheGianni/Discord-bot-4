@@ -8,10 +8,14 @@ const client = new Client({
     presence: {
         status:'idle',
         activities: [{
-            name:'Espionner les membres du Bistrot',
+            name:'Espionner les membres du Bistrot, **/help**',
             type:'PLAYING'
         }]
     },
+
+	allowedMentions: {
+		parse: ['users', 'roles']
+	},
 
     intents: [Intents.FLAGS.GUILDS] 
     
