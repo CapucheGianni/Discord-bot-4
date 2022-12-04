@@ -1,24 +1,28 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Intents, MessageEmbed } = require('discord.js');
-const { token } = require('./auth.json');
+const { Client, Collection, GatewayIntentBits, Partials, MessageEmbed } = require('discord.js');
+const { token } = require('../auth.json');
 
 const client = new Client({
 
     presence: {
         status:'idle',
         activities: [{
-            name:'Espionner les membres du Bistrot, **/help**',
+            name:'Espionner des gens, **/help**',
             type:'PLAYING'
         }]
     },
+
+	version: '1.0.2',
 
 	allowedMentions: {
 		parse: ['users', 'roles']
 	},
 
-    intents: [Intents.FLAGS.GUILDS] 
-    
+	intents: [GatewayIntentBits.Guilds],
+
+	partials: [Partials.Channel]
+
 });
 
 client.commands = new Collection();
