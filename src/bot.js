@@ -8,9 +8,9 @@ const client = new Client({
     presence: {
         status:'idle',
         activities: [{
-            name:'Espionner des gens, **/help**',
-            type:'PLAYING'
-        }]
+			name: 'Discord.js',
+			type: 'WATCHING',
+		}],
     },
 
 	version: '1.0.2',
@@ -42,16 +42,20 @@ client.once(Events.ClientReady, client => {
 	console.log('Connecté!');
 });
 
-client.on('interactionCreate', async interaction => {
+client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isCommand()) return;
 
 	const command = client.commands.get(interaction.commandName);
 
-	if (!command) return;
+	if (!command) {
+		console.error(`No command matching ${interaction.commandName} was found.`);
+		return;
+	}
 
 	try {
 		await command.execute(client, interaction);
 	} catch (error) {
+		console.error(`Error executing ${interaction.commandName}`);
 		console.error(error);
 		await interaction.reply({ content: 'Il y a eu une erreur lors de l\'exécution de cette commande !', ephemeral: true });
 	}
