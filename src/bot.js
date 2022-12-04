@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, GatewayIntentBits, Partials, MessageEmbed } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials, Events } = require('discord.js');
 const { token } = require('../auth.json');
 
 const client = new Client({
@@ -26,8 +26,6 @@ const client = new Client({
 });
 
 client.commands = new Collection();
-client.methods = {};
-client.methods.MessageEmbed = MessageEmbed;
 
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
@@ -40,7 +38,7 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
-client.once('ready', () => {
+client.once(Events.ClientReady, client => {
 	console.log('Connecté!');
 });
 

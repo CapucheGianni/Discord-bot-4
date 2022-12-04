@@ -1,17 +1,18 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('banner')
 		.setDescription('Affiche votre bannière ou celle d\'un membre du serveur')
 		.addUserOption(option => option.setName('membre').setDescription('La bannière du membre voulu'))
-		.addBooleanOption(option => option.setName('couleur').setDescription('Affiche la couleur de la bannière')), // Boolean: true & false
-	async execute(client, interaction) {
+		.addBooleanOption(option => option.setName('couleur').setDescription('Affiche la couleur de la bannière')),
+	async execute(interaction) {
 		let user = interaction.options.getUser('membre') ?? interaction.user;
 		user = await user.fetch();
 		if (interaction.options.getBoolean('couleur')) {
 			if (user.hexAccentColor) {
-				const embed = new client.methods.MessageEmbed()
+				const embed = new EmbedBuilder()
 				.setDescription(`**[${user.hexAccentColor}](https://colorhexa.com/${user.hexAccentColor})**`)
 				.setColor(user.hexAccentColor);
 				return interaction.reply({content: `La couleur de la bannière est : ${user.hexAccentColor}.`, embeds: [embed]})
