@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
-const version = require('../../package.json');
+const infos = require('../../package.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,7 +15,7 @@ module.exports = {
                 return `\`${command.data.name}\` : ${command.data.description}`
             }).join('\n')}`)
             .setFooter({
-               text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${version.version}`
+               text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${infos.version}`
             })
             .setTimestamp()
             .setColor(`#ffc800`);
