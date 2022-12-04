@@ -1,8 +1,8 @@
 {
     "name": "kaide",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Un bot pour découvrir d.js",
-    "main": "bot.js",
+    "main": "src/bot.js",
     "author": "CapucheGianni",
     "dependencies": {
         "@sindresorhus/is": "^5.2.0",

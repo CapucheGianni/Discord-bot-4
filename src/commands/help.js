@@ -12,7 +12,7 @@ module.exports = {
             .setTitle('Liste des commandes 📚')
             .setURL('https://canary.discord.com/channels/777863908932845588/835895027314065489')
             .setDescription(`Voici la liste des commandes disponibles :\n\n${client.commands.map(command => {
-                return `\`${command.data.name}\` : ${command.data.description}`
+                return `\`${command.data.name}\`: ${command.data.description}`
             }).join('\n')}`)
             .setFooter({
                text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${infos.version}`

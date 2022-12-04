@@ -9,12 +9,10 @@ const client = new Client({
         status: 'dnd',
 		activities: [{
 			name: '📚 /help',
-			type: 2,
+			type: 2
 		}],
 
     },
-
-	version: '1.0.3',
 
 	allowedMentions: {
 		parse: ['users', 'roles']
@@ -27,6 +25,7 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+
 
 const commandsPath = path.join(__dirname, 'commands');
 const eventsPath = path.join(__dirname, 'events');
@@ -41,7 +40,7 @@ for (const file of commandFiles) {
 	} else {
 		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
 	}
-}
+};
 
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
@@ -51,6 +50,6 @@ for (const file of eventFiles) {
 	} else {
 		client.on(event.name, (...args) => event.execute(client, ...args));
 	}
-}
+};
 
 client.login(token);
