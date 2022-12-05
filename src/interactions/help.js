@@ -11,7 +11,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Liste des commandes 📚')
             .setURL('https://canary.discord.com/channels/777863908932845588/835895027314065489')
-            .setDescription(`Voici la liste des commandes disponibles :\n\n${client.commands.map(command => {
+            .setDescription(`Voici la liste des intéractions disponibles :\n\n${client.interactions.map(command => {
                 return `\`${command.data.name}\`: ${command.data.description}`
             }).join('\n')}`)
             .setFooter({

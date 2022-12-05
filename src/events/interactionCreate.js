@@ -5,20 +5,19 @@ module.exports = {
     async execute(client, interaction) {
         if (!interaction.isCommand()) return;
 
-        const command = client.commands.get(interaction.commandName);
+        const getInteraction = client.interactions.get(interaction.commandName);
 
-        if (!command) {
-            console.error(`No command matching ${interaction.commandName} was found.`);
+        if (!getInteraction) {
+            console.error(`No interaction matching ${interaction.commandName} was found.`);
             return;
         }
-
         try {
-            await command.execute(client, interaction);
-            console.log(`${interaction.commandName} command executed by ${interaction.user.tag} (${interaction.user.id}) in ${interaction.guild.name} (${interaction.guild.id})`);
+            await getInteraction.execute(client, interaction);
+            console.log(`${interaction.commandName} interaction executed by ${interaction.user.tag} (${interaction.user.id}) in ${interaction.guild.name} (${interaction.guild.id}) at ${interaction.createdAt}`);
         } catch (error) {
             console.error(`Error executing ${interaction.commandName}`);
             console.error(error);
-            await interaction.reply({ content: 'Il y a eu une erreur lors de l\'exécution de cette commande !', ephemeral: true });
+            await interaction.reply({ content: 'Il y a eu une erreur lors de l\'exécution de cette intéraction !', ephemeral: true });
         }
     }
 }
