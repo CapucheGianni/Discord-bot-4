@@ -21,7 +21,7 @@ module.exports = {
 				return interaction.reply("L'utilisateur n'a pas de bannière.")
 			}
 		}
-		const message = (user.bannerURL()) ? `Bannière de ${user}[ : ](${user.bannerURL({dynamic: true, size: 4096})})` : `${user} n'a pas de bannière`;
+		const message = (user.bannerURL()) ? `Bannière de ${user} [:] (${user.bannerURL({dynamic: true, size: 4096})})` : `${user} n'a pas de bannière`;
 
 		if (user) return interaction.reply({content: message, allowedMentions: {parse: []}});
 	},
