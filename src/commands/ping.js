@@ -2,9 +2,9 @@ const { EmbedBuilder } = require('discord.js');
 const infos = require('../../package.json');
 
 module.exports = {
-    name: "*ping",
+    name: "ping",
     description: "Affiche le ping du bot",
-    async execute(client, command) {
+    async run(client, command, args) {
         const sent = await command.reply({ content: 'Pinging...', fetchReply: true });
         const embed = new EmbedBuilder()
             .setTitle("Pinged Successfully 🏓")

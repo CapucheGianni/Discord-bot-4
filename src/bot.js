@@ -18,7 +18,7 @@ const client = new Client({
 		parse: ['users', 'roles']
 	},
 
-	intents: [GatewayIntentBits.Guilds],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
 
 	partials: [Partials.Channel]
 
@@ -28,8 +28,10 @@ client.interactions = new Collection();
 client.commands = new Collection();
 
 const interactionsPath = path.join(__dirname, 'interactions');
+const commandsPath = path.join(__dirname, 'commands');
 const eventsPath = path.join(__dirname, 'events');
 const interactionsFiles = fs.readdirSync(interactionsPath).filter(file => file.endsWith('.js'));
+const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of interactionsFiles) {
@@ -43,10 +45,22 @@ for (const file of interactionsFiles) {
 	}
 };
 
+for (const file of commandsFiles) {
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+
+	if ('name' in command && 'run' in command) {
+		client.commands.set(command.name, command);
+		//console.log(command.name, command);
+	} else {
+		console.log(`[WARNING] The command at ${filePath} is missing a required "name" or "run" property.`);
+	}
+};
+
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
 	const event = require(filePath);
-
+	
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(client, ...args));
 	} else {

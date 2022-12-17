@@ -4,9 +4,9 @@ const infos = require('../../package.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
-    .setName('help')
-    .setDescription('Affiche la liste des commandes disponibles')
-    .addStringOption(option => option.setName('commande').setDescription('La commande à afficher')),
+        .setName('help')
+        .setDescription('Affiche la liste des commandes disponibles')
+        .addStringOption(option => option.setName('commande').setDescription('La commande à afficher')),
     async execute(client, interaction) {
         const embed = new EmbedBuilder()
             .setTitle('Liste des commandes 📚')
