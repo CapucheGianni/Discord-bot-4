@@ -4,8 +4,12 @@ const infos = require('../../package.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-	.setName('ping')
-	.setDescription('Affiche le ping du bot'),
+	    .setName('ping')
+	    .setDescription('Affiche le ping du bot'),
+    stats: {
+        category: 'Utilitaire',
+        usage: '/ping',
+    },
 	async execute(client, interaction) {
         const sent = await interaction.reply({ content: 'Pinging...', fetchReply: true });
         const embed = new EmbedBuilder()

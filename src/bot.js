@@ -51,7 +51,6 @@ for (const file of commandsFiles) {
 
 	if ('name' in command && 'run' in command) {
 		client.commands.set(command.name, command);
-		//console.log(command.name, command);
 	} else {
 		console.log(`[WARNING] The command at ${filePath} is missing a required "name" or "run" property.`);
 	}

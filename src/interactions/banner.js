@@ -7,6 +7,10 @@ module.exports = {
 		.setDescription('Affiche votre bannière ou celle d\'un membre du serveur')
 		.addUserOption(option => option.setName('membre').setDescription('La bannière du membre voulu'))
 		.addBooleanOption(option => option.setName('couleur').setDescription('Affiche la couleur de la bannière')),
+	stats: {
+		category: 'Image',
+		usage: '/banner [membre] [couleur]',
+	},
 	async execute(client, interaction) {
 		let user = interaction.options.getUser('membre') ?? interaction.user;
 		user = await user.fetch();
