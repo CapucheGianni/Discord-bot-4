@@ -18,7 +18,7 @@ const client = new Client({
 		parse: ['users', 'roles']
 	},
 
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
 
 	partials: [Partials.Channel]
 
