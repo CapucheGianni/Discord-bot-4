@@ -6,16 +6,21 @@ module.exports = {
         usage: "*avatar [membre]",
     },
     async run(client, command, args) {
-        let user = args[0] ?? command.author;
-        let userExists = await client.users.fetch(user).catch(() => null);
+        const user = args[0] ?? command.author;
+        const userMention = command.mentions.users.first();
+        const userExists = await client.users.fetch(user).catch(() => null);
 
         if (userExists) {
             return command.reply({
-                content: `Photo de profil de **${userExists.tag}** :\n||${userExists.displayAvatarURL({ dynamic: true, size: 4096 })}||`, allowedMentions: {parse: []}
+                content: `Photo de profil de **${userExists.tag}** :\n${userExists.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
+            });
+        } else if (!userMention.bot || userMention.bot) {
+            return command.reply({
+                content: `Photo de profil de **${userMention.tag}** :\n${userMention.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
             });
         } else {
             return command.reply({
-                content: "Merci d'indiquer un utilisateur valide"
+                content: "Merci d'indiquer un utilisateur valide."
             });
         };
     },
