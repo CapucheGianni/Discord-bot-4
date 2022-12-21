@@ -24,7 +24,7 @@ const client = new Client({
 
 });
 
-const messageCountSchema = require('./mongo_db/message_count_schema.js');
+const messageCountSchema = require('./mongo_db/messageCountSchema.js');
 
 client.interactions = new Collection();
 client.commands = new Collection();

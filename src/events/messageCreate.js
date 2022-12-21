@@ -1,6 +1,6 @@
 const { Events } = require('discord.js');
 const { prefix } = require('../../auth.json');
-const messageCountSchema = require('../mongo_db/message_count_schema.js');
+const messageCountSchema = require('../mongo_db/messageCountSchema.js');
 
 module.exports = {
     name: Events.MessageCreate,
