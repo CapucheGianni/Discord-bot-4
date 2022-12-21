@@ -1,10 +1,27 @@
 const { Events } = require('discord.js');
-const prefix = '*';
+const { prefix } = require('../../auth.json');
+const messageCountSchema = require('../mongo_db/message_count_schema.js');
 
 module.exports = {
     name: Events.MessageCreate,
     async execute(client, message) {
         if (message.author.bot) return;
+        
+        await messageCountSchema.findOneAndUpdate({
+            _id: message.author.id,
+            _serverid: message.guild.id,
+        }, 
+        {
+            _id: message.author.id,
+            _serverid: message.guild.id,
+            $inc: {
+                messageCount: 1,
+            },
+        }, 
+        {
+            upsert: true,
+        });
+
         if (!message.content.startsWith(prefix)) return;
         if (!message.guild) return;
         
