@@ -12,11 +12,11 @@ module.exports = {
 
         if (userExists) {
             return command.reply({
-                content: `Photo de profil de **${userExists.tag}** :\n${userExists.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
+                content: `Photo de profil de **${userExists}** :\n${userExists.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
             });
-        } else if (!userMention.bot || userMention.bot) {
+        } else if (userMention) {
             return command.reply({
-                content: `Photo de profil de **${userMention.tag}** :\n${userMention.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
+                content: `Photo de profil de **${userMention}** :\n${userMention.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
             });
         } else {
             return command.reply({

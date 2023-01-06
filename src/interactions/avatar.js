@@ -13,7 +13,7 @@ module.exports = {
 		const user = interaction.options.getUser('membre') ?? interaction.user;
 
 		if (user) return interaction.reply({
-			content: `Photo de profil de ${user.tag}[ : ](${user.displayAvatarURL({ dynamic: true, size: 4096 })})`, allowedMentions: {parse: []}
+			content: `Photo de profil de ${user}[ : ](${user.displayAvatarURL({ dynamic: true, size: 4096 })})`, allowedMentions: {parse: []}
 		});
 	},
 };

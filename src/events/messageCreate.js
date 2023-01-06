@@ -7,13 +7,14 @@ module.exports = {
     async execute(client, message) {
         if (message.author.bot) return;
         
+        // Get the message count for an user in a server
         await messageCountSchema.findOneAndUpdate({
             _id: message.author.id,
-            _serverid: message.guild.id,
+            //_serverid: message.guild.id,
         }, 
         {
             _id: message.author.id,
-            _serverid: message.guild.id,
+            //_serverid: message.guild.id,
             $inc: {
                 messageCount: 1,
             },
@@ -22,6 +23,7 @@ module.exports = {
             upsert: true,
         });
 
+        // Compare if it is a command or not
         if (!message.content.startsWith(prefix)) return;
         if (!message.guild) return;
         
