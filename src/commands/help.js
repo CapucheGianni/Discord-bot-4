@@ -32,7 +32,7 @@ module.exports = {
                 .setTitle("Liste des commandes 📚")
                 .setURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
                 .setDescription(`voici la liste des commandes disponibles :\n\n${client.commands.map(command => {
-                    return `\`*${command.name}\`: ${command.description}`
+                    return `\`*${command.name}\` - ${command.description}`
                 }).join('\n')}`)
                 .setFooter({
                     text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${infos.version}`

@@ -10,7 +10,7 @@ module.exports = {
     async run (client, command, args) {
         if (args[0] === "color") {
             let user = args[1] ?? command.author;
-            let userExists = await client.users.fetch(user).catch(() => null);
+            const userExists = await client.users.fetch(user).catch(() => null);
             let userMention = command.mentions.users.first() ?? userExists;
             
             if (userMention) {
@@ -30,12 +30,12 @@ module.exports = {
             };
         } else {
             let user = args[0] ?? command.author;
-            let userExists = await client.users.fetch(user).catch(() => null);
+            const userExists = await client.users.fetch(user).catch(() => null);
             let userMention = command.mentions.users.first() ?? userExists;
             
             if (userMention) {
                 userMention = await userMention.fetch();
-                const message = (userMention.bannerURL()) ? `Bannière de ${userMention} :\n${userMention.bannerURL({dynamic: true, size: 4096})}` : `${userMention} n'a pas de bannière*b`;
+                const message = (userMention.bannerURL()) ? `Bannière de ${userMention} :\n${userMention.bannerURL({dynamic: true, size: 4096})}` : `${userMention} n'a pas de bannière.`;
                 return command.reply({content: message, allowedMentions: {parse: []}});
             } else {
                 return command.reply({
