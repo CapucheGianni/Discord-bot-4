@@ -20,7 +20,7 @@ module.exports = {
                 .setTitle(`Commande \`${commandName}\` 📚`)
                 .setDescription(`**Catégorie:** ${cmd.stats.category}\n\n**Description:** ${cmd.description}\n\n**Usage:** \`${cmd.stats.usage}\``)
                 .setFooter({
-                    text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${infos.version}`
+                    text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${infos.version}`, iconURL: command.author.displayAvatarURL({ dynamic: true })
                 })
                 .setTimestamp()
                 .setColor(`#ffc800`);
@@ -35,7 +35,7 @@ module.exports = {
                     return `\`*${command.name}\` - ${command.description}`
                 }).join('\n')}`)
                 .setFooter({
-                    text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${infos.version}`
+                    text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${infos.version}`, iconURL: command.author.displayAvatarURL({ dynamic: true })
                 })
                 .setTimestamp()
                 .setColor(`#ffc800`);

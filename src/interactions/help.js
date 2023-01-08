@@ -22,7 +22,7 @@ module.exports = {
                 .setTitle(`Commande \`${cmd.data.name}\` 📚`)
                 .setDescription(`**Catégorie:** ${cmd.stats.category}\n\n**Description:** ${cmd.data.description}\n\n**Usage:** \`${cmd.stats.usage}\``)
                 .setFooter({
-                    text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${infos.version}`
+                    text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${infos.version}`, iconURL: interaction.user.displayAvatarURL({ dynamic: true })
                 })
                 .setTimestamp()
                 .setColor(`#ffc800`);
@@ -37,7 +37,7 @@ module.exports = {
                     return `\`/${interactions.data.name}\` - ${interactions.data.description}`
                 }).join('\n')}`)
                 .setFooter({
-                   text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${infos.version}`
+                   text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${infos.version}`, iconURL: interaction.user.displayAvatarURL({ dynamic: true })
                 })
                 .setTimestamp()
                 .setColor(`#ffc800`);

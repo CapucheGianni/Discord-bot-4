@@ -14,7 +14,7 @@ module.exports = {
             .setTitle("Pinged Successfully 🏓")
             .setDescription(`**Client Latency:** ${client.ws.ping}ms\n**API latency:** ${sent.createdTimestamp - command.createdTimestamp}ms`)
             .setFooter({
-                text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${infos.version}`
+                text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${infos.version}`, iconURL: command.author.displayAvatarURL({ dynamic: true })
             })
             .setTimestamp()
             .setColor(`#ffc800`);

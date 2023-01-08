@@ -16,7 +16,7 @@ module.exports = {
             .setTitle("Pinged Successfully 🏓")
             .setDescription(`**Client Latency:** ${client.ws.ping}ms\n**API latency:** ${sent.createdTimestamp - interaction.createdTimestamp}ms`)
             .setFooter({
-                text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${infos.version}`
+                text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${infos.version}`, iconURL: interaction.user.displayAvatarURL({ dynamic: true })
             })
             .setTimestamp()
             .setColor(`#ffc800`);

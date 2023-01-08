@@ -12,7 +12,7 @@ module.exports = {
 
         if (userMention) {
             return command.reply({
-                content: `Photo de profil de **${userMention}** :\n${userMention.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
+                content: `Photo de profil de **${userMention}** :\n${userMention.displayAvatarURL({ dynamic: true, size: 4096, server: false })}`, allowedMentions: {parse: []}
             });
         } else {
             return command.reply({
