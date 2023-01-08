@@ -7,14 +7,10 @@ module.exports = {
     },
     async run(client, command, args) {
         const user = args[0] ?? command.author;
-        const userMention = command.mentions.users.first();
         const userExists = await client.users.fetch(user).catch(() => null);
+        const userMention = command.mentions.users.first() ?? userExists;
 
-        if (userExists) {
-            return command.reply({
-                content: `Photo de profil de **${userExists}** :\n${userExists.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
-            });
-        } else if (userMention) {
+        if (userMention) {
             return command.reply({
                 content: `Photo de profil de **${userMention}** :\n${userMention.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
             });

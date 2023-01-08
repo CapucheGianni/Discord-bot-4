@@ -9,27 +9,19 @@ module.exports = {
     },
     async run (client, command, args) {
         if (args[0] === "color") {
-            const user = args[1] ?? command.author;
-            const userMention = command.mentions.users.first();
-            const userExists = await client.users.fetch(user).catch(() => null);
-
-            if (userExists) {
-                if (user.hexAccentColor) {
-                    const embed = new EmbedBuilder()
-                    .setDescription(`**[${userExists.hexAccentColor}](https://colorhexa.com/${userExists.hexAccentColor})**`)
-                    .setColor(userExists.hexAccentColor);
-                    return command.reply({content: `La couleur de la bannière est : ${userExists.hexAccentColor}.`, embeds: [embed]})
-                } else {
-                    return command.reply("L'utilisateur n'a pas de bannière prout.")
-                };
-            } else if (userMention) {
+            let user = args[1] ?? command.author;
+            let userExists = await client.users.fetch(user).catch(() => null);
+            let userMention = command.mentions.users.first() ?? userExists;
+            
+            if (userMention) {
+                userMention = await userMention.fetch();
                 if (userMention.hexAccentColor) {
                     const embed = new EmbedBuilder()
                     .setDescription(`**[${userMention.hexAccentColor}](https://colorhexa.com/${userMention.hexAccentColor})**`)
                     .setColor(userMention.hexAccentColor);
                     return command.reply({content: `La couleur de la bannière est : ${userMention.hexAccentColor}.`, embeds: [embed]})
                 } else {
-                    return command.reply("L'utilisateur n'a pas de bannière prout.")
+                    return command.reply("L'utilisateur n'a pas de couleur personnalisée.")
                 };
             } else {
                 return command.reply({
@@ -37,15 +29,13 @@ module.exports = {
                 });
             };
         } else {
-            const user = args[0] ?? command.author;
-            const userMention = command.mentions.users.first();
-            const userExists = await client.users.fetch(user).catch(() => null);
-
-            if (userExists) {
-                const message = (userExists.bannerURL()) ? `Bannière de ${userExists} :\n(${userExists.bannerURL({dynamic: true, size: 4096})})` : `${userExists} n'a pas de bannière bite`;
-                return command.reply({content: message, allowedMentions: {parse: []}});
-            } else if (userMention) {
-                const message = (userMention.bannerURL()) ? `Bannière de ${userMention} :\n(${userMention.bannerURL({dynamic: true, size: 4096})})` : `${userMention} n'a pas de bannière bite`;
+            let user = args[0] ?? command.author;
+            let userExists = await client.users.fetch(user).catch(() => null);
+            let userMention = command.mentions.users.first() ?? userExists;
+            
+            if (userMention) {
+                userMention = await userMention.fetch();
+                const message = (userMention.bannerURL()) ? `Bannière de ${userMention} :\n${userMention.bannerURL({dynamic: true, size: 4096})}` : `${userMention} n'a pas de bannière*b`;
                 return command.reply({content: message, allowedMentions: {parse: []}});
             } else {
                 return command.reply({
