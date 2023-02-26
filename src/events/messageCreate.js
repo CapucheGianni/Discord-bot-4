@@ -5,7 +5,12 @@ const messageCountSchema = require('../mongo_db/messageCountSchema.js');
 module.exports = {
     name: Events.MessageCreate,
     async execute(client, message) {
-        if (message.author.bot) return;
+        if (message.author.bot) {
+            if (message.author.id == "276060004262477825") {
+                message.channel.lastMessage.react("👋");
+            }
+            return;
+        }
         
         // Get the message count for an user in a server
         await messageCountSchema.findOneAndUpdate({
@@ -33,6 +38,7 @@ module.exports = {
 
         let command = client.commands.get(commandName);
         if (command) command.run(client, message, args);
+        else return;
 
         try {
             console.log(`${commandName} command executed by ${message.author.tag} (${message.author.id}) in ${message.guild.name} (${message.guild.id}) at ${message.createdAt}`);
