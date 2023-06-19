@@ -11,7 +11,7 @@ module.exports = {
             }
             return;
         }
-        
+
         // Get the message count for an user in a server
         await messageCountSchema.findOneAndUpdate({
             _id: message.author.id,
@@ -31,7 +31,7 @@ module.exports = {
         // Compare if it is a command or not
         if (!message.content.startsWith(prefix)) return;
         if (!message.guild) return;
-        
+
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
         const commandName = args.shift().toLowerCase();
         if (commandName.length == 0) return;
@@ -41,7 +41,11 @@ module.exports = {
         else return;
 
         try {
-            console.log(`${commandName} command executed by ${message.author.tag} (${message.author.id}) in ${message.guild.name} (${message.guild.id}) at ${message.createdAt}`);
+            const currentDate = new Date();
+            const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`
+            const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`
+
+            console.log(`${commandName} command executed by ${message.author.username} (${message.author.id}) in ${message.guild.name} (${message.guild.id}) at ${date} ${time}`);
         } catch (error) {
             console.error(`Error executing ${commandName}`);
             console.error(error);
