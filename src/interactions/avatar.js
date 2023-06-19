@@ -1,16 +1,16 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require("@discordjs/builders");
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('avatar')
-		.setDescription('Affiche votre photo de profil ou celle d\'un membre du serveur')
-		.addUserOption(option => option.setName('membre').setDescription('La photo de profil du membre voulu')),
+		.setName("avatar")
+		.setDescription("Affiche votre photo de profil ou celle d'un membre du serveur")
+		.addUserOption(option => option.setName("membre").setDescription("La photo de profil du membre voulu")),
 	stats: {
-		category: 'Image',
-		usage: '/avatar [membre]',
+		category: "Image",
+		usage: "/avatar [membre]",
 	},
 	async execute(client, interaction) {
-		const user = interaction.options.getUser('membre') ?? interaction.user;
+		const user = interaction.options.getUser("membre") ?? interaction.user;
 
 		if (user) return interaction.reply({
 			content: `Photo de profil de ${user}[ : ](${user.displayAvatarURL({ dynamic: true, size: 4096 })})`,

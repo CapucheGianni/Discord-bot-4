@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { prefix } = require('../../auth.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,7 +10,6 @@ module.exports = {
         usage: '/prefix',
     },
     async execute(client, interaction) {
-        const infos = require('../../auth.json');
-        return interaction.reply({content: `Le préfixe de ${client.user.tag} est : **${infos.prefix}**`});
+        return interaction.reply({content: `Le préfixe de ${client.user.username} est : **${prefix}**`});
     }
 }
