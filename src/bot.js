@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const { token } = require('../auth.json');
+const deployInteractions = require('./deployInteractions.js');
 
 const client = new Client({
 
@@ -24,7 +25,7 @@ const client = new Client({
 
 });
 
-const messageCountSchema = require('./mongo_db/messageCountSchema.js');
+// const messageCountSchema = require('./mongo_db/messageCountSchema.js');
 
 client.interactions = new Collection();
 client.commands = new Collection();
@@ -69,4 +70,5 @@ for (const file of eventFiles) {
 	}
 };
 
+deployInteractions();
 client.login(token);
