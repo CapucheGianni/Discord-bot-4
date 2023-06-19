@@ -26,14 +26,14 @@ module.exports = {
         }).then(response => {
             if (response.ok)
               return response.json();
-          }, networkError => {
+        }, networkError => {
             console.log(networkError.message);
-          }).then(jsonResponse => {
+        }).then(jsonResponse => {
             try {
                 interaction.reply(`https://${jsonResponse.shortUrl}`);
             } catch (err) {
                 interaction.reply('Une erreur est survenue lors de la création du lien.');
             }
-          });
+        });
 	}
 };
