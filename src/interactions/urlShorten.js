@@ -16,24 +16,23 @@ module.exports = {
         const url = "https://api.rebrandly.com/v1/links";
         const data = JSON.stringify({destination: urlToShorten});
 
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "apikey": rebrandlyApiKey,
-            },
-            body: data,
-        }).then(response => {
-            if (response.ok)
-              return response.json();
-        }, networkError => {
-            console.log(networkError.message);
-        }).then(jsonResponse => {
-            try {
-                interaction.reply(`https://${jsonResponse.shortUrl}`);
-            } catch (err) {
-                interaction.reply("Une erreur est survenue lors de la création du lien.");
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": rebrandlyApiKey,
+                },
+                body: data
+            });
+            if (response.ok) {
+                const jsonResponse = await response.json();
+                return interaction.reply(`https://${jsonResponse.shortUrl}`);
             }
-        });
+            return interaction.reply("Merci de fournir un url valide.");
+        } catch (error) {
+            interaction.reply("Une erreur est survenue lors de la création du lien.");
+            console.log(error.content);
+        }
 	}
 };
