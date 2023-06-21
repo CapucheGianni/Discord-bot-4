@@ -18,11 +18,12 @@ module.exports = {
         if (interactionName) {
             const cmd = client.interactions.find(cmd => cmd.data.name === interactionName);
 
-            if (!cmd)
+            if (!cmd) {
                 return interaction.reply({
                     content: `La commande \`${interactionName}\` n'existe pas !`,
                     ephemeral: true
                 });
+            }
             embed.setTitle(`Commande \`${cmd.data.name}\` 📚`)
             .setDescription(`**Catégorie:** ${cmd.stats.category}\n\n**Description:** ${cmd.data.description}\n\n**Usage:** \`${cmd.stats.usage}\``)
             .setFooter({

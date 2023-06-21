@@ -6,7 +6,8 @@ module.exports = {
         usage: "*prefix"
     },
     async run(client, command) {
-        const infos = require("../../auth.json");
-        return command.reply({ content: `Le préfixe de ${client.user.tag} est : **${infos.prefix}**` });
+        const prefix = require("../setPrefix.js");
+
+        return command.reply({ content: `Le préfixe de ${client.user.username} est : **${prefix}**` });
     },
 };

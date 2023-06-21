@@ -19,5 +19,5 @@ module.exports = {
                 content: "Merci d'indiquer un utilisateur valide."
             });
         };
-    },
+    }
 };

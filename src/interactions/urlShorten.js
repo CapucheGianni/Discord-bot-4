@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { rebrandlyApiKey } = require("../../auth.json");
 const fetch = require("node-fetch");
+require("dotenv").config();
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,7 +21,7 @@ module.exports = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "apikey": rebrandlyApiKey,
+                    "apikey": process.env.REBRANDLY_API_KEY
                 },
                 body: data
             });
@@ -32,7 +32,7 @@ module.exports = {
             return interaction.reply("Merci de fournir un url valide.");
         } catch (error) {
             interaction.reply("Une erreur est survenue lors de la création du lien.");
-            console.log(error.content);
+            console.log(error);
         }
 	}
 };

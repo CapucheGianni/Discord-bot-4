@@ -1,8 +1,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
-const { token } = require('../auth.json');
 const deployInteractions = require('./deployInteractions.js');
+require('dotenv').config();
 
 const client = new Client({
     presence: {
@@ -10,7 +10,7 @@ const client = new Client({
 		activities: [{
 			name: '📚 /help',
 			type: 2
-		}],
+		}]
 
     },
 	allowedMentions: {
@@ -66,4 +66,4 @@ for (const file of eventFiles) {
 };
 
 deployInteractions();
-client.login(token);
+client.login(process.env.TOKEN);

@@ -1,6 +1,4 @@
 const { Events } = require('discord.js');
-const mongoose = require('mongoose');
-const { mongoUI } = require('../../auth.json');
 
 module.exports = {
     name: Events.ClientReady,

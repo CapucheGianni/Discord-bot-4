@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
-const { clientId, guildId, token } = require('../auth.json');
+require('dotenv').config();
 
 const deployInteractions = () => {
     const interactions = [];
@@ -15,9 +15,9 @@ const deployInteractions = () => {
         interactions.push(interaction.data.toJSON());
     }
 
-    const rest = new REST({ version: '9' }).setToken(token);
+    const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
-    rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: interactions })
+    rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), { body: interactions })
         .then(() => console.log('Successfully registered application commands.'))
         .catch(console.error);
 }
