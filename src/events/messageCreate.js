@@ -1,6 +1,5 @@
 const { Events } = require('discord.js');
 const { prefix } = require('../../auth.json');
-const messageCountSchema = require('../mongo_db/messageCountSchema.js');
 
 module.exports = {
     name: Events.MessageCreate,
@@ -11,22 +10,6 @@ module.exports = {
             }
             return;
         }
-
-        // Get the message count for an user in a server
-        await messageCountSchema.findOneAndUpdate({
-            _id: message.author.id,
-            //_serverid: message.guild.id,
-        }, 
-        {
-            _id: message.author.id,
-            //_serverid: message.guild.id,
-            $inc: {
-                messageCount: 1,
-            },
-        }, 
-        {
-            upsert: true,
-        });
 
         // Compare if it is a command or not
         if (!message.content.startsWith(prefix)) return;

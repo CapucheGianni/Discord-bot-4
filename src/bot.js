@@ -20,8 +20,6 @@ const client = new Client({
 	partials: [Partials.Channel]
 });
 
-// const messageCountSchema = require('./mongo_db/messageCountSchema.js');
-
 client.interactions = new Collection();
 client.commands = new Collection();
 
