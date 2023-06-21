@@ -1,4 +1,5 @@
 const { EmbedBuilder } = require ("discord.js");
+const getUser = require("../utils/getUser");
 
 module.exports = {
     name: "banner",
@@ -9,18 +10,16 @@ module.exports = {
     },
     async run(client, command, args) {
         if (args[0] === "color") {
-            let user = args[1] ?? command.author;
-            const userExists = await client.users.fetch(user).catch(() => null);
-            let userMention = command.mentions.users.first() ?? userExists;
+            let user = await getUser(client, command, args[1]);
 
-            if (userMention) {
-                userMention = await userMention.fetch();
-                if (userMention.hexAccentColor) {
+            if (user) {
+                user = await user.fetch();
+                if (user.hexAccentColor) {
                     const embed = new EmbedBuilder()
-                    .setDescription(`**[${userMention.hexAccentColor}](https://colorhexa.com/${userMention.hexAccentColor})**`)
-                    .setColor(userMention.hexAccentColor);
+                    .setDescription(`**[${user.hexAccentColor}](https://colorhexa.com/${user.hexAccentColor})**`)
+                    .setColor(user.hexAccentColor);
                     return command.reply({
-                        content: `La couleur de la bannière est : ${userMention.hexAccentColor}.`,
+                        content: `La couleur de la bannière est : ${user.hexAccentColor}.`,
                         embeds: [embed]
                     });
                 } else {
@@ -32,14 +31,12 @@ module.exports = {
                 });
             };
         } else {
-            let user = args[0] ?? command.author;
-            const userExists = await client.users.fetch(user).catch(() => null);
-            let userMention = command.mentions.users.first() ?? userExists;
+            let user = await getUser(client, command, args[0]);
 
-            if (userMention) {
-                userMention = await userMention.fetch();
+            if (user) {
+                user = await user.fetch();
                 return command.reply({
-                    content: (userMention.bannerURL()) ? `Bannière de ${userMention} :\n${userMention.bannerURL({dynamic: true, size: 4096})}` : `${userMention} n'a pas de bannière.`,
+                    content: (user.bannerURL()) ? `Bannière de ${user} :\n${user.bannerURL({dynamic: true, size: 4096})}` : `${user} n'a pas de bannière.`,
                     allowedMentions: {parse: []}
                 });
             } else {

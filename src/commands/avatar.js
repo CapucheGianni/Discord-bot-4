@@ -1,3 +1,5 @@
+const getUser = require("../utils/getUser");
+
 module.exports = {
     name: "avatar",
     description: "Affiche l'avatar d'un utilisateur",
@@ -6,13 +8,12 @@ module.exports = {
         usage: "avatar [membre]",
     },
     async run(client, command, args) {
-        const user = args[0] ?? command.author;
-        const userExists = await client.users.fetch(user).catch(() => null);
-        const userMention = command.mentions.users.first() ?? userExists;
+        const user = await getUser(client, command, args[0]);
 
-        if (userMention) {
+        if (user) {
             return command.reply({
-                content: `Photo de profil de **${userMention}** :\n${userMention.displayAvatarURL({ dynamic: true, size: 4096 })}`, allowedMentions: {parse: []}
+                content: `Photo de profil de **${user}** :\n${user.displayAvatarURL({ dynamic: true, size: 4096 })}`,
+                allowedMentions: {parse: []}
             });
         } else {
             return command.reply({
