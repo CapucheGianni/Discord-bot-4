@@ -5,7 +5,6 @@ const { token } = require('../auth.json');
 const deployInteractions = require('./deployInteractions.js');
 
 const client = new Client({
-
     presence: {
         status: 'online',
 		activities: [{
@@ -14,15 +13,11 @@ const client = new Client({
 		}],
 
     },
-
 	allowedMentions: {
 		parse: ['users', 'roles']
 	},
-
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
-
 	partials: [Partials.Channel]
-
 });
 
 // const messageCountSchema = require('./mongo_db/messageCountSchema.js');
@@ -31,11 +26,7 @@ client.interactions = new Collection();
 client.commands = new Collection();
 
 const interactionsPath = path.join(__dirname, 'interactions');
-const commandsPath = path.join(__dirname, 'commands');
-const eventsPath = path.join(__dirname, 'events');
 const interactionsFiles = fs.readdirSync(interactionsPath).filter(file => file.endsWith('.js'));
-const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of interactionsFiles) {
 	const filePath = path.join(interactionsPath, file);
@@ -48,6 +39,9 @@ for (const file of interactionsFiles) {
 	}
 };
 
+const commandsPath = path.join(__dirname, 'commands');
+const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
 for (const file of commandsFiles) {
 	const filePath = path.join(commandsPath, file);
 	const command = require(filePath);
@@ -58,6 +52,9 @@ for (const file of commandsFiles) {
 		console.log(`[WARNING] The command at ${filePath} is missing a required "name" or "run" property.`);
 	}
 };
+
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
