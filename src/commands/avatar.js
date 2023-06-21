@@ -3,7 +3,7 @@ module.exports = {
     description: "Affiche l'avatar d'un utilisateur",
     stats: {
         category: "Image",
-        usage: "*avatar [membre]",
+        usage: "avatar [membre]",
     },
     async run(client, command, args) {
         const user = args[0] ?? command.author;

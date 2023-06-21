@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const prefix = require('../setPrefix.js');
+const { getPrefix } = require('../setPrefix.js');
 
 module.exports = {
     name: Events.MessageCreate,
@@ -10,13 +10,12 @@ module.exports = {
             }
             return;
         }
-
-        if (!message.content.startsWith(prefix))
+        if (!message.content.startsWith(getPrefix()))
             return;
         if (!message.guild)
             return;
 
-        const args = message.content.slice(prefix.length).trim().split(/ +/g);
+        const args = message.content.slice(getPrefix().length).trim().split(/ +/g);
         const commandName = args.shift().toLowerCase();
 
         if (commandName.length === 0)

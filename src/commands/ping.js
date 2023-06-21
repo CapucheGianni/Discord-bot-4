@@ -6,7 +6,7 @@ module.exports = {
     description: "Affiche le ping du bot",
     stats: {
         category: 'Utilitaire',
-        usage: '*ping',
+        usage: 'ping',
     },
     async run(client, command, args) {
         const sent = await command.reply({ content: 'Pinging...', fetchReply: true });

@@ -5,7 +5,7 @@ module.exports = {
     description: "Affiche votre bannière ou celle d\'un membre du serveur",
     stats: {
         category: "Image",
-        usage: "*banner [color] [membre]"
+        usage: "banner [color] [membre]"
     },
     async run(client, command, args) {
         if (args[0] === "color") {
