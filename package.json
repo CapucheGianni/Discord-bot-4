@@ -1,6 +1,6 @@
 {
     "name": "kaide",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Un bot pour découvrir d.js",
     "main": "src/bot.js",
     "author": "CapucheGianni",
