@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { version } = require('../../package.json');
-const { getPrefix } = require("../setPrefix.js");
+const { getPrefix } = require("../utils/setPrefix.js");
 
 module.exports = {
     name: "help",

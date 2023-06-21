@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { getPrefix, setPrefix } = require('../setPrefix.js');
+const { getPrefix, setPrefix } = require('../utils/setPrefix.js');
 
 module.exports = {
     data: new SlashCommandBuilder()

@@ -13,12 +13,11 @@ module.exports = {
             return;
         }
         try {
-            await getInteraction.execute(client, interaction);
-
             const currentDate = new Date();
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
             const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
 
+            await getInteraction.execute(client, interaction);
             console.log(`${interaction.commandName} interaction executed by ${interaction.user.username} (${interaction.user.id}) in ${interaction.guild.name} (${interaction.guild.id}) at ${date} ${time}`);
         } catch (error) {
             console.error(`Error executing ${interaction.commandName}`);

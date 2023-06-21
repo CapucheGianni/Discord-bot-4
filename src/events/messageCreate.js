@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const { getPrefix } = require('../setPrefix.js');
+const { getPrefix } = require('../utils/setPrefix.js');
 
 module.exports = {
     name: Events.MessageCreate,
@@ -23,15 +23,13 @@ module.exports = {
 
         let command = client.commands.get(commandName);
 
-        if (command)
-            command.run(client, message, args);
-        else
-            return;
         try {
             const currentDate = new Date();
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
             const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
 
+            if (command)
+                command.run(client, message, args);
             console.log(`${commandName} command executed by ${message.author.username} (${message.author.id}) in ${message.guild.name} (${message.guild.id}) at ${date} ${time}`);
         } catch (error) {
             console.error(`Error executing ${commandName}`);

@@ -1,3 +1,5 @@
+const { getPrefix, setPrefix } = require("../utils/setPrefix.js");
+
 module.exports = {
     name: "prefix",
     description: "Affiche le préfixe du bot",
@@ -6,7 +8,6 @@ module.exports = {
         usage: "prefix"
     },
     async run(client, command, args) {
-        const { getPrefix, setPrefix } = require("../setPrefix.js");
         const newPrefix = args[0];
 
         if (newPrefix) {
