@@ -1,5 +1,20 @@
-const { Events } = require('discord.js');
+const { Events, EmbedBuilder } = require('discord.js');
 const { getPrefix } = require('../utils/setPrefix.js');
+
+const commandSuccess = async (client, message, commandName) => {
+    const embed = new EmbedBuilder()
+        .setTitle("Commande exécutée ✅")
+        .setDescription(`**Auteur:** ${message.author} (${message.author.id})\n**Salon:** ${message.channel} (${message.channel.id})\n**command:** ${commandName}`)
+        .setFooter({
+            text: `Commande exécutée par ${message.author.username} | ${client.user.username}`,
+            iconURL: client.user.displayAvatarURL({ dynamic: true })
+        })
+        .setTimestamp()
+        .setColor(`#00ff00`);
+    await client.channels.cache.get("1121226924082077747").send({
+        embeds: [embed]
+    });
+};
 
 module.exports = {
     name: Events.MessageCreate,
@@ -30,6 +45,9 @@ module.exports = {
 
             if (command)
                 command.run(client, message, args);
+            else
+                return;
+            await commandSuccess(client, message, commandName);
             console.log(`${commandName} command executed by ${message.author.username} (${message.author.id}) in ${message.guild.name} (${message.guild.id}) at ${date} ${time}`);
         } catch (error) {
             console.error(`Error executing ${commandName}`);
