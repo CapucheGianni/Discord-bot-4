@@ -4,7 +4,7 @@ const { getPrefix } = require('../utils/setPrefix.js');
 const commandSuccess = async (client, message, commandName) => {
     const embed = new EmbedBuilder()
         .setTitle("Commande exécutée ✅")
-        .setDescription(`**Auteur:** ${message.author} (${message.author.id})\n**Salon:** ${message.channel} (${message.channel.id})\n**command:** ${commandName}`)
+        .setDescription(`**Auteur:** ${message.author} (${message.author.id})\n**Salon:** ${message.channel} (${message.channel.id})\n**Serveur:** ${message.guild} (${message.guild.id})\n**commande:** ${commandName}`)
         .setFooter({
             text: `Commande exécutée par ${message.author.username} | ${client.user.username}`,
             iconURL: client.user.displayAvatarURL({ dynamic: true })
