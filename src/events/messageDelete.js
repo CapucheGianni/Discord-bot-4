@@ -10,14 +10,14 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle("Message supprimé 🗑️")
-            .setDescription(`**Auteur:** ${message.author}\n**Salon:** ${message.channel}\n**Message:** ${message.content}`)
+            .setDescription(`**Auteur:** ${message.author} (${message.author.id})\n**Salon:** ${message.channel} (${message.channel.id})\n**Serveur:** ${message.guild} (${message.guild.id})\n**Message:** ${message.content}`)
             .setFooter({
                 text: `Message supprimé par ${message.author.username} | ${client.user.username}`,
                 iconURL: message.author.displayAvatarURL({ dynamic: true })
             })
             .setTimestamp()
             .setColor(`#ff0000`);
-        await client.channels.cache.get("873663564135690352").send({
+        await client.channels.cache.get("1121226924082077747").send({
             embeds: [embed]
         });
     }
