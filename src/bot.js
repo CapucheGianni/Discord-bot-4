@@ -22,6 +22,7 @@ const client = new Client({
 
 client.interactions = new Collection();
 client.commands = new Collection();
+client.cooldowns = new Collection();
 
 const interactionsPath = path.join(__dirname, 'interactions');
 const interactionsFiles = fs.readdirSync(interactionsPath).filter(file => file.endsWith('.js'));
