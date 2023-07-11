@@ -31,7 +31,7 @@ getCommands(client);
 getEvents(client);
 
 // Deploy the interactions to discord
-deployInteractions();
+// deployInteractions();
 
 // Connect the bot to Discord
 client.login(process.env.TOKEN);
