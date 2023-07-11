@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, PermissionFlagsBits } = require("discord.js");
 const { version } = require("../../package.json");
 
 module.exports = {
@@ -9,6 +9,7 @@ module.exports = {
     stats: {
         category: "Utilitaire",
         usage: "/ping",
+        permissions: []
     },
 	async execute(client, interaction) {
         const sent = await interaction.reply({

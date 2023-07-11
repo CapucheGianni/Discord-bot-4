@@ -10,6 +10,7 @@ module.exports = {
 	stats: {
 		category: "Image",
 		usage: "/banner [membre] [couleur]",
+		permissions: []
 	},
 	async execute(client, interaction) {
 		let user = interaction.options.getUser("membre") ?? interaction.user;

@@ -9,6 +9,7 @@ module.exports = {
     stats: {
         category: 'Utilitaire',
         usage: '/prefix',
+        permissions: []
     },
     async execute(client, interaction) {
         const newPrefix = interaction.options.getString("prefix");

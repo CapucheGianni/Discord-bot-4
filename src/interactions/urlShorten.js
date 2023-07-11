@@ -10,6 +10,7 @@ module.exports = {
 	stats: {
 		category: "Utilitaire",
 		usage: "/urlshorten [url]",
+        permissions: []
 	},
 	async execute(client, interaction) {
         const urlToShorten = interaction.options.getString("url");

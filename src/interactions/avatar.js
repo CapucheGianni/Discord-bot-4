@@ -8,6 +8,7 @@ module.exports = {
 	stats: {
 		category: "Image",
 		usage: "/avatar [membre]",
+		permissions: []
 	},
 	async execute(client, interaction) {
 		const user = interaction.options.getUser("membre") ?? interaction.user;
