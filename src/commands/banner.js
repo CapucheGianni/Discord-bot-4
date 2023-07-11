@@ -4,6 +4,7 @@ const getUser = require("../utils/getUser");
 module.exports = {
     name: "banner",
     description: "Affiche votre bannière ou celle d\'un membre du serveur",
+    permissions: [],
     stats: {
         category: "Image",
         usage: "banner [color] [membre]"

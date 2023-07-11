@@ -3,6 +3,7 @@ const getUser = require("../utils/getUser");
 module.exports = {
     name: "avatar",
     description: "Affiche l'avatar d'un utilisateur",
+    permissions: [],
     stats: {
         category: "Image",
         usage: "avatar [membre]",

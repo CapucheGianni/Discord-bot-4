@@ -4,6 +4,7 @@ const { version } = require('../../package.json');
 module.exports = {
     name: "ping",
     description: "Affiche le ping du bot",
+    permissions: [],
     stats: {
         category: 'Utilitaire',
         usage: 'ping',

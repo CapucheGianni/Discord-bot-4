@@ -3,6 +3,7 @@ const { getPrefix, setPrefix } = require("../utils/setPrefix.js");
 module.exports = {
     name: "prefix",
     description: "Affiche le préfixe du bot",
+    permissions: [],
     stats: {
         category: "Utilitaire",
         usage: "prefix"
