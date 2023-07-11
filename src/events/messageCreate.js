@@ -1,4 +1,4 @@
-const { Events, EmbedBuilder } = require('discord.js');
+const { Events, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { getPrefix } = require('../utils/setPrefix.js');
 
 const commandSuccess = async (client, message, commandName) => {
@@ -14,6 +14,21 @@ const commandSuccess = async (client, message, commandName) => {
     await client.channels.cache.get("1121226924082077747").send({
         embeds: [embed]
     });
+};
+
+const checkPermissions = (command, message) => {
+    if (message.author.id !== process.env.OWNER_ID && command.permissions[0] === "OWNER") {
+        message.reply("Vous n'avez pas la permission d'utiliser cette commande !");
+        return 1;
+    }
+    if (command.permissions.length && command.permissions[0] !== "OWNER") {
+        for (let i = 0; command.permissions[i]; i++) {
+            if (!message.member.permissions.has(command.permissions[i])) {
+                message.reply(`Vous n'avez pas la permission \`${command.permissions[i]}\` requise pour utiliser cette commande !`);
+                return 1;
+            }
+        }
+    }
 };
 
 module.exports = {
@@ -43,10 +58,14 @@ module.exports = {
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
             const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
 
-            if (command)
+            if (command) {
+                const perm = checkPermissions(command, message);
+                if (perm)
+                    return;
                 command.run(client, message, args);
-            else
+            } else {
                 return;
+            }
             await commandSuccess(client, message, commandName);
             console.log(`${commandName} command executed by ${message.author.username} (${message.author.id}) in ${message.guild.name} (${message.guild.id}) at ${date} ${time}`);
         } catch (error) {
