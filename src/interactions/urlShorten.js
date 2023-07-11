@@ -25,11 +25,11 @@ module.exports = {
                 },
                 body: data
             });
-            if (response.ok) {
-                const jsonResponse = await response.json();
-                return interaction.reply(`https://${jsonResponse.shortUrl}`);
+            if (!response.ok) {
+                return interaction.reply("Merci de fournir un url valide.");
             }
-            return interaction.reply("Merci de fournir un url valide.");
+            const jsonResponse = await response.json();
+            return interaction.reply(`https://${jsonResponse.shortUrl}`);
         } catch (error) {
             interaction.reply("Une erreur est survenue lors de la création du lien.");
             console.log(error);
