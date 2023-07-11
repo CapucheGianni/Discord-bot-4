@@ -10,6 +10,7 @@ module.exports = {
     stats: {
         category: "Utilitaire",
         usage: "/help [command]",
+        permissions: []
     },
     async execute(client, interaction) {
         const interactionName = interaction.options.getString("commande");
@@ -25,7 +26,29 @@ module.exports = {
                 });
             }
             embed.setTitle(`Commande \`${cmd.data.name}\` 📚`)
-            .setDescription(`**Catégorie:** ${cmd.stats.category}\n\n**Description:** ${cmd.data.description}\n\n**Usage:** \`${cmd.stats.usage}\``)
+            .setDescription("Voici les informations sur l'intéraction demandée :")
+            .addFields(
+                {
+                    name: "Catégorie",
+                    value: cmd.stats.category,
+                    inline: true
+                },
+                {
+                    name: "Description",
+                    value: cmd.data.description,
+                    inline: true
+                },
+                {
+                    name: "Usage",
+                    value: `\`${cmd.stats.usage}\``,
+                    inline: true
+                },
+                {
+                    name: "Permissions",
+                    value: cmd.stats.permissions.length ? cmd.stats.permissions.map(perm => `\`${perm}\``).join(', ') : "Aucune permission requise",
+                    inline: true
+                }
+            )
             .setFooter({
                 text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} V${version}`,
                 iconURL: interaction.user.displayAvatarURL({ dynamic: true })
