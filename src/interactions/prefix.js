@@ -15,6 +15,12 @@ module.exports = {
         const newPrefix = interaction.options.getString("prefix");
 
         if (newPrefix) {
+            if (!interaction.member.permissions.has("ManageGuild")) {
+                return interaction.reply({
+                    content: "Vous n'avez pas les permissions nécessaires pour modifier le préfixe !",
+                    ephemeral: true
+                });
+            }
             if (newPrefix.length > 3) {
                 return interaction.reply({
                     content: "Le préfixe ne peut pas dépasser 3 caractères !",

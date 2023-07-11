@@ -12,6 +12,11 @@ module.exports = {
         const newPrefix = args[0];
 
         if (newPrefix) {
+            if (!command.member.permissions.has("ManageGuild")) {
+                return command.reply({
+                    content: "Vous n'avez pas les permissions nécessaires pour modifier le préfixe !"
+                });
+            }
             if (newPrefix.length > 3) {
                 return command.reply({
                     content: "Le préfixe ne peut pas dépasser 3 caractères !"
