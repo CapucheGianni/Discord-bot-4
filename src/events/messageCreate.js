@@ -1,4 +1,4 @@
-const { Events, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { Events, EmbedBuilder, Collection } = require('discord.js');
 const { getPrefix } = require('../utils/setPrefix.js');
 
 const commandSuccess = async (client, message, commandName) => {
@@ -31,6 +31,34 @@ const checkPermissions = (command, message) => {
     }
 };
 
+const initCommandsCooldowns = (client, command, getCommand) => {
+    const { cooldowns } = client;
+
+    if (!cooldowns.has(getCommand.name)) {
+        cooldowns.set(getCommand.name, new Collection());
+    }
+
+    const now = Date.now();
+    const timestamps = cooldowns.get(getCommand.name);
+    const defaultCooldownDuration = 3;
+    const cooldownAmount = (getCommand.cooldown ?? defaultCooldownDuration) * 1000;
+
+    if (timestamps.has(command.author.id)) {
+        const expirationTime = timestamps.get(command.author.id) + cooldownAmount;
+
+        if (now < expirationTime) {
+            const expiredTimestamp = Math.round(expirationTime / 1000);
+            command.reply({
+                content: `Please wait, you are on a cooldown for \`${getCommand.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+                ephemeral: true
+            });
+            return 1;
+        }
+    }
+    timestamps.set(command.author.id, now);
+    setTimeout(() => timestamps.delete(command.author.id), cooldownAmount);
+};
+
 module.exports = {
     name: Events.MessageCreate,
     async execute(client, message) {
@@ -50,16 +78,18 @@ module.exports = {
 
         if (commandName.length === 0)
             return;
-
-        let command = client.commands.get(commandName);
-
         try {
             const currentDate = new Date();
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
             const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
+            let command = client.commands.get(commandName);
 
             if (command) {
+                const isCd = initCommandsCooldowns(client, message, command);
                 const perm = checkPermissions(command, message);
+
+                if (isCd)
+                    return;
                 if (perm)
                     return;
                 command.run(client, message, args);
