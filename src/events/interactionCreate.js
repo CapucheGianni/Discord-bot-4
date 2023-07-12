@@ -16,6 +16,27 @@ const interactionLog = async (client, interaction) => {
     });
 };
 
+const checkPermissions = (getInteraction, interaction) => {
+    if (interaction.user.id !== process.env.OWNER_ID && getInteraction.stats.permissions[0] === "OWNER") {
+        interaction.reply({
+            content: "Vous n'avez pas la permission d'utiliser cette interaction !",
+            ephemeral: true
+        });
+        return 1;
+    }
+    if (getInteraction.stats.permissions.length && getInteraction.stats.permissions[0] !== "OWNER") {
+        for (let i = 0; getInteraction.stats.permissions[i]; i++) {
+            if (!interaction.member.permissions.has(getInteraction.stats.permissions[i])) {
+                interaction.reply({
+                    content: `Vous n'avez pas la permission \`${getInteraction.stats.permissions[i]}\` requise pour utiliser cette commande !`,
+                    ephemeral: true
+                });
+                return 1;
+            }
+        }
+    }
+};
+
 const initInteractionsCooldowns = (client, interaction, getInteraction) => {
     const { cooldowns } = client;
 
@@ -66,6 +87,10 @@ module.exports = {
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
             const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
 
+            const perms = checkPermissions(getInteraction, interaction);
+
+            if (perms)
+                return;
             await getInteraction.execute(client, interaction);
             await interactionLog(client, interaction);
             console.log(`${interaction.commandName} interaction executed by ${interaction.user.username} (${interaction.user.id}) in ${interaction.guild.name} (${interaction.guild.id}) at ${date} ${time}`);
