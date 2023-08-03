@@ -1,5 +1,6 @@
 const { Events, EmbedBuilder, Collection } = require('discord.js');
 const { getPrefix } = require('../utils/setPrefix.js');
+const getPun = require('../utils/pun.js');
 
 const commandSuccess = async (client, message, commandName) => {
     const embed = new EmbedBuilder()
@@ -68,9 +69,10 @@ module.exports = {
             }
             return;
         }
-        if (!message.content.startsWith(getPrefix()))
-            return;
+        getPun(message);
         if (!message.guild)
+            return;
+        if (!message.content.startsWith(getPrefix()))
             return;
 
         const args = message.content.slice(getPrefix().length).trim().split(/ +/g);
