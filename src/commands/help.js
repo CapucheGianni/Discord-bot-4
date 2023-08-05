@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { version } = require('../../package.json');
-const { getPrefix } = require("../utils/setPrefix.js");
+const { getPrefix } = require('../utils/setPrefix.js');
 
 module.exports = {
     name: "help",
@@ -14,6 +14,7 @@ module.exports = {
         const commandName = args[0];
         const embed = new EmbedBuilder();
         const cmdList = client.commands.filter(command => command.permissions[0] !== "OWNER");
+        const prefix = await getPrefix(command.guildId);
 
         if (args[1])
             return command.reply("Merci de n'indiquer qu'une seule commande");
@@ -37,7 +38,7 @@ module.exports = {
                 },
                 {
                     name: "Usage",
-                    value: `\`${getPrefix()}${cmd.stats.usage}\``,
+                    value: `\`${prefix}${cmd.stats.usage}\``,
                     inline: true
                 },
                 {
@@ -58,7 +59,7 @@ module.exports = {
             .setDescription(`voici la liste des commandes disponibles :\n\n${cmdList.map(command => {
                 if (command.permissions[0] === "OWNER")
                     return;
-                return `\`${getPrefix()}${command.name}\` - ${command.description}`;
+                return `\`${prefix}${command.name}\` - ${command.description}`;
             }).join('\n')}`)
             .setFooter({
                 text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${version}`,

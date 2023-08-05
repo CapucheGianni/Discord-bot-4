@@ -10,6 +10,7 @@ module.exports = {
     },
     async run(client, command, args) {
         const newPrefix = args[0];
+        const prefix = await getPrefix(command.guildId);
 
         if (newPrefix) {
             if (!command.member.permissions.has("ManageGuild")) {
@@ -22,13 +23,13 @@ module.exports = {
                     content: "Le préfixe ne peut pas dépasser 3 caractères !"
                 });
             }
-            setPrefix(newPrefix);
+            await setPrefix(command.guildId, newPrefix);
             return command.reply({
-                content: `Le préfixe de ${client.user.username} est maintenant \`${getPrefix()}\``
+                content: `Le préfixe de ${client.user.username} est maintenant \`${newPrefix}\``
             });
         } else {
             return command.reply({
-                content: `Le préfixe de ${client.user.username} est : \`${getPrefix()}\``
+                content: `Le préfixe de ${client.user.username} est : \`${prefix}\``
             });
         }
     },

@@ -13,6 +13,7 @@ module.exports = {
     },
     async execute(client, interaction) {
         const newPrefix = interaction.options.getString("prefix");
+        const prefix = await getPrefix(interaction.guildId);
 
         if (newPrefix) {
             if (!interaction.member.permissions.has("ManageGuild")) {
@@ -27,13 +28,13 @@ module.exports = {
                     ephemeral: true
                 });
             }
-            setPrefix(newPrefix);
+            setPrefix(interaction.guildId, newPrefix);
             return interaction.reply({
-                content: `Le préfixe de ${client.user.username} est maintenant \`${getPrefix()}\``
+                content: `Le préfixe de ${client.user.username} est maintenant \`${newPrefix}\``
             });
         } else {
             return interaction.reply({
-                content: `Le préfixe de ${client.user.username} est : \`${getPrefix()}\``
+                content: `Le préfixe de ${client.user.username} est : \`${prefix}\``
             });
         }
     }
