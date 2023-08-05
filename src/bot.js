@@ -3,6 +3,7 @@ const deployInteractions = require('./deployInteractions.js');
 const getInteractions = require('./utils/getInteractions.js');
 const getCommands = require('./utils/getCommands.js');
 const getEvents = require('./utils/getEvents.js');
+const { dbDisconnect } = require('./db/main.js');
 require('dotenv').config();
 
 const client = new Client({
@@ -32,6 +33,9 @@ getEvents(client);
 
 // Deploy the interactions to discord
 // deployInteractions();
+
+// Disconnect from the db when the bot is shut down
+dbDisconnect(client);
 
 // Connect the bot to Discord
 client.login(process.env.TOKEN);
