@@ -1,5 +1,6 @@
 const { Events, EmbedBuilder, Collection } = require('discord.js');
 const { getPrefix } = require('../utils/setPrefix.js');
+const getUserWriting = require('../db/addUser.js');
 const getPun = require('../utils/pun.js');
 
 const commandSuccess = async (client, message, commandName) => {
@@ -69,6 +70,7 @@ module.exports = {
             }
             return;
         }
+        getUserWriting(client, message);
         getPun(message);
         if (!message.guild)
             return;
