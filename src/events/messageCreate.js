@@ -1,7 +1,7 @@
 const { Events, EmbedBuilder, Collection } = require('discord.js');
 const { getPrefix } = require('../utils/setPrefix.js');
 const { addUserMessage } = require('../db/addUser.js');
-const getPun = require('../utils/pun.js');
+const getPun = require('../fun/pun.js');
 
 const detectName = (message, prefix) => {
     if (message.content.toLowerCase() === "kaide") {
