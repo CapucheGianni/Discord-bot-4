@@ -2,12 +2,12 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-const getUserWriting = async (client, message) => {
+const addUserMessage = async (client, message) => {
     try {
         const user = await prisma.user.create({
             data: {
-                userid: message.author.id,
-                username: message.author.username,
+                id: message.author.id,
+                name: message.author.username,
             }
         });
     } catch (e) {
@@ -15,4 +15,20 @@ const getUserWriting = async (client, message) => {
     };
 };
 
-module.exports = getUserWriting;
+const addUserInteraction = async (client, interaction) => {
+    try {
+        const user = await prisma.user.create({
+            data: {
+                id: interaction.user.id,
+                name: interaction.user.username,
+            }
+        });
+    } catch (e) {
+        return;
+    };
+};
+
+module.exports = {
+    addUserMessage,
+    addUserInteraction
+};

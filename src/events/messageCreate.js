@@ -1,7 +1,15 @@
 const { Events, EmbedBuilder, Collection } = require('discord.js');
 const { getPrefix } = require('../utils/setPrefix.js');
-const getUserWriting = require('../db/addUser.js');
+const { addUserMessage } = require('../db/addUser.js');
 const getPun = require('../utils/pun.js');
+
+const detectName = (message, prefix) => {
+    if (message.content.toLowerCase() === "kaide") {
+        message.channel.send(`Bonjour!\n\nJe suis **Kaide** le bot du goat __capuchegianni__.\nLe préfixe du bot est ${prefix} mais il est tout à fait possible de le modifier.`);
+        if (!message.guild)
+            message.channel.send("Je ne suis utilisable que sur un serveur !");
+    }
+};
 
 const commandSuccess = async (client, message, commandName) => {
     const embed = new EmbedBuilder()
@@ -64,20 +72,25 @@ const initCommandsCooldowns = (client, command, getCommand) => {
 module.exports = {
     name: Events.MessageCreate,
     async execute(client, message) {
+        let prefix = await getPrefix(message.guildId);
+
         if (message.author.bot) {
             if (message.author.id == "276060004262477825") {
                 message.channel.lastMessage.react("👋");
             }
             return;
         }
-        getUserWriting(client, message);
-        getPun(message);
+        detectName(message, prefix);
         if (!message.guild)
             return;
-        if (!message.content.startsWith(getPrefix()))
+        await addUserMessage(client, message);
+        getPun(message);
+        if (!message.content.startsWith(prefix) && !message.content.startsWith("kaide"))
             return;
+        if (message.content.startsWith("kaide"))
+            prefix = "kaide";
 
-        const args = message.content.slice(getPrefix().length).trim().split(/ +/g);
+        const args = message.content.slice(prefix.length).trim().split(/ +/g);
         const commandName = args.shift().toLowerCase();
 
         if (commandName.length === 0)

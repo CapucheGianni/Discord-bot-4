@@ -1,4 +1,5 @@
 const { Events, EmbedBuilder, Collection } = require('discord.js');
+const { addUserInteraction } = require('../db/addUser.js');
 
 const interactionLog = async (client, interaction) => {
     const embed = new EmbedBuilder()
@@ -70,6 +71,11 @@ module.exports = {
     async execute(client, interaction) {
         if (!interaction.isCommand())
             return;
+        if (!interaction.guildId) {
+            return interaction.reply({
+                content: "Les intéractions ne sont pas disponibles en message privé !"
+            });
+        }
 
         const getInteraction = client.interactions.get(interaction.commandName);
 
@@ -77,6 +83,7 @@ module.exports = {
             console.error(`No interaction matching ${interaction.commandName} was found.`);
             return;
         }
+        await addUserInteraction(client, interaction);
 
         const isCd = initInteractionsCooldowns(client, interaction, getInteraction);
 
