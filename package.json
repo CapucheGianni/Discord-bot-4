@@ -5,10 +5,13 @@
     "main": "src/bot.js",
     "author": "CapucheGianni",
     "dependencies": {
+        "@prisma/client": "^5.1.1",
         "@sindresorhus/is": "^5.2.0",
         "discord-api-types": "^0.35.0",
         "discord.js": "^14.7.1",
         "dotenv": "^16.3.1",
-        "node-fetch": "^2.6.11"
+        "mysql2": "^3.6.0",
+        "node-fetch": "^2.6.11",
+        "prisma": "^5.1.1"
     }
 }
