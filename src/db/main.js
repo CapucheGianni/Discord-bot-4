@@ -8,6 +8,7 @@ const prisma = new PrismaClient();
 const dbConnect = async (client) => {
 	try {
 		await prisma.$connect();
+
         const embed = new EmbedBuilder()
             .setTitle('Successfully connected to the database.')
             .setColor(`#5FC1F9`)
@@ -18,13 +19,13 @@ const dbConnect = async (client) => {
         });
 		console.log("Connected to the database!");
 	} catch (e) {
-		const embed = new EmbedBuilder();
-
         await prisma.$disconnect();
-        embed.setTitle('An error occured while connecting to the database.')
-        .setDescription(`\`\`\`js\n${e}\n\`\`\``)
-        .setColor(`#ff0000`)
-        .setTimestamp();
+
+		const embed = new EmbedBuilder()
+            .setTitle('An error occured while connecting to the database.')
+            .setDescription(`\`\`\`js\n${e}\n\`\`\``)
+            .setColor(`#ff0000`)
+            .setTimestamp();
 
         client.channels.cache.get('1121226924082077747').send({
             embeds: [embed]
@@ -36,26 +37,26 @@ const dbConnect = async (client) => {
 // Close the database connection when the bot is closed
 const dbDisconnect = async (client) => {
     process.on('SIGINT', async () => {
-        const waitingEmbed = new EmbedBuilder();
-
-        waitingEmbed.setTitle('Shutting down...')
-        .setDescription('The bot is now shutting down, see you soon !')
-        .setColor(`#FF9300`)
-        .setTimestamp();
-        client.channels.cache.get('1121226924082077747').send({
-            embeds: [waitingEmbed]
-        });
-        console.log("Shutting down...");
         try {
+            const waitingEmbed = new EmbedBuilder()
+                .setTitle('Shutting down...')
+                .setDescription('The bot is now shutting down, see you soon !')
+                .setColor(`#FF9300`)
+                .setTimestamp();
+
+            client.channels.cache.get('1121226924082077747').send({
+                embeds: [waitingEmbed]
+            });
+            console.log("Shutting down...");
             await prisma.$disconnect();
             console.log("Disconnected from the database!");
         } catch (e) {
-            const embed = new EmbedBuilder();
+            const embed = new EmbedBuilder()
+                .setTitle('There was an error while disconnecting from the database.')
+                .setDescription(`\`\`\`js\n${e}\n\`\`\``)
+                .setColor(`#ff0000`)
+                .setTimestamp();
 
-            embed.setTitle('There was an error while disconnecting from the database.')
-            .setDescription(`\`\`\`js\n${e}\n\`\`\``)
-            .setColor(`#ff0000`)
-            .setTimestamp();
             client.channels.cache.get('1121226924082077747').send({
                 embeds: [embed]
             });
