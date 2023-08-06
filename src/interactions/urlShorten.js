@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const fetch = require("node-fetch");
-require("dotenv").config();
+const { rebrandly } = require("../../settings.json");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,7 +22,7 @@ module.exports = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "apikey": process.env.REBRANDLY_API_KEY
+                    "apikey": rebrandly.API_KEY
                 },
                 body: data
             });

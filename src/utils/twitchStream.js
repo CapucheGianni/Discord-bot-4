@@ -1,13 +1,13 @@
 const { EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 let check = 0;
-require('dotenv').config();
+const { twitch } = require("../../settings.json");
 
 const getTwitchAccessToken = async () => {
     const twitchAPIURL = 'https://id.twitch.tv/oauth2/token';
     const params = {
-        client_id: process.env.TWITCH_CLIENT_ID,
-        client_secret: process.env.TWITCH_SECRET,
+        client_id: twitch.TWITCH_CLIENT_ID,
+        client_secret: twitch.TWITCH_CLIENT_SECRET,
         grant_type: 'client_credentials'
     };
 
@@ -25,10 +25,10 @@ const getTwitchStream = async (client) => {
     const twitchAccessToken = await getTwitchAccessToken();
     const twitchAPIURL = 'https://api.twitch.tv/helix/streams';
     const params = {
-        user_login: process.env.TWITCH_USER_LOGIN
+        user_login: twitch.TWITCH_USER_LOGIN
     };
     const headers = {
-        'Client-ID': process.env.TWITCH_CLIENT_ID,
+        'Client-ID': twitch.TWITCH_CLIENT_ID,
         'Authorization': `Bearer ${twitchAccessToken}`
     };
 
@@ -41,7 +41,7 @@ const getTwitchStream = async (client) => {
                 const { title, viewer_count, game_name } = data.data[0];
                 const embed = new EmbedBuilder()
                     .setTitle(`${title}`)
-                    .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${process.env.TWITCH_USER_LOGIN}-1920x1080.jpg?cacheBypass=${Date.now()}`)
+                    .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${twitch.TWITCH_USER_LOGIN}-1920x1080.jpg?cacheBypass=${Date.now()}`)
                     .addFields(
                         {
                             name: 'Viewers',
@@ -50,7 +50,7 @@ const getTwitchStream = async (client) => {
                         },
                         {
                             name: 'Lien',
-                            value: `https://twitch.tv/${process.env.TWITCH_USER_LOGIN}`,
+                            value: `https://twitch.tv/${twitch.TWITCH_USER_LOGIN}`,
                             inline: true
                         },
                         {
@@ -60,7 +60,7 @@ const getTwitchStream = async (client) => {
                         }
                     )
                     .setFooter({
-                        text: `Stream de ${process.env.TWITCH_USER_LOGIN} | ${client.user.username}`,
+                        text: `Stream de ${twitch.TWITCH_USER_LOGIN} | ${client.user.username}`,
                         iconURL: client.user.displayAvatarURL({ dynamic: true })
                     })
                     .setTimestamp()
@@ -70,7 +70,7 @@ const getTwitchStream = async (client) => {
                     return;
                 check = 1;
                 await client.channels.cache.get("1137739326822826065").send({
-                    content: `Coucou @everyone! **${process.env.TWITCH_USER_LOGIN}** est en live sur Twitch !`,
+                    content: `Coucou @everyone! **${twitch.TWITCH_USER_LOGIN}** est en live sur Twitch !`,
                     embeds: [embed],
                     allowedMentions: {
                         parse: ['everyone']
@@ -82,7 +82,7 @@ const getTwitchStream = async (client) => {
         } catch (e) {
             console.log(e);
         }
-    }, 1000 * 30);
+    }, 1000 * 60);
 };
 
 module.exports = getTwitchStream;
