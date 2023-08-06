@@ -1,6 +1,7 @@
 const { Events, EmbedBuilder } = require('discord.js');
 const { dbConnect } = require('../db/main.js');
 const fetchServer = require('../db/fetchServer.js');
+const getTwitchStream = require('../utils/twitchStream.js');
 
 module.exports = {
     name: Events.ClientReady,
@@ -10,6 +11,7 @@ module.exports = {
             let totalUsers = client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0);
             const embed = new EmbedBuilder();
 
+            getTwitchStream(client);
             fetchServer(client);
             if (totalUsers >= 1000) {
                 totalUsers /= 100;
