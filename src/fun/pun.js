@@ -11,8 +11,13 @@ module.exports = async (message) => {
             id: message.author.id
         }
     });
+    const server = await prisma.server.findUnique({
+        where: {
+            id: message.guildId
+        }
+    })
 
-    if (!user.jokes)
+    if (!user.jokes || !server.jokes)
         return;
     for (let i = 0; puns[i]; i++) {
         if (lastWord === puns[i][0]) {
