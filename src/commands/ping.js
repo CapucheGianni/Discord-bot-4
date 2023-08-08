@@ -7,10 +7,13 @@ module.exports = {
     permissions: [],
     stats: {
         category: 'Utilitaire',
-        usage: 'ping',
+        usage: 'ping'
     },
-    async run(client, command, args) {
-        const sent = await command.reply({ content: 'Pinging...', fetchReply: true });
+    async run(client, command) {
+        const sent = await command.reply({
+            content: 'Pinging...',
+            fetchReply: true
+        });
         const embed = new EmbedBuilder()
             .setTitle("Pinged Successfully 🏓")
             .setDescription(`**Client Latency:** ${client.ws.ping}ms\n**API latency:** ${sent.createdTimestamp - command.createdTimestamp}ms`)
@@ -22,7 +25,7 @@ module.exports = {
             .setColor(`#ffc800`);
         return sent.edit({
             content: "Pinged successfully !",
-            embeds: [embed]
+            embeds: [ embed ]
         });
     }
 };

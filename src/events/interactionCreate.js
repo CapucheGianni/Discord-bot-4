@@ -1,35 +1,35 @@
-const { Events, EmbedBuilder, Collection } = require('discord.js');
+const {
+    Events, EmbedBuilder, Collection
+} = require('discord.js');
 const { addUserInteraction } = require('../db/addUser.js');
 
 const interactionLog = async (client, interaction) => {
     const embed = new EmbedBuilder()
-    .setTitle("Interaction exécutée ✅")
-    .setDescription(`**Auteur:** ${interaction.user} (${interaction.user.id})\n**Salon:** ${interaction.channel} (${interaction.channel.id})\n**Serveur:** ${interaction.guild} (${interaction.guild.id})\n**Interaction:** ${interaction.commandName}`)
-    .setFooter({
-        text: `Interaction exécutée par ${interaction.user.username} | ${client.user.username}`,
-        iconURL: interaction.user.displayAvatarURL({ dynamic: true })
-    })
-    .setTimestamp()
-    .setColor(`#00ff00`);
+        .setTitle("Interaction exécutée ✅")
+        .setDescription(`**Auteur:** ${interaction.user} (${interaction.user.id})\n**Salon:** ${interaction.channel} (${interaction.channel.id})\n**Serveur:** ${interaction.guild} (${interaction.guild.id})\n**Interaction:** ${interaction.commandName}`)
+        .setFooter({
+            text: `Interaction exécutée par ${interaction.user.username} | ${client.user.username}`,
+            iconURL: interaction.user.displayAvatarURL({ dynamic: true })
+        })
+        .setTimestamp()
+        .setColor(`#00ff00`);
 
-    await client.channels.cache.get("1121226924082077747").send({
-        embeds: [embed]
-    });
+    await client.channels.cache.get("1121226924082077747").send({ embeds: [ embed ] });
 };
 
 const checkPermissions = (getInteraction, interaction) => {
-    if (interaction.user.id !== process.env.OWNER_ID && getInteraction.stats.permissions[0] === "OWNER") {
+    if (interaction.user.id !== process.env.OWNER_ID && getInteraction.stats.permissions[ 0 ] === "OWNER") {
         interaction.reply({
             content: "Vous n'avez pas la permission d'utiliser cette interaction !",
             ephemeral: true
         });
         return 1;
     }
-    if (getInteraction.stats.permissions.length && getInteraction.stats.permissions[0] !== "OWNER") {
-        for (let i = 0; getInteraction.stats.permissions[i]; i++) {
-            if (!interaction.member.permissions.has(getInteraction.stats.permissions[i])) {
+    if (getInteraction.stats.permissions.length && getInteraction.stats.permissions[ 0 ] !== "OWNER") {
+        for (let i = 0; getInteraction.stats.permissions[ i ]; i++) {
+            if (!interaction.member.permissions.has(getInteraction.stats.permissions[ i ])) {
                 interaction.reply({
-                    content: `Vous n'avez pas la permission \`${getInteraction.stats.permissions[i]}\` requise pour utiliser cette commande !`,
+                    content: `Vous n'avez pas la permission \`${getInteraction.stats.permissions[ i ]}\` requise pour utiliser cette commande !`,
                     ephemeral: true
                 });
                 return 1;
@@ -69,12 +69,11 @@ const initInteractionsCooldowns = (client, interaction, getInteraction) => {
 module.exports = {
     name: Events.InteractionCreate,
     async execute(client, interaction) {
-        if (!interaction.isCommand())
+        if (!interaction.isCommand()) {
             return;
+        }
         if (!interaction.guildId) {
-            return interaction.reply({
-                content: "Les intéractions ne sont pas disponibles en message privé !"
-            });
+            return interaction.reply({ content: "Les intéractions ne sont pas disponibles en message privé !" });
         }
 
         const getInteraction = client.interactions.get(interaction.commandName);
@@ -87,8 +86,9 @@ module.exports = {
 
         const isCd = initInteractionsCooldowns(client, interaction, getInteraction);
 
-        if (isCd)
+        if (isCd) {
             return;
+        }
         try {
             const currentDate = new Date();
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
@@ -96,8 +96,9 @@ module.exports = {
 
             const perms = checkPermissions(getInteraction, interaction);
 
-            if (perms)
+            if (perms) {
                 return;
+            }
             await getInteraction.execute(client, interaction);
             await interactionLog(client, interaction);
             console.log(`${interaction.commandName} interaction executed by ${interaction.user.username} (${interaction.user.id}) in ${interaction.guild.name} (${interaction.guild.id}) at ${date} ${time}`);

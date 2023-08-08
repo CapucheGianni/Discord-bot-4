@@ -5,7 +5,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('prefix')
         .setDescription('Affiche le préfixe du bot')
-        .addStringOption(option => option.setName("prefix").setDescription("Le nouveau préfixe du bot")),
+        .addStringOption((option) => option.setName("prefix").setDescription("Le nouveau préfixe du bot")),
     stats: {
         category: 'Utilitaire',
         usage: '/prefix',
@@ -29,13 +29,8 @@ module.exports = {
                 });
             }
             setPrefix(interaction.guildId, newPrefix);
-            return interaction.reply({
-                content: `Le préfixe de ${client.user.username} est maintenant \`${newPrefix}\``
-            });
-        } else {
-            return interaction.reply({
-                content: `Le préfixe de ${client.user.username} est : \`${prefix}\``
-            });
+            return interaction.reply(`Le préfixe de ${client.user.username} est maintenant \`${newPrefix}\``);
         }
+        return interaction.reply(`Le préfixe de ${client.user.username} est : \`${prefix}\``);
     }
 };

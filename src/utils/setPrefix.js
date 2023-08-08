@@ -14,7 +14,7 @@ const setPrefix = async (guildId, newPrefix) => {
         });
     } catch (e) {
         console.error(e);
-    };
+    }
 };
 
 const getPrefix = async (guildId) => {
@@ -27,7 +27,7 @@ const getPrefix = async (guildId) => {
         return server.prefix;
     } catch (e) {
         console.error(e);
-    };
+    }
 };
 
 module.exports = {

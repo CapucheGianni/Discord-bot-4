@@ -4,12 +4,12 @@ require('dotenv').config();
 module.exports = {
     name: "reloadinteractions",
     description: "Recharge les interactions",
-    permissions: ["OWNER"],
+    permissions: [ "OWNER" ],
     stats: {
         category: "Utilitaire",
         usage: "reloadInteractions"
     },
-    async run(client, command, args) {
+    run(client, command) {
         try {
             deployInteractions();
             command.reply("Interactions rechargées !");

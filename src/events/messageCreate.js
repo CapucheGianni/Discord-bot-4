@@ -6,8 +6,9 @@ const getPun = require('../fun/pun.js');
 const detectName = (message, prefix) => {
     if (message.content.toLowerCase() === "kaide") {
         message.channel.send(`Bonjour!\n\nJe suis **Kaide** le bot du goat __capuchegianni__.\nLe préfixe du bot est \`${prefix}\` mais il est tout à fait possible de le modifier.`);
-        if (!message.guild)
+        if (!message.guild) {
             message.channel.send("Je ne suis utilisable que sur un serveur !");
+        }
     }
 };
 
@@ -21,20 +22,18 @@ const commandSuccess = async (client, message, commandName) => {
         })
         .setTimestamp()
         .setColor(`#00ff00`);
-    await client.channels.cache.get("1121226924082077747").send({
-        embeds: [embed]
-    });
+    await client.channels.cache.get("1121226924082077747").send({ embeds: [ embed ] });
 };
 
 const checkPermissions = (command, message) => {
-    if (message.author.id !== process.env.OWNER_ID && command.permissions[0] === "OWNER") {
+    if (message.author.id !== process.env.OWNER_ID && command.permissions[ 0 ] === "OWNER") {
         message.reply("Vous n'avez pas la permission d'utiliser cette commande !");
         return 1;
     }
-    if (command.permissions.length && command.permissions[0] !== "OWNER") {
-        for (let i = 0; command.permissions[i]; i++) {
-            if (!message.member.permissions.has(command.permissions[i])) {
-                message.reply(`Vous n'avez pas la permission \`${command.permissions[i]}\` requise pour utiliser cette commande !`);
+    if (command.permissions.length && command.permissions[ 0 ] !== "OWNER") {
+        for (let i = 0; command.permissions[ i ]; i++) {
+            if (!message.member.permissions.has(command.permissions[ i ])) {
+                message.reply(`Vous n'avez pas la permission \`${command.permissions[ i ]}\` requise pour utiliser cette commande !`);
                 return 1;
             }
         }
@@ -75,40 +74,43 @@ module.exports = {
         let prefix = await getPrefix(message.guildId);
 
         if (message.author.bot) {
-            if (message.author.id == "276060004262477825") {
+            if (message.author.id === "276060004262477825") {
                 message.channel.lastMessage.react("👋");
             }
             return;
         }
         detectName(message, prefix);
-        if (!message.guild)
+        if (!message.guild) {
             return;
+        }
         await addUserMessage(client, message);
         getPun(message);
-        if (!message.content.startsWith(prefix) && !message.content.startsWith("kaide"))
+        if (!message.content.startsWith(prefix) && !message.content.startsWith("kaide")) {
             return;
-        if (message.content.startsWith("kaide"))
+        }
+        if (message.content.startsWith("kaide")) {
             prefix = "kaide";
+        }
 
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
         const commandName = args.shift().toLowerCase();
 
-        if (commandName.length === 0)
+        if (commandName.length === 0) {
             return;
+        }
         try {
             const currentDate = new Date();
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
             const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
-            let command = client.commands.get(commandName);
+            const command = client.commands.get(commandName);
 
             if (command) {
                 const isCd = initCommandsCooldowns(client, message, command);
                 const perm = checkPermissions(command, message);
 
-                if (isCd)
+                if (isCd || perm) {
                     return;
-                if (perm)
-                    return;
+                }
                 command.run(client, message, args);
             } else {
                 return;

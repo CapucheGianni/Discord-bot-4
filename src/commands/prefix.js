@@ -1,4 +1,6 @@
-const { getPrefix, setPrefix } = require("../utils/setPrefix.js");
+const {
+    getPrefix, setPrefix
+} = require("../utils/setPrefix.js");
 
 module.exports = {
     name: "prefix",
@@ -9,28 +11,20 @@ module.exports = {
         usage: "prefix"
     },
     async run(client, command, args) {
-        const newPrefix = args[0];
+        const newPrefix = args[ 0 ];
         const prefix = await getPrefix(command.guildId);
+        const maxLength = 3;
 
         if (newPrefix) {
             if (!command.member.permissions.has("ManageGuild")) {
-                return command.reply({
-                    content: "Vous n'avez pas les permissions nécessaires pour modifier le préfixe !"
-                });
+                return command.reply({ content: "Vous n'avez pas les permissions nécessaires pour modifier le préfixe !" });
             }
-            if (newPrefix.length > 3) {
-                return command.reply({
-                    content: "Le préfixe ne peut pas dépasser 3 caractères !"
-                });
+            if (newPrefix.length > maxLength) {
+                return command.reply({ content: "Le préfixe ne peut pas dépasser 3 caractères !" });
             }
             await setPrefix(command.guildId, newPrefix);
-            return command.reply({
-                content: `Le préfixe de ${client.user.username} est maintenant \`${newPrefix}\``
-            });
-        } else {
-            return command.reply({
-                content: `Le préfixe de ${client.user.username} est : \`${prefix}\``
-            });
+            return command.reply({ content: `Le préfixe de ${client.user.username} est maintenant \`${newPrefix}\`` });
         }
-    },
+        return command.reply(`Le préfixe de ${client.user.username} est : \`${prefix}\``);
+    }
 };

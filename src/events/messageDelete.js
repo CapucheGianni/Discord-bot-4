@@ -3,10 +3,12 @@ const { Events, EmbedBuilder } = require('discord.js');
 module.exports = {
     name: Events.MessageDelete,
     async execute(client, message) {
-        if (!message.guild)
+        if (!message.guild) {
             return;
-        if (message.guild.id !== "832753902943207454")
+        }
+        if (message.guild.id !== "832753902943207454") {
             return;
+        }
 
         const embed = new EmbedBuilder()
             .setTitle("Message supprimé 🗑️")
@@ -17,8 +19,6 @@ module.exports = {
             })
             .setTimestamp()
             .setColor(`#ff0000`);
-        await client.channels.cache.get("1121226924082077747").send({
-            embeds: [embed]
-        });
+        await client.channels.cache.get("1121226924082077747").send({ embeds: [ embed ] });
     }
 };

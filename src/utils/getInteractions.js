@@ -3,7 +3,7 @@ const path = require('node:path');
 
 const getInteractions = (client) => {
     const interactionsPath = path.join(__dirname, '../interactions');
-    const interactionsFiles = fs.readdirSync(interactionsPath).filter(file => file.endsWith('.js'));
+    const interactionsFiles = fs.readdirSync(interactionsPath).filter((file) => file.endsWith('.js'));
 
     for (const file of interactionsFiles) {
         const filePath = path.join(interactionsPath, file);

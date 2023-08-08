@@ -3,7 +3,7 @@ const path = require('node:path');
 
 const getCommands = (client) => {
     const commandsPath = path.join(__dirname, '../commands');
-    const commandsFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    const commandsFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
 
     for (const file of commandsFiles) {
         const filePath = path.join(commandsPath, file);
@@ -14,7 +14,7 @@ const getCommands = (client) => {
         } else {
             console.log(`[WARNING] The command at ${filePath} is missing a required "name" or "run" property.`);
         }
-    };
+    }
 };
 
 module.exports = getCommands;

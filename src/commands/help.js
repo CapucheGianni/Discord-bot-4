@@ -8,68 +8,64 @@ module.exports = {
     permissions: [],
     stats: {
         category: 'Utilitaire',
-        usage: 'help [command]',
+        usage: 'help [command]'
     },
     async run(client, command, args) {
-        const commandName = args[0];
+        const commandName = args[ 0 ];
         const embed = new EmbedBuilder();
-        const cmdList = client.commands.filter(command => command.permissions[0] !== "OWNER");
+        const cmdList = client.commands.filter((cmd) => cmd.permissions[ 0 ] !== "OWNER");
         const prefix = await getPrefix(command.guildId);
 
-        if (args[1])
+        if (args[ 1 ]) {
             return command.reply("Merci de n'indiquer qu'une seule commande");
+        }
         if (commandName) {
-            const cmd = client.commands.find(cmd => cmd.name === commandName);
+            const cmd = client.commands.find((comm) => comm.name === commandName);
 
-            if (!cmd || cmd.permissions[0] === "OWNER")
+            if (!cmd || cmd.permissions[ 0 ] === "OWNER") {
                 return command.reply(`La command \`${commandName}\` n'existe pas !`);
+            }
             embed.setTitle(`Commande \`${commandName}\` 📚`)
-            .setDescription("Voici les informations sur la commande demandée :")
-            .addFields(
-                {
-                    name: "Catégorie",
-                    value: cmd.stats.category,
-                    inline: true
-                },
-                {
-                    name: "Description",
-                    value: cmd.description,
-                    inline: true
-                },
-                {
-                    name: "Usage",
-                    value: `\`${prefix}${cmd.stats.usage}\``,
-                    inline: true
-                },
-                {
-                    name: "Permissions",
-                    value: cmd.permissions.length ? cmd.permissions.map(perm => `\`${perm}\``).join(', ') : "Aucune permission requise",
-                    inline: true
-                }
-            )
-            .setFooter({
-                text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${version}`,
-                iconURL: command.author.displayAvatarURL({ dynamic: true })
-            })
-            .setTimestamp()
-            .setColor(`#ffc800`);
+                .setDescription("Voici les informations sur la commande demandée :")
+                .addFields(
+                    {
+                        name: "Catégorie",
+                        value: cmd.stats.category,
+                        inline: true
+                    },
+                    {
+                        name: "Description",
+                        value: cmd.description,
+                        inline: true
+                    },
+                    {
+                        name: "Usage",
+                        value: `\`${prefix}${cmd.stats.usage}\``,
+                        inline: true
+                    },
+                    {
+                        name: "Permissions",
+                        value: cmd.permissions.length ? cmd.permissions.map((perm) => `\`${perm}\``).join(', ') : "Aucune permission requise",
+                        inline: true
+                    }
+                )
+                .setFooter({
+                    text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${version}`,
+                    iconURL: command.author.displayAvatarURL({ dynamic: true })
+                })
+                .setTimestamp()
+                .setColor(`#ffc800`);
         } else {
             embed.setTitle("Liste des commandes 📚")
-            .setURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-            .setDescription(`voici la liste des commandes disponibles :\n\n${cmdList.map(command => {
-                if (command.permissions[0] === "OWNER")
-                    return;
-                return `\`${prefix}${command.name}\` - ${command.description}`;
-            }).join('\n')}`)
-            .setFooter({
-                text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${version}`,
-                iconURL: command.author.displayAvatarURL({ dynamic: true })
-            })
-            .setTimestamp()
-            .setColor(`#ffc800`);
+                .setURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                .setDescription(`voici la liste des commandes disponibles :\n\n${cmdList.map((comm) => `\`${prefix}${comm.name}\` - ${comm.description}`).join('\n')}`)
+                .setFooter({
+                    text: `Commande effectuée par ${command.author.username} | ${client.user.username} V${version}`,
+                    iconURL: command.author.displayAvatarURL({ dynamic: true })
+                })
+                .setTimestamp()
+                .setColor(`#ffc800`);
         }
-        await command.reply({
-            embeds: [embed]
-        });
+        await command.reply({ embeds: [ embed ] });
     }
 };

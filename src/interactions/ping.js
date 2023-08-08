@@ -1,17 +1,17 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 const { version } = require("../../package.json");
 
 module.exports = {
-	data: new SlashCommandBuilder()
-	    .setName("ping")
-	    .setDescription("Affiche le ping du bot"),
+    data: new SlashCommandBuilder()
+        .setName("ping")
+        .setDescription("Affiche le ping du bot"),
     stats: {
         category: "Utilitaire",
         usage: "/ping",
         permissions: []
     },
-	async execute(client, interaction) {
+    async execute(client, interaction) {
         const sent = await interaction.reply({
             content: "Pinging...",
             fetchReply: true
@@ -27,7 +27,7 @@ module.exports = {
             .setColor(`#ffc800`);
         return interaction.editReply({
             content: "Pinged successfully !",
-            embeds: [embed]
+            embeds: [ embed ]
         });
     }
 };

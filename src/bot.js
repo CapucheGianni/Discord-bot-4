@@ -9,17 +9,15 @@ require('dotenv').config();
 const client = new Client({
     presence: {
         status: 'online',
-		activities: [{
-			name: '📚 /help',
-			type: 2
-		}]
+        activities: [ {
+            name: '📚 /help',
+            type: 2
+        } ]
 
     },
-	allowedMentions: {
-		parse: ['users', 'roles']
-	},
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
-	partials: [Partials.Channel]
+    allowedMentions: { parse: [ 'users', 'roles' ] },
+    intents: [ GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent ],
+    partials: [ Partials.Channel ]
 });
 
 client.interactions = new Collection();
@@ -32,7 +30,7 @@ getCommands(client);
 getEvents(client);
 
 // Deploy the interactions to discord
-// deployInteractions();
+deployInteractions();
 
 // Disconnect from the db when the bot is shut down
 dbDisconnect(client);
