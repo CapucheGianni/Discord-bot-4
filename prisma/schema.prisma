@@ -11,10 +11,19 @@ model Server {
   id     String @id
   name   String
   prefix String @default("k!")
+  jokes  Boolean @default(true)
+  welcomeChannel WelcomeChannel?
 }
 
 model User {
   id    String  @id
   name  String
   jokes Boolean @default(true)
+}
+
+model WelcomeChannel {
+  id String @id
+  name String @default("none")
+  server Server @relation(fields: [serverId], references: [id])
+  serverId String @unique
 }
