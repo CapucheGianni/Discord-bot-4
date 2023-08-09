@@ -29,7 +29,6 @@ const commandLog = async (client, message, commandName) => {
 
 const checkPermissions = (command, message) => {
     if (message.author.id !== process.env.OWNER_ID && command.permissions[ 0 ] === "OWNER") {
-        message.reply("Vous n'avez pas la permission d'utiliser cette commande !");
         return 1;
     }
     if (command.permissions.length && command.permissions[ 0 ] !== "OWNER") {
