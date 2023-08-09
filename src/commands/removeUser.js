@@ -7,7 +7,7 @@ module.exports = {
     description: "Retire un utilisateur de la base de données.",
     permissions: [ "OWNER" ],
     stats: {
-        category: "Utilitaire",
+        category: "Owner",
         usage: "rmuser [userid]"
     },
     async run(client, command, args) {

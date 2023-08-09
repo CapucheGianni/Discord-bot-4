@@ -6,7 +6,7 @@ module.exports = {
     description: "Recharge les interactions",
     permissions: [ "OWNER" ],
     stats: {
-        category: "Utilitaire",
+        category: "Owner",
         usage: "reloadInteractions"
     },
     run(client, command) {

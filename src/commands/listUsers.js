@@ -7,7 +7,7 @@ module.exports = {
     description: "Liste les utilisateurs de la base de données.",
     permissions: [ "OWNER" ],
     stats: {
-        category: "Utilitaire",
+        category: "Owner",
         usage: "lusers"
     },
     async run(client, command) {
