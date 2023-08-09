@@ -19,8 +19,10 @@ module.exports = {
             });
             command.reply(`L'utilisateur ${user.name} a été retiré de la base de données !`);
         } catch (e) {
-            console.error("Erreur lors de l'exécution de la commande rmuser.");
-            command.reply("Une erreur est survenue lors de la suppression de l'utilisateur !");
+            if (e.code === "P2025") {
+                return command.reply("Merci de spécifier l'id d'un utilisateur présent dans la db.");
+            }
+            throw new Error(e);
         }
     }
 };

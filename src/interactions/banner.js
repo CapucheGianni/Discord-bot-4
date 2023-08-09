@@ -13,29 +13,33 @@ module.exports = {
         permissions: []
     },
     async execute(client, interaction) {
-        let user = interaction.options.getUser("membre") ?? interaction.user;
+        try {
+            let user = interaction.options.getUser("membre") ?? interaction.user;
 
-        user = await user.fetch();
-        if (interaction.options.getBoolean("couleur")) {
-            if (user.hexAccentColor) {
-                const embed = new EmbedBuilder()
-                    .setDescription(`**[${user.hexAccentColor}](https://colorhexa.com/${user.hexAccentColor})**`)
-                    .setColor(user.hexAccentColor);
+            user = await user.fetch();
+            if (interaction.options.getBoolean("couleur")) {
+                if (user.hexAccentColor) {
+                    const embed = new EmbedBuilder()
+                        .setDescription(`**[${user.hexAccentColor}](https://colorhexa.com/${user.hexAccentColor})**`)
+                        .setColor(user.hexAccentColor);
+                    return interaction.reply({
+                        content: `La couleur de la bannière est : ${user.hexAccentColor}.`,
+                        embeds: [ embed ]
+                    });
+                }
+                return interaction.reply("L'utilisateur n'a pas de bannière.");
+            }
+            if (user) {
                 return interaction.reply({
-                    content: `La couleur de la bannière est : ${user.hexAccentColor}.`,
-                    embeds: [ embed ]
+                    content: (user.bannerURL()) ? `Bannière de ${user}[ : ](${user.bannerURL({
+                        dynamic: true,
+                        size: 4096
+                    })})` : `${user} n'a pas de bannière`,
+                    allowedMentions: { parse: [] }
                 });
             }
-            return interaction.reply("L'utilisateur n'a pas de bannière.");
-        }
-        if (user) {
-            return interaction.reply({
-                content: (user.bannerURL()) ? `Bannière de ${user}[ : ](${user.bannerURL({
-                    dynamic: true,
-                    size: 4096
-                })})` : `${user} n'a pas de bannière`,
-                allowedMentions: { parse: [] }
-            });
+        } catch (e) {
+            throw new Error(e);
         }
     }
 };

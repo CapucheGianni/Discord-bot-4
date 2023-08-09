@@ -1,7 +1,9 @@
 const { Events, EmbedBuilder, Collection } = require('discord.js');
 const { getPrefix } = require('../utils/setPrefix.js');
 const { addUserMessage } = require('../db/addUser.js');
+const { commandErrorLog } = require('../utils/errorLog.js');
 const getPun = require('../fun/pun.js');
+require('dotenv').config();
 
 const detectName = (message, prefix) => {
     if (message.content.toLowerCase() === "kaide") {
@@ -12,7 +14,7 @@ const detectName = (message, prefix) => {
     }
 };
 
-const commandSuccess = async (client, message, commandName) => {
+const commandLog = async (client, message, commandName) => {
     const embed = new EmbedBuilder()
         .setTitle("Commande exécutée ✅")
         .setDescription(`**Auteur:** ${message.author} (${message.author.id})\n**Salon:** ${message.channel} (${message.channel.id})\n**Serveur:** ${message.guild} (${message.guild.id})\n**commande:** ${commandName}`)
@@ -94,32 +96,28 @@ module.exports = {
 
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
         const commandName = args.shift().toLowerCase();
+        const command = client.commands.get(commandName);
 
-        if (commandName.length === 0) {
+        if (!command) {
             return;
         }
         try {
             const currentDate = new Date();
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
             const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
-            const command = client.commands.get(commandName);
+            const isCd = initCommandsCooldowns(client, message, command);
+            const perm = checkPermissions(command, message);
 
-            if (command) {
-                const isCd = initCommandsCooldowns(client, message, command);
-                const perm = checkPermissions(command, message);
-
-                if (isCd || perm) {
-                    return;
-                }
-                command.run(client, message, args);
-            } else {
+            if (isCd || perm) {
                 return;
             }
-            await commandSuccess(client, message, commandName);
+            await command.run(client, message, args);
+            await commandLog(client, message, commandName);
             console.log(`${commandName} command executed by ${message.author.username} (${message.author.id}) in ${message.guild.name} (${message.guild.id}) at ${date} ${time}`);
         } catch (error) {
             console.error(`Error executing ${commandName}`);
-            console.error(error);
+            commandErrorLog(client, error, message);
+            await message.reply(`Une erreur est survenue lors de la commande \`${commandName}\` !\n\n Veuillez contacter **__${client.users.cache.get(process.env.OWNER_ID).username}__** si l'erreur survient à plusieurs reprises.`);
         }
     }
 };

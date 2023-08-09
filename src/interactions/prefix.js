@@ -12,25 +12,29 @@ module.exports = {
         permissions: []
     },
     async execute(client, interaction) {
-        const newPrefix = interaction.options.getString("prefix");
-        const prefix = await getPrefix(interaction.guildId);
+        try {
+            const newPrefix = interaction.options.getString("prefix");
+            const prefix = await getPrefix(interaction.guildId);
 
-        if (newPrefix) {
-            if (!interaction.member.permissions.has("ManageGuild")) {
-                return interaction.reply({
-                    content: "Vous n'avez pas les permissions nécessaires pour modifier le préfixe !",
-                    ephemeral: true
-                });
+            if (newPrefix) {
+                if (!interaction.member.permissions.has("ManageGuild")) {
+                    return interaction.reply({
+                        content: "Vous n'avez pas les permissions nécessaires pour modifier le préfixe !",
+                        ephemeral: true
+                    });
+                }
+                if (newPrefix.length > 3) {
+                    return interaction.reply({
+                        content: "Le préfixe ne peut pas dépasser 3 caractères !",
+                        ephemeral: true
+                    });
+                }
+                setPrefix(interaction.guildId, newPrefix);
+                return interaction.reply(`Le préfixe de ${client.user.username} est maintenant \`${newPrefix}\``);
             }
-            if (newPrefix.length > 3) {
-                return interaction.reply({
-                    content: "Le préfixe ne peut pas dépasser 3 caractères !",
-                    ephemeral: true
-                });
-            }
-            setPrefix(interaction.guildId, newPrefix);
-            return interaction.reply(`Le préfixe de ${client.user.username} est maintenant \`${newPrefix}\``);
+            return interaction.reply(`Le préfixe de ${client.user.username} est : \`${prefix}\``);
+        } catch (e) {
+            throw new Error(e);
         }
-        return interaction.reply(`Le préfixe de ${client.user.username} est : \`${prefix}\``);
     }
 };

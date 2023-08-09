@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const fetch = require("node-fetch");
 const { rebrandly } = require("../../settings.json");
 
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("urlshorten")
@@ -13,11 +14,10 @@ module.exports = {
         permissions: []
     },
     async execute(client, interaction) {
-        const urlToShorten = interaction.options.getString("url");
-        const url = "https://api.rebrandly.com/v1/links";
-        const data = JSON.stringify({ destination: urlToShorten });
-
         try {
+            const urlToShorten = interaction.options.getString("url");
+            const url = "https://api.rebrandly.com/v1/links";
+            const data = JSON.stringify({ destination: urlToShorten });
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -26,14 +26,16 @@ module.exports = {
                 },
                 body: data
             });
+
             if (!response.ok) {
                 return interaction.reply("Merci de fournir un url valide.");
             }
+
             const jsonResponse = await response.json();
+
             return interaction.reply(`https://${jsonResponse.shortUrl}`);
-        } catch (error) {
-            interaction.reply("Une erreur est survenue lors de la création du lien.");
-            console.log(error);
+        } catch (e) {
+            throw new Error(e);
         }
     }
 };

@@ -13,9 +13,8 @@ module.exports = {
         try {
             deployInteractions();
             command.reply("Interactions rechargées !");
-        } catch (err) {
-            console.error(err);
-            command.reply("Une erreur est survenue lors du rechargement des interactions !");
+        } catch (e) {
+            throw new Error(e);
         }
     }
 };

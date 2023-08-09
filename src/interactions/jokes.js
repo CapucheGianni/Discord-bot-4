@@ -91,7 +91,7 @@ module.exports = {
                 userUpdate(interaction.user.id, choice, interaction);
             }
         } catch (e) {
-            console.error(e);
+            throw new Error(e);
         }
     }
 };

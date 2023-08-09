@@ -1,7 +1,7 @@
-const {
-    Events, EmbedBuilder, Collection
-} = require('discord.js');
+const { Events, EmbedBuilder, Collection } = require('discord.js');
 const { addUserInteraction } = require('../db/addUser.js');
+const { interactionErrorLog } = require('../utils/errorLog.js');
+require('dotenv').config();
 
 const interactionLog = async (client, interaction) => {
     const embed = new EmbedBuilder()
@@ -83,20 +83,14 @@ module.exports = {
             return;
         }
         await addUserInteraction(client, interaction);
-
-        const isCd = initInteractionsCooldowns(client, interaction, getInteraction);
-
-        if (isCd) {
-            return;
-        }
         try {
             const currentDate = new Date();
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
             const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
-
+            const isCd = initInteractionsCooldowns(client, interaction, getInteraction);
             const perms = checkPermissions(getInteraction, interaction);
 
-            if (perms) {
+            if (isCd || perms) {
                 return;
             }
             await getInteraction.execute(client, interaction);
@@ -104,9 +98,9 @@ module.exports = {
             console.log(`${interaction.commandName} interaction executed by ${interaction.user.username} (${interaction.user.id}) in ${interaction.guild.name} (${interaction.guild.id}) at ${date} ${time}`);
         } catch (error) {
             console.error(`Error executing ${interaction.commandName}`);
-            console.error(error);
+            interactionErrorLog(client, error, interaction);
             await interaction.reply({
-                content: 'Il y a eu une erreur lors de l\'exécution de cette intéraction !',
+                content: `Une erreur est survenue lors de l'exécution de l'interaction \`${interaction.commandName}\`\n\n Veuillez contacter **__${client.users.cache.get(process.env.OWNER_ID).username}__** si l'erreur survient à plusieurs reprises. !`,
                 ephemeral: true
             });
         }

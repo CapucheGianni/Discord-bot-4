@@ -11,16 +11,20 @@ module.exports = {
         permissions: []
     },
     execute(client, interaction) {
-        const user = interaction.options.getUser("membre") ?? interaction.user;
+        try {
+            const user = interaction.options.getUser("membre") ?? interaction.user;
 
-        if (user) {
-            return interaction.reply({
-                content: `Photo de profil de ${user}[ : ](${user.displayAvatarURL({
-                    dynamic: true,
-                    size: 4096
-                })})`,
-                allowedMentions: { parse: [] }
-            });
+            if (user) {
+                return interaction.reply({
+                    content: `Photo de profil de ${user}[ : ](${user.displayAvatarURL({
+                        dynamic: true,
+                        size: 4096
+                    })})`,
+                    allowedMentions: { parse: [] }
+                });
+            }
+        } catch (e) {
+            throw new Error(e);
         }
     }
 };
