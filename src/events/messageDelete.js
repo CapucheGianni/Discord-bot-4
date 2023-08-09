@@ -19,6 +19,7 @@ module.exports = {
             })
             .setTimestamp()
             .setColor(`#ff0000`);
+
         await client.channels.cache.get("1121226924082077747").send({ embeds: [ embed ] });
     }
 };

@@ -16,7 +16,7 @@ const client = new Client({
 
     },
     allowedMentions: { parse: [ 'users', 'roles' ] },
-    intents: [ GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent ],
+    intents: [ GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers ],
     partials: [ Partials.Channel ]
 });
 
