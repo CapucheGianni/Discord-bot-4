@@ -33,7 +33,7 @@ getEvents(client);
 deployInteractions();
 
 // Disconnect from the db when the bot is shut down
-dbDisconnect(client);
+dbDisconnect();
 
 // Connect the bot to Discord
 client.login(process.env.TOKEN);

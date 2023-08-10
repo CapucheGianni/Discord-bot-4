@@ -31,27 +31,13 @@ const dbConnect = async (client) => {
 };
 
 // Close the database connection when the bot is closed
-const dbDisconnect = (client) => {
+const dbDisconnect = () => {
     process.on('SIGINT', async () => {
         try {
-            const waitingEmbed = new EmbedBuilder()
-                .setTitle('Shutting down...')
-                .setDescription('The bot is now shutting down, see you soon !')
-                .setColor(`#FF9300`)
-                .setTimestamp();
-
-            client.channels.cache.get('1121226924082077747').send({ embeds: [ waitingEmbed ] });
             console.log("Shutting down...");
             await prisma.$disconnect();
             console.log("Disconnected from the database!");
         } catch (e) {
-            const embed = new EmbedBuilder()
-                .setTitle('There was an error while disconnecting from the database.')
-                .setDescription(`\`\`\`js\n${e}\n\`\`\``)
-                .setColor(`#ff0000`)
-                .setTimestamp();
-
-            client.channels.cache.get('1121226924082077747').send({ embeds: [ embed ] });
             console.error("An error occured while disconnecting from the database.");
         }
         process.exit(0);
