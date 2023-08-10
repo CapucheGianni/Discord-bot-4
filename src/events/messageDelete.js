@@ -1,4 +1,5 @@
 const { Events, EmbedBuilder } = require('discord.js');
+require('dotenv').config();
 
 module.exports = {
     name: Events.MessageDelete,
@@ -20,6 +21,6 @@ module.exports = {
             .setTimestamp()
             .setColor(`#ff0000`);
 
-        await client.channels.cache.get("1121226924082077747").send({ embeds: [ embed ] });
+        await client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({ embeds: [ embed ] });
     }
 };

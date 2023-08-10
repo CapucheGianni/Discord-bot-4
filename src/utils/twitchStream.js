@@ -5,6 +5,7 @@ const infos = {
     oldGame: ""
 };
 const { twitch } = require("../../settings.json");
+require('dotenv').config();
 
 const getTwitchAccessToken = async () => {
     const twitchAPIURL = 'https://id.twitch.tv/oauth2/token';
@@ -56,7 +57,7 @@ const setEmbed = (client, title, viewer_count, game_name) => {
 };
 
 const sendMessage = async (client, content, embed) => {
-    await client.channels.cache.get("1121226924082077747").send({
+    await client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({
         content: content,
         embeds: [ embed ],
         allowedMentions: { parse: [ 'everyone' ] }

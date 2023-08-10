@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const { EmbedBuilder } = require('discord.js');
+require('dotenv').config();
 
 // Create a new Prisma client (db)
 const prisma = new PrismaClient();
@@ -14,7 +15,7 @@ const dbConnect = async (client) => {
             .setColor(`#5FC1F9`)
             .setTimestamp();
 
-        client.channels.cache.get('1121226924082077747').send({ embeds: [ embed ] });
+        client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({ embeds: [ embed ] });
         console.log("Connected to the database!");
     } catch (e) {
         await prisma.$disconnect();
@@ -25,7 +26,7 @@ const dbConnect = async (client) => {
             .setColor(`#ff0000`)
             .setTimestamp();
 
-        client.channels.cache.get('1121226924082077747').send({ embeds: [ embed ] });
+        client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({ embeds: [ embed ] });
         console.error("An error occured while sending the ready message.");
     }
 };

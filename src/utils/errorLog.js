@@ -1,4 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
+require('dotenv').config();
 
 const commandErrorLog = (client, error, cmd) => {
     const embed = new EmbedBuilder()
@@ -11,7 +12,7 @@ const commandErrorLog = (client, error, cmd) => {
         .setColor('#ff0000')
         .setTimestamp()
 
-    client.channels.cache.get('1121226924082077747').send({ embeds: [ embed ] })
+    client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({ embeds: [ embed ] })
 }
 
 const interactionErrorLog = (client, error, int) => {
@@ -25,7 +26,7 @@ const interactionErrorLog = (client, error, int) => {
         .setColor('#ff0000')
         .setTimestamp()
 
-    client.channels.cache.get('1121226924082077747').send({ embeds: [ embed ] })
+    client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({ embeds: [ embed ] })
 }
 
 module.exports = {

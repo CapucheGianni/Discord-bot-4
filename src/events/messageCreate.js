@@ -24,7 +24,7 @@ const commandLog = async (client, message, commandName) => {
         })
         .setTimestamp()
         .setColor(`#00ff00`);
-    await client.channels.cache.get("1121226924082077747").send({ embeds: [ embed ] });
+    await client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({ embeds: [ embed ] });
 };
 
 const checkPermissions = (command, message) => {
