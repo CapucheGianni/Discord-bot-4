@@ -57,7 +57,7 @@ const setEmbed = (client, title, viewer_count, game_name) => {
 };
 
 const sendMessage = async (client, content, embed) => {
-    await client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({
+    await client.channels.cache.get('1137739326822826065').send({
         content: content,
         embeds: [ embed ],
         allowedMentions: { parse: [ 'everyone' ] }
@@ -102,7 +102,7 @@ const getTwitchStream = async (client) => {
         } catch (e) {
             console.log(e);
         }
-    }, 1000 * 60 * 5);
+    }, 1000 * 5);
 };
 
 module.exports = getTwitchStream;
