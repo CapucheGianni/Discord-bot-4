@@ -19,10 +19,6 @@ const interactionLog = async (client, interaction) => {
 
 const checkPermissions = (getInteraction, interaction) => {
     if (interaction.user.id !== process.env.OWNER_ID && getInteraction.stats.permissions[ 0 ] === "OWNER") {
-        interaction.reply({
-            content: "Vous n'avez pas la permission d'utiliser cette interaction !",
-            ephemeral: true
-        });
         return 1;
     }
     if (getInteraction.stats.permissions.length && getInteraction.stats.permissions[ 0 ] !== "OWNER") {
