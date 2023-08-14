@@ -3,7 +3,6 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const fetchServers = (client) => {
-    const time = 1000 * 60;
 
     setInterval(async () => {
         try {
@@ -31,7 +30,7 @@ const fetchServers = (client) => {
         } catch (e) {
             console.error(e);
         }
-    }, time);
+    }, 1000 * 60 * 5);
 };
 
 module.exports = fetchServers;
