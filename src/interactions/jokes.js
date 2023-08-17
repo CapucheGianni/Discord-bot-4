@@ -1,7 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { PrismaClient } = require("@prisma/client");
-
-const prisma = new PrismaClient();
+const { prisma } = require('../db/main.js');
 
 const serverUpdate = async (guildId, choice, interaction) => {
     if (choice) {

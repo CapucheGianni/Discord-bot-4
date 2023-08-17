@@ -47,5 +47,6 @@ const dbDisconnect = () => {
 
 module.exports = {
     dbConnect,
-    dbDisconnect
+    dbDisconnect,
+    prisma
 };

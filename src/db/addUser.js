@@ -1,6 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const { prisma } = require('./main.js');
 
 const addUserMessage = async (client, message) => {
     try {

@@ -1,6 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-
-const prisma = new PrismaClient();
+const { prisma } = require('../db/main.js');
 
 const setPrefix = async (guildId, newPrefix) => {
     try {
