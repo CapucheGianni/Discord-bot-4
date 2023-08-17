@@ -9,7 +9,6 @@ module.exports = {
         .addStringOption((option) => option.setName("commande").setDescription("La commande à afficher")),
     stats: {
         category: "Utilitaire",
-        usage: "/help [command]",
         permissions: []
     },
     async execute(client, interaction) {
@@ -30,24 +29,27 @@ module.exports = {
                     .setDescription("Voici les informations sur l'intéraction demandée :")
                     .addFields(
                         {
-                            name: "Catégorie",
-                            value: cmd.stats.category,
-                            inline: true
-                        },
-                        {
                             name: "Description",
-                            value: cmd.data.description,
-                            inline: true
+                            value: cmd.data.description
                         },
                         {
                             name: "Usage",
-                            value: `\`${cmd.stats.usage}\``,
+                            value: `\`/${cmd.data.name}\``,
+                            inline: true
+                        },
+                        {
+                            name: "Catégorie",
+                            value: cmd.stats.category,
                             inline: true
                         },
                         {
                             name: "Permissions",
                             value: cmd.stats.permissions.length ? cmd.stats.permissions.map((perm) => `\`${perm}\``).join(', ') : "Aucune permission requise",
                             inline: true
+                        },
+                        {
+                            name: "Options",
+                            value: cmd.data.options.length ? `>>> ${cmd.data.options.map((option) => `\`${option.name}\`: ${option.description} - ${option.required ? "requis" : "non requis"}`).join('\n')}` : "Aucune option disponible"
                         }
                     )
                     .setFooter({

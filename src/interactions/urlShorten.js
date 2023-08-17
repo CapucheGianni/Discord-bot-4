@@ -10,7 +10,6 @@ module.exports = {
         .addStringOption((option) => option.setName("url").setDescription("Url à raccourcir").setRequired(true)),
     stats: {
         category: "Utilitaire",
-        usage: "/urlshorten [url]",
         permissions: []
     },
     async execute(client, interaction) {

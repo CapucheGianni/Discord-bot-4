@@ -8,7 +8,6 @@ module.exports = {
         .setDescription("Affiche le ping du bot"),
     stats: {
         category: "Utilitaire",
-        usage: "/ping",
         permissions: []
     },
     async execute(client, interaction) {

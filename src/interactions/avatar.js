@@ -7,7 +7,6 @@ module.exports = {
         .addUserOption((option) => option.setName("membre").setDescription("La photo de profil du membre voulu")),
     stats: {
         category: "Image",
-        usage: "/avatar [membre]",
         permissions: []
     },
     execute(client, interaction) {

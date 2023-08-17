@@ -66,12 +66,11 @@ const userUpdate = async (userId, choice, interaction) => {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("jokes")
-        .setDescription("Choisissez si vous voulez que le bot réponde à certains de vos messages ou non.")
-        .addBooleanOption((option) => option.setName("serveur").setDescription("Active ou désactive les blagues sur le serveur."))
+        .setDescription("Choisissez si vous voulez que le bot réponde à certains de vos messages.")
+        .addBooleanOption((option) => option.setName("serveur").setDescription("Choisissez cette option si vous voulez activer/désactiver les blagues à l'échelle du serveur."))
         .addBooleanOption((option) => option.setName("activer").setDescription("Active ou désactive les blagues.")),
     stats: {
         category: "Utilitaire",
-        usage: "/jokes [true/false]",
         permissions: []
     },
     execute(client, interaction) {

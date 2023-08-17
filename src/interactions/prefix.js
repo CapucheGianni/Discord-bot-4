@@ -8,7 +8,6 @@ module.exports = {
         .addStringOption((option) => option.setName("prefix").setDescription("Le nouveau préfixe du bot")),
     stats: {
         category: 'Utilitaire',
-        usage: '/prefix',
         permissions: []
     },
     async execute(client, interaction) {

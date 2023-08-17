@@ -9,7 +9,6 @@ module.exports = {
         .addBooleanOption((option) => option.setName("couleur").setDescription("Affiche la couleur de la bannière")),
     stats: {
         category: "Image",
-        usage: "/banner [membre] [couleur]",
         permissions: []
     },
     async execute(client, interaction) {
