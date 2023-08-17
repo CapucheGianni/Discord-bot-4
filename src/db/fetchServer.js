@@ -1,7 +1,6 @@
 const { prisma } = require('./main.js');
 
 const fetchServers = (client) => {
-
     setInterval(async () => {
         try {
             const guilds = client.guilds.cache.map((guild) => guild);
