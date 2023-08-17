@@ -27,3 +27,7 @@ model WelcomeChannel {
   server Server @relation(fields: [serverId], references: [id])
   serverId String @unique
 }
+
+model Interactions {
+  name String @id
+}
