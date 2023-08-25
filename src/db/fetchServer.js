@@ -25,10 +25,6 @@ const fetchServers = (client) => {
                     await prisma.server.delete({
                         where: {
                             id: guildInDb.id
-                        },
-                        select: {
-                            id: true,
-                            name: true
                         }
                     });
                 }
