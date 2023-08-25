@@ -10,7 +10,6 @@ module.exports = {
         try {
             eval(args.join(' '));
         } catch (e) {
-            console.log(e);
             message.channel.send(`\`\`\`js${e}\`\`\``);
         }
     }
