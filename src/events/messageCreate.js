@@ -6,7 +6,7 @@ const getPun = require('../fun/pun.js');
 require('dotenv').config();
 
 const detectName = (message, prefix) => {
-    if (message.content.toLowerCase() === "kaide") {
+    if (message.content.toLowerCase() === "kaide" || message.mentions.has(process.env.CLIENT_ID)) {
         message.channel.send(`Bonjour!\n\nJe suis **Kaide** le bot du goat __capuchegianni__.\nLe préfixe du bot est \`${prefix}\` mais il est tout à fait possible de le modifier.`);
         if (!message.guild) {
             message.channel.send("Je ne suis utilisable que sur un serveur !");
