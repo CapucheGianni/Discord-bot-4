@@ -9,22 +9,17 @@ module.exports = {
     once: true,
     execute(client) {
         try {
-            let totalUsers = client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0);
             const embed = new EmbedBuilder();
 
             getTwitchStream(client);
             fetchServer(client);
-            if (totalUsers >= 1000) {
-                totalUsers /= 100;
-                totalUsers = Math.round(totalUsers) * 100;
-            }
             embed.setTitle('Bot is online !')
-                .setDescription(`The bot is available on ${client.guilds.cache.size} servers with approximatively ${totalUsers} members.`)
+                .setDescription(`The bot is available on ${client.guilds.cache.size} servers with approximatively ${client.users.cache.size} members.`)
                 .setColor(`#00ff00`)
                 .setTimestamp();
             client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({ embeds: [ embed ] });
             dbConnect(client);
-            console.log(`${client.user.tag} is online !\nThe bot is available on ${client.guilds.cache.size} servers with approximatively ${totalUsers} members.`);
+            console.log(`${client.user.tag} is online !\nThe bot is available on ${client.guilds.cache.size} servers with approximatively ${client.users.cache.size} members.`);
         } catch (e) {
             const embed = new EmbedBuilder()
                 .setTitle('An error occured while sending the ready message.')
