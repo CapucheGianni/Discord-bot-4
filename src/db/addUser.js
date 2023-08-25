@@ -2,9 +2,15 @@ const { prisma } = require('./main.js');
 
 const addUserMessage = async (client, message) => {
     try {
-        await prisma.user.create({
-            data: {
+        await prisma.user.upsert({
+            where: {
+                id: message.author.id
+            },
+            create: {
                 id: message.author.id,
+                name: message.author.username
+            },
+            update: {
                 name: message.author.username
             }
         });
@@ -15,9 +21,15 @@ const addUserMessage = async (client, message) => {
 
 const addUserInteraction = async (client, interaction) => {
     try {
-        await prisma.user.create({
-            data: {
+        await prisma.user.upsert({
+            where: {
+                id: interaction.user.id
+            },
+            create: {
                 id: interaction.user.id,
+                name: interaction.user.username
+            },
+            update: {
                 name: interaction.user.username
             }
         });
