@@ -7,6 +7,11 @@ module.exports = {
         usage: 'eval [code]'
     },
     run(client, message, args) {
-        eval(args.join(' '));
+        try {
+            eval(args.join(' '));
+        } catch (e) {
+            console.log(e);
+            message.channel.send(`\`\`\`js${e}\`\`\``);
+        }
     }
 };
