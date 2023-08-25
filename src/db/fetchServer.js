@@ -5,21 +5,30 @@ const fetchServers = (client) => {
         try {
             const guilds = client.guilds.cache.map((guild) => guild);
             const guildsInDb = await prisma.server.findMany();
-            const guildsNotInDb = guilds.filter((guild) => !guildsInDb.find((guildInDb) => guildInDb.id === guild.id));
 
-            guildsNotInDb.forEach(async (guild) => {
-                await prisma.server.create({
-                    data: {
+            guilds.forEach(async (guild) => {
+                await prisma.server.upsert({
+                    where: {
+                        id: guild.id
+                    },
+                    update: {
+                        name: guild.name
+                    },
+                    create: {
                         id: guild.id,
                         name: guild.name
                     }
                 });
-            });
+            })
             guildsInDb.forEach(async (guildInDb) => {
                 if (!guilds.find((guild) => guild.id === guildInDb.id)) {
                     await prisma.server.delete({
                         where: {
                             id: guildInDb.id
+                        },
+                        select: {
+                            id: true,
+                            name: true
                         }
                     });
                 }
@@ -27,7 +36,7 @@ const fetchServers = (client) => {
         } catch (e) {
             console.error(e);
         }
-    }, 1000 * 60 * 5);
+    }, 1000 * 60);
 };
 
 module.exports = fetchServers;
