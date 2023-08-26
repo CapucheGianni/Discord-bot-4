@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const fetch = require("node-fetch");
-const { rebrandly } = require("../../settings.json");
+const { rebrandly, interactionsIds } = require("../../settings.json");
 
 
 module.exports = {
@@ -10,7 +10,8 @@ module.exports = {
         .addStringOption((option) => option.setName("url").setDescription("Url à raccourcir").setRequired(true)),
     stats: {
         category: "Utilitaire",
-        permissions: []
+        permissions: [],
+        id: interactionsIds.urlShorten
     },
     async execute(client, interaction) {
         try {

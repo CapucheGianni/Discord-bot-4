@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { getPrefix, setPrefix } = require('../utils/setPrefix.js');
+const { interactionsIds } = require('../../settings.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,7 +9,8 @@ module.exports = {
         .addStringOption((option) => option.setName("prefix").setDescription("Le nouveau préfixe du bot")),
     stats: {
         category: 'Utilitaire',
-        permissions: []
+        permissions: [],
+        id: interactionsIds.prefix
     },
     async execute(client, interaction) {
         try {

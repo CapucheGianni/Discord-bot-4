@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
 const { version } = require("../../package.json");
+const { interactionsIds } = require('../../settings.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,7 +9,8 @@ module.exports = {
         .setDescription("Affiche le ping du bot"),
     stats: {
         category: "Utilitaire",
-        permissions: []
+        permissions: [],
+        id: interactionsIds.ping
     },
     async execute(client, interaction) {
         try {

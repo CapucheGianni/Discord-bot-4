@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { interactionsIds } = require('../../settings.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -7,7 +8,8 @@ module.exports = {
         .addUserOption((option) => option.setName("membre").setDescription("La photo de profil du membre voulu")),
     stats: {
         category: "Image",
-        permissions: []
+        permissions: [],
+        id: interactionsIds.avatar
     },
     execute(client, interaction) {
         try {

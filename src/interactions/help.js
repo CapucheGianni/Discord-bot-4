@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
 const { version } = require("../../package.json");
+const { interactionsIds } = require('../../settings.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,7 +10,8 @@ module.exports = {
         .addStringOption((option) => option.setName("commande").setDescription("La commande à afficher")),
     stats: {
         category: "Utilitaire",
-        permissions: []
+        permissions: [],
+        id: interactionsIds.help
     },
     async execute(client, interaction) {
         try {

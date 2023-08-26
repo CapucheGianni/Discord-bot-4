@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { EmbedBuilder } = require("discord.js");
+const { interactionsIds } = require('../../settings.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,7 +10,8 @@ module.exports = {
         .addBooleanOption((option) => option.setName("couleur").setDescription("Affiche la couleur de la bannière")),
     stats: {
         category: "Image",
-        permissions: []
+        permissions: [],
+        id: interactionsIds.banner
     },
     async execute(client, interaction) {
         try {

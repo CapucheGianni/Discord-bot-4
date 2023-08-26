@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { prisma } = require('../db/main.js');
+const { interactionsIds } = require('../../settings.json');
 
 const serverUpdate = async (guildId, choice, interaction) => {
     if (choice) {
@@ -69,7 +70,8 @@ module.exports = {
         .addBooleanOption((option) => option.setName("activer").setDescription("Active ou désactive les blagues.")),
     stats: {
         category: "Utilitaire",
-        permissions: []
+        permissions: [],
+        id: interactionsIds.jokes
     },
     execute(client, interaction) {
         try {
