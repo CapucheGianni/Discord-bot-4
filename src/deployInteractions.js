@@ -8,17 +8,30 @@ require('dotenv').config();
 const fetchInteractions = async (interactions) => {
     try {
         const interactionsInDb = await prisma.interactions.findMany();
-        const interactionsNotInDb = interactions.filter((interaction) => !interactionsInDb.find((interactionInDb) => interactionInDb.name === interaction.name));
 
-        interactionsNotInDb.forEach(async (interaction) => {
-            await prisma.interactions.create({
-                data: {
-                    name: interaction.name
+        interactions.forEach(async (interaction) => {
+            await prisma.interactions.upsert({
+                where: {
+                    name: interaction.data.name
+                },
+                create: {
+                    name: interaction.data.name,
+                    description: interaction.data.description,
+                    options: interaction.data.options.length ? interaction.data.options.map((option) => option.name).join(' ') : "None",
+                    optionsDescription: interaction.data.options.length ? interaction.data.options.map((option) => option.description).join(' | ') : "None",
+                    interactionId: interaction.stats.id
+                },
+                update: {
+                    name: interaction.data.name,
+                    description: interaction.data.description,
+                    options: interaction.data.options.length ? interaction.data.options.map((option) => option.name).join(' ') : "None",
+                    optionsDescription: interaction.data.options.length ? interaction.data.options.map((option) => option.description).join(' | ') : "None",
+                    interactionId: interaction.stats.id
                 }
             });
         });
         interactionsInDb.forEach(async (interactionInDb) => {
-            if (!interactions.find((interaction) => interaction.name === interactionInDb.name)) {
+            if (!interactions.find((interaction) => interaction.data.name === interactionInDb.name)) {
                 await prisma.interactions.delete({
                     where: {
                         name: interactionInDb.name
@@ -31,7 +44,7 @@ const fetchInteractions = async (interactions) => {
     }
 };
 
-const deployInteractions = async () => {
+const deployInteractions = async (client) => {
     const interactions = [];
     const interactionsPath = path.join(__dirname, 'interactions');
     const interactionFiles = fs.readdirSync(interactionsPath).filter((file) => file.endsWith('.js'));
@@ -43,7 +56,7 @@ const deployInteractions = async () => {
         interactions.push(interaction.data.toJSON());
     }
     try {
-        await fetchInteractions(interactions);
+        await fetchInteractions(client.interactions);
         await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: interactions });
         console.log('Successfully registered application commands.');
     } catch (e) {
@@ -51,4 +64,7 @@ const deployInteractions = async () => {
     }
 }
 
-module.exports = deployInteractions;
+module.exports = {
+    deployInteractions,
+    fetchInteractions
+};

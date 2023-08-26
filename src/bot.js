@@ -1,9 +1,9 @@
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
-const deployInteractions = require('./deployInteractions.js');
+const { deployInteractions } = require('./deployInteractions.js');
 const getInteractions = require('./utils/getInteractions.js');
 const getCommands = require('./utils/getCommands.js');
 const getEvents = require('./utils/getEvents.js');
-const { dbDisconnect, prisma } = require('./db/main.js');
+const { dbDisconnect } = require('./db/main.js');
 require('dotenv').config();
 
 const client = new Client({
@@ -37,14 +37,7 @@ getCommands(client);
 getEvents(client);
 
 // Deploy the interactions to discord
-const deploy = async () => {
-    const cmdNbr = await prisma.interactions.count();
-    if (client.interactions.size !== cmdNbr) {
-        deployInteractions();
-    }
-}
-
-deploy();
+deployInteractions(client);
 
 // Disconnect from the db when the bot is shut down
 dbDisconnect();
