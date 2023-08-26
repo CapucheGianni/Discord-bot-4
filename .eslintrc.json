@@ -46,7 +46,6 @@
         "eqeqeq": "warn",
         "func-name-matching": "warn",
         "func-style": ["warn", "expression", { "allowArrowFunctions": true }],
-        "guard-for-in": "error",
         "init-declarations": "error",
         "max-depth": ["warn", 4],
         "no-alert": "warn",
