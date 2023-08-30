@@ -14,7 +14,7 @@ module.exports = {
             getTwitchStream(client);
             fetchServer(client);
             embed.setTitle('Bot is online !')
-                .setDescription(`The bot is available on ${client.guilds.cache.size} servers with approximatively ${client.users.cache.size} members.`)
+                .setDescription(`The bot is available on ${client.guilds.cache.size} servers with approximatively ${client.users.cache.size} members.\n\nThe RAM usage is currently at ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100}MB.`)
                 .setColor(`#00ff00`)
                 .setTimestamp();
             client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({ embeds: [ embed ] });
