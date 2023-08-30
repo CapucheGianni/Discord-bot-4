@@ -24,7 +24,7 @@ const client = new Client({
         GatewayIntentBits.GuildPresences,
         GatewayIntentBits.MessageContent
     ],
-    partials: [ Partials.Channel ]
+    partials: [ Partials.Channel, Partials.GuildMember, Partials.Message ]
 });
 
 client.interactions = new Collection();
