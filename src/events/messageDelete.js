@@ -4,23 +4,34 @@ require('dotenv').config();
 module.exports = {
     name: Events.MessageDelete,
     async execute(client, message) {
-        if (!message.guild) {
-            return;
-        }
-        if (message.guild.id !== "832753902943207454") {
-            return;
-        }
+        const embed = new EmbedBuilder();
 
-        const embed = new EmbedBuilder()
-            .setTitle("Message supprimé 🗑️")
-            .setDescription(`**Auteur:** ${message.author} (${message.author.id})\n**Salon:** ${message.channel} (${message.channel.id})\n**Serveur:** ${message.guild} (${message.guild.id})\n**Message:** ${message.content}`)
+        if (!message.guild || !message.author) {
+            return;
+        }
+        embed.setTitle("Message supprimé 🗑️")
+            .setDescription(`> ${message.content}\n\n<t:${message.createdTimestamp.toString().slice(0, 10)}>`)
+            .addFields({
+                name: "Auteur",
+                value: `${message.author} (${message.author.id})`,
+                inline: true
+            },
+            {
+                name: "Salon",
+                value: `${message.channel} (${message.channel.id})`,
+                inline: true
+            },
+            {
+                name: "Serveur",
+                value: `${message.guild} (${message.guild.id})`,
+                inline: true
+            })
             .setFooter({
-                text: `Message supprimé par ${message.author.username} | ${client.user.username}`,
+                text: `Message supprimé | ${client.user.username}`,
                 iconURL: message.author.displayAvatarURL({ dynamic: true })
             })
             .setTimestamp()
             .setColor(`#ff0000`);
-
         await client.channels.cache.get(process.env.LOG_CHANNEL_ID).send({ embeds: [ embed ] });
     }
 };
