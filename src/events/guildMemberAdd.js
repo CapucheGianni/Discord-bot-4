@@ -7,6 +7,7 @@ module.exports = {
     async execute(client, member) {
         try {
             const { guild, user } = member;
+            const fetchedUser = await user.fetch();
             const channel = await prisma.welcomeChannel.findUnique({
                 where: {
                     serverId: guild.id
@@ -14,7 +15,7 @@ module.exports = {
             });
             const embed = new EmbedBuilder();
 
-            if (!channel || !channel.isActivated || channel.name === "default") {
+            if (!channel || !channel.isActivated) {
                 return;
             }
             embed.setTitle(`Welcome to ${user.username}!`)
@@ -25,7 +26,7 @@ module.exports = {
                     iconURL: client.user.displayAvatarURL({ dynamic: true })
                 })
                 .setTimestamp()
-                .setColor(Math.floor(Math.random() * 16777215).toString(16))
+                .setColor(fetchedUser.hexAccentColor || "#000")
             if (channel.dm) {
                 user.send({ embeds: [ embed ] });
             } else {

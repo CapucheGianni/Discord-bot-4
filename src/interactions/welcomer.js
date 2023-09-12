@@ -5,6 +5,7 @@ const { interactionsIds } = require('../../settings.json');
 
 const enableSubCommand = async (client, interaction) => {
     const isEnabled = interaction.options.getBoolean("activate") ?? true;
+    const channel = await client.channels.cache.get(interaction.channelId);
 
     await prisma.welcomeChannel.upsert({
         where: {
@@ -12,7 +13,7 @@ const enableSubCommand = async (client, interaction) => {
         },
         create: {
             id: interaction.channelId,
-            name: "default",
+            name: channel.name,
             serverId: interaction.guildId,
             serverName: interaction.member.guild.name,
             isActivated: isEnabled
@@ -159,18 +160,14 @@ module.exports = {
             const command = interaction.options.getSubcommand();
 
             switch (command) {
-            case 'enable': {
+            case 'enable':
                 return enableSubCommand(client, interaction);
-            }
-            case 'channels': {
+            case 'channels':
                 return channelsSubCommand(client, interaction);
-            }
-            case 'message': {
+            case 'message':
                 return messageSubCommand(client, interaction);
-            }
-            case 'test': {
+            case 'test':
                 return testSubCommand(client, interaction);
-            }
             }
         } catch (e) {
             throw new Error(e);
