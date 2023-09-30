@@ -1,5 +1,5 @@
-const { EmbedBuilder } = require("discord.js");
-const getUser = require("../utils/getUser");
+const { EmbedBuilder } = require('discord.js');
+const getUser = require('../utils/getUser');
 
 module.exports = {
     name: "banner",

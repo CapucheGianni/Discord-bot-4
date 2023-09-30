@@ -1,4 +1,4 @@
-const getUser = require("../utils/getUser");
+const getUser = require('../utils/getUser');
 
 module.exports = {
     name: "avatar",

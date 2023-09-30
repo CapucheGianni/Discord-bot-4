@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { EmbedBuilder } = require("discord.js");
-const { version } = require("../../package.json");
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
+const { version } = require('../../package.json');
 const { interactionsIds } = require('../../settings.json');
 
 module.exports = {

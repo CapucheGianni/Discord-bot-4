@@ -1,4 +1,4 @@
-const { getPrefix, setPrefix } = require("../utils/setPrefix.js");
+const { getPrefix, setPrefix } = require('../utils/setPrefix.js');
 
 module.exports = {
     name: "prefix",

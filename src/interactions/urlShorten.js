@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const fetch = require("node-fetch");
-const { rebrandly, interactionsIds } = require("../../settings.json");
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const fetch = require('node-fetch');
+const { rebrandly, interactionsIds } = require('../../settings.json');
 
 
 module.exports = {

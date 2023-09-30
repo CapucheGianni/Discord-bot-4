@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { prisma } = require('../db/main.js');
 const { interactionsIds } = require('../../settings.json');
 
