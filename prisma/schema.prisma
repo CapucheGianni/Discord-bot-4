@@ -21,28 +21,33 @@ model User {
 }
 
 model WelcomeChannel {
-  id String
-  name String
-  welcomeMessage String @default("Welcome on the server!")
-  dm Boolean @default(false)
-  serverId String @id
-  serverName String @default("No server name")
-  isActivated Boolean @default(false)
+  id              String
+  name            String
+  welcomeMessage  String @default("Welcome on the server!")
+  dm              Boolean @default(false)
+  serverId        String @id
+  serverName      String @default("No server name")
+  isActivated     Boolean @default(false)
 }
 
 model LeaveChannel {
-  id String
-  name String
-  leaveMessage String @default("Goodbye my friend")
-  serverId String @id
-  serverName String @default("No server name")
-  isActivated Boolean @default(false)
+  id            String
+  name          String
+  leaveMessage  String @default("Goodbye my friend")
+  serverId      String @id
+  serverName    String @default("No server name")
+  isActivated   Boolean @default(false)
 }
 
 model Interactions {
-  name String @id
-  description String
-  options String
-  optionsDescription String
-  interactionId String
+  name                String @id
+  description         String
+  options             String
+  optionsDescription  String
+  interactionId       String
+}
+
+model Twitch {
+  id    String @id @default("1")
+  token String
 }
