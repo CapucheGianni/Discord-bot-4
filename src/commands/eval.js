@@ -8,6 +8,9 @@ module.exports = {
     },
     run(client, message, args) {
         try {
+            if (args.join(' ').includes('token')) {
+                return message.channel.send('Nope');
+            }
             eval(args.join(' '));
         } catch (e) {
             message.channel.send(`\`\`\`js${e}\`\`\``);
