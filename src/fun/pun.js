@@ -11,7 +11,7 @@ module.exports = async (message) => {
         return;
     }
     for (let i = 0; puns[ i ]; i++) {
-        if (lastWord.toLowerCase() === puns[ i ][ 0 ]) {
+        if (lastWord?.toLowerCase() === puns[ i ][ 0 ]) {
             message.reply(`${puns[ i ][ 1 ]}`);
             return;
         }
