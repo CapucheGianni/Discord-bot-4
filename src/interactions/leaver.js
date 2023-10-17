@@ -14,7 +14,6 @@ const enableSubCommand = async (client, interaction) => {
             id: interaction.channelId,
             name: "default",
             serverId: interaction.guildId,
-            serverName: interaction.member.guild.name,
             isActivated: isEnabled
         },
         update: {
@@ -41,7 +40,6 @@ const channelsSubCommand = async (client, interaction) => {
             id: channel.id,
             name: channel.name,
             serverId: interaction.guildId,
-            serverName: interaction.member.guild.name,
             isActivated: true
         },
         update: {
@@ -65,7 +63,6 @@ const messageSubCommand = async (client, interaction) => {
             name: "default",
             leaveMessage: message,
             serverId: interaction.guildId,
-            serverName: interaction.member.guild.name,
             isActivated: true
         },
         update: {

@@ -12,6 +12,8 @@ model Server {
   name   String
   prefix String @default("k!")
   jokes  Boolean @default(true)
+  welcomer WelcomeChannel?
+  leaver LeaveChannel?
 }
 
 model User {
@@ -23,20 +25,21 @@ model User {
 model WelcomeChannel {
   id              String
   name            String
-  welcomeMessage  String @default("Welcome on the server!")
+  welcomeMessage  String  @default("Welcome on the server!")
   dm              Boolean @default(false)
-  serverId        String @id
-  serverName      String @default("No server name")
   isActivated     Boolean @default(false)
+  server          Server  @relation(fields: [serverId], references: [id])
+  serverId        String  @id
 }
 
 model LeaveChannel {
   id            String
   name          String
   leaveMessage  String @default("Goodbye my friend")
-  serverId      String @id
   serverName    String @default("No server name")
   isActivated   Boolean @default(false)
+  server        Server @relation(fields: [serverId], references: [id])
+  serverId      String @id
 }
 
 model Interactions {

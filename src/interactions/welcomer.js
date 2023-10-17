@@ -15,7 +15,6 @@ const enableSubCommand = async (client, interaction) => {
             id: interaction.channelId,
             name: channel.name,
             serverId: interaction.guildId,
-            serverName: interaction.member.guild.name,
             isActivated: isEnabled
         },
         update: {
@@ -45,7 +44,6 @@ const channelsSubCommand = async (client, interaction) => {
                 name: "none",
                 dm: isDms,
                 serverId: interaction.guildId,
-                serverName: interaction.member.guild.name,
                 isActivated: true
             },
             update: {
@@ -64,7 +62,6 @@ const channelsSubCommand = async (client, interaction) => {
             name: channel.name,
             dm: isDms,
             serverId: interaction.guildId,
-            serverName: interaction.member.guild.name,
             isActivated: true
         },
         update: {
@@ -89,7 +86,6 @@ const messageSubCommand = async (client, interaction) => {
             name: "default",
             welcomeMessage: message,
             serverId: interaction.guildId,
-            serverName: interaction.member.guild.name,
             isActivated: true
         },
         update: {
@@ -97,7 +93,7 @@ const messageSubCommand = async (client, interaction) => {
             isActivated: true
         }
     });
-    interaction.reply(`Voici le nouveau message d'arrivée de votre serveur: "${message}"`);
+    interaction.reply(`Voici le nouveau message d'arrivée de votre serveur:\n\n${message}`);
 };
 
 const testSubCommand = async (client, interaction) => {
