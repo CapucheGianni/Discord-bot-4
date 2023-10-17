@@ -123,7 +123,7 @@ const getTwitchStream = async (client) => {
                 console.log(err);
             }
         }
-    }, 1000 * 10);
+    }, 1000 * 60 * 5);
 };
 
 module.exports = getTwitchStream;
