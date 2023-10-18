@@ -7,47 +7,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Server {
-  id     String @id
-  name   String
-  prefix String @default("k!")
-  jokes  Boolean @default(true)
-  welcomer WelcomeChannel?
-  leaver LeaveChannel?
-}
-
 model User {
-  id    String  @id
+  id    String @id
   name  String
   jokes Boolean @default(true)
 }
 
+model Server {
+  id        String @id
+  name      String
+  prefix    String @default("k!")
+  jokes     Boolean @default(true)
+  welcomer  WelcomeChannel?
+  leaver    LeaveChannel?
+}
+
 model WelcomeChannel {
-  id              String
+  id              String @id
   name            String
-  welcomeMessage  String  @default("Welcome on the server!")
+  welcomeMessage  String @default("Welcome on the server!")
   dm              Boolean @default(false)
   isActivated     Boolean @default(false)
-  server          Server  @relation(fields: [serverId], references: [id])
-  serverId        String  @id
+  server          Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId        String @unique
 }
 
 model LeaveChannel {
-  id            String
+  id            String @id
   name          String
   leaveMessage  String @default("Goodbye my friend")
   serverName    String @default("No server name")
   isActivated   Boolean @default(false)
-  server        Server @relation(fields: [serverId], references: [id])
-  serverId      String @id
+  server        Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId      String @unique
 }
 
-model Interactions {
-  name                String @id
-  description         String
-  options             String
-  optionsDescription  String
-  interactionId       String
+model Interaction {
+  name          String @id
+  description   String?
+  options       InteractionOption[]
+  interactionId String @unique
+}
+
+model InteractionOption {
+  id              String @id
+  name            String
+  description     String?
+  interaction     Interaction @relation(fields: [interactionName], references: [name], onDelete: Cascade)
+  interactionName String
 }
 
 model Twitch {

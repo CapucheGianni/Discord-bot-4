@@ -7,32 +7,47 @@ require('dotenv').config();
 
 const fetchInteractions = async (interactions) => {
     try {
-        const interactionsInDb = await prisma.interactions.findMany();
+        const interactionsInDb = await prisma.interaction.findMany();
 
         interactions.forEach(async (interaction) => {
-            await prisma.interactions.upsert({
+            await prisma.interaction.upsert({
                 where: {
                     name: interaction.data.name
+                },
+                include: {
+                    options: true
                 },
                 create: {
                     name: interaction.data.name,
                     description: interaction.data.description,
-                    options: interaction.data.options.length ? interaction.data.options.map((option) => option.name).join(' ') : "None",
-                    optionsDescription: interaction.data.options.length ? interaction.data.options.map((option) => option.description).join(' | ') : "None",
-                    interactionId: interaction.stats.id
+                    interactionId: interaction.stats?.id
                 },
                 update: {
-                    name: interaction.data.name,
                     description: interaction.data.description,
-                    options: interaction.data.options.length ? interaction.data.options.map((option) => option.name).join(' ') : "None",
-                    optionsDescription: interaction.data.options.length ? interaction.data.options.map((option) => option.description).join(' | ') : "None",
-                    interactionId: interaction.stats.id
+                    interactionId: interaction.stats?.id
                 }
+            });
+            interaction.data.options.forEach(async (option) => {
+                await prisma.interactionOption.upsert({
+                    where: {
+                        id: `${interaction.data.name}-${option.name}`
+                    },
+                    create: {
+                        id: `${interaction.data.name}-${option.name}`,
+                        interactionName: interaction.data.name,
+                        name: option.name,
+                        description: option.description
+                    },
+                    update: {
+                        name: option.name,
+                        description: option.description
+                    }
+                });
             });
         });
         interactionsInDb.forEach(async (interactionInDb) => {
             if (!interactions.find((interaction) => interaction.data.name === interactionInDb.name)) {
-                await prisma.interactions.delete({
+                await prisma.interaction.delete({
                     where: {
                         name: interactionInDb.name
                     }
