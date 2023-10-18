@@ -74,32 +74,19 @@ module.exports = {
     async execute(client, message) {
         let prefix = await getPrefix(message.guildId);
 
-        if (message.author.bot) {
-            if (message.author.id === "276060004262477825") {
-                message.channel.lastMessage.react("👋");
-            }
-            return;
-        }
+        if (message.author.bot) return;
         detectName(message, prefix);
-        if (!message.guild) {
-            return;
-        }
+        if (!message.guild) return;
         await addUserMessage(client, message);
         getPun(message);
-        if (!message.content.startsWith(prefix) && !message.content.startsWith("kaide")) {
-            return;
-        }
-        if (message.content.startsWith("kaide")) {
-            prefix = "kaide";
-        }
+        if (!message.content.startsWith(prefix) && !message.content.startsWith("kaide")) return;
+        if (message.content.startsWith("kaide")) prefix = "kaide";
 
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
         const commandName = args.shift().toLowerCase();
         const command = client.commands.get(commandName);
 
-        if (!command) {
-            return;
-        }
+        if (!command) return;
         try {
             const currentDate = new Date();
             const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
@@ -107,9 +94,7 @@ module.exports = {
             const isCd = initCommandsCooldowns(client, message, command);
             const perm = checkPermissions(command, message);
 
-            if (isCd || perm) {
-                return;
-            }
+            if (isCd || perm) return;
             await command.run(client, message, args);
             await commandLog(client, message, commandName);
             console.log(`${commandName} command executed by ${message.author.username} (${message.author.id}) in ${message.guild.name} (${message.guild.id}) at ${date} ${time}`);
