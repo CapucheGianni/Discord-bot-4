@@ -12,7 +12,6 @@ const enableSubCommand = async (client, interaction) => {
         },
         create: {
             id: interaction.channelId,
-            name: "default",
             serverId: interaction.guildId,
             isActivated: isEnabled
         },
@@ -38,13 +37,11 @@ const channelsSubCommand = async (client, interaction) => {
         },
         create: {
             id: channel.id,
-            name: channel.name,
             serverId: interaction.guildId,
             isActivated: true
         },
         update: {
             id: channel.id,
-            name: channel.name,
             isActivated: true
         }
     });
@@ -60,7 +57,6 @@ const messageSubCommand = async (client, interaction) => {
         },
         create: {
             id: interaction.channelId,
-            name: "default",
             leaveMessage: message,
             serverId: interaction.guildId,
             isActivated: true
@@ -70,7 +66,7 @@ const messageSubCommand = async (client, interaction) => {
             isActivated: true
         }
     });
-    interaction.reply(`Voici le nouveau message de départ de votre serveur: "${message}"`);
+    interaction.reply(`Voici le nouveau message de départ de votre serveur:\n\n${message}`);
 };
 
 const testSubCommand = async (client, interaction) => {
@@ -86,7 +82,7 @@ const testSubCommand = async (client, interaction) => {
 
     const { id, leaveMessage, isActivated } = infos;
 
-    interaction.reply(`Voici toutes les informations concernant les départs sur le serveur **${interaction.guild.name}**:\n\n>>> \`Salon:\` <#${id}>\n\`Message:\` ${leaveMessage}\n\`Activé:\` ${isActivated}`);
+    interaction.reply(`Voici toutes les informations concernant les départs sur le serveur **${interaction.guild.name}**:\n\n>>> \`Salon:\` <#${id}>\n\`Message:\` ${leaveMessage ? leaveMessage : "Aucun message de départ indiqué"}\n\`Activé:\` ${isActivated}`);
 };
 
 module.exports = {

@@ -25,22 +25,23 @@ model Server {
 
 model WelcomeChannel {
   id              String @id
-  name            String
-  welcomeMessage  String @default("Welcome on the server!")
+  welcomeMessage  String?
   dm              Boolean @default(false)
   isActivated     Boolean @default(false)
-  server          Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  embed           Boolean @default(false)
   serverId        String @unique
+  server          Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  channel         Channel @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model LeaveChannel {
   id            String @id
-  name          String
-  leaveMessage  String @default("Goodbye my friend")
-  serverName    String @default("No server name")
+  leaveMessage  String?
   isActivated   Boolean @default(false)
-  server        Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  embed         Boolean @default(false)
   serverId      String @unique
+  server        Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  channel       Channel @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Interaction {
@@ -54,16 +55,18 @@ model InteractionOption {
   id              String @id
   name            String
   description     String?
-  interaction     Interaction @relation(fields: [interactionName], references: [name], onDelete: Cascade)
   interactionName String
+  interaction     Interaction @relation(fields: [interactionName], references: [name], onDelete: Cascade)
 }
 
 model Channel {
-  id        String @id
-  name      String
-  jokes     Boolean @default(true)
-  server    Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  serverId  String
+  id            String @id
+  name          String
+  jokes         Boolean @default(true)
+  serverId      String
+  server        Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  leaveChannel  LeaveChannel?
+  welcomeChannel WelcomeChannel?
 }
 
 model Twitch {

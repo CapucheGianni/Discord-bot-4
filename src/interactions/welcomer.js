@@ -5,7 +5,6 @@ const { interactionsIds } = require('../../settings.json');
 
 const enableSubCommand = async (client, interaction) => {
     const isEnabled = interaction.options.getBoolean("activate") ?? true;
-    const channel = await client.channels.cache.get(interaction.channelId);
 
     await prisma.welcomeChannel.upsert({
         where: {
@@ -13,7 +12,6 @@ const enableSubCommand = async (client, interaction) => {
         },
         create: {
             id: interaction.channelId,
-            name: channel.name,
             serverId: interaction.guildId,
             isActivated: isEnabled
         },
@@ -40,8 +38,7 @@ const channelsSubCommand = async (client, interaction) => {
                 serverId: interaction.guildId
             },
             create: {
-                id: "none",
-                name: "none",
+                id: interaction.channelId,
                 dm: isDms,
                 serverId: interaction.guildId,
                 isActivated: true
@@ -59,14 +56,12 @@ const channelsSubCommand = async (client, interaction) => {
         },
         create: {
             id: channel.id,
-            name: channel.name,
             dm: isDms,
             serverId: interaction.guildId,
             isActivated: true
         },
         update: {
             id: channel.id,
-            name: channel.name,
             dm: isDms,
             isActivated: true
         }
@@ -83,7 +78,6 @@ const messageSubCommand = async (client, interaction) => {
         },
         create: {
             id: interaction.channelId,
-            name: "default",
             welcomeMessage: message,
             serverId: interaction.guildId,
             isActivated: true
@@ -109,7 +103,7 @@ const testSubCommand = async (client, interaction) => {
 
     const { id, welcomeMessage, dm, isActivated } = infos;
 
-    interaction.reply(`Voici toutes les informations concernant les arrivées sur le serveur **${interaction.guild.name}**:\n\n>>> \`Salon:\` <#${id}>\n\`Message:\` ${welcomeMessage}\n\`Messages privés:\` ${dm}\n\`Activé:\` ${isActivated}`);
+    interaction.reply(`Voici toutes les informations concernant les arrivées sur le serveur **${interaction.guild.name}**:\n\n>>> \`Salon:\` <#${id}>\n\`Message:\` ${welcomeMessage ? welcomeMessage : "Aucun message indiqué"}\n\`Messages privés:\` ${dm}\n\`Activé:\` ${isActivated}`);
 };
 
 module.exports = {
