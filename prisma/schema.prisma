@@ -20,6 +20,7 @@ model Server {
   jokes     Boolean @default(true)
   welcomer  WelcomeChannel?
   leaver    LeaveChannel?
+  channels  Channel[]
 }
 
 model WelcomeChannel {
@@ -55,6 +56,14 @@ model InteractionOption {
   description     String?
   interaction     Interaction @relation(fields: [interactionName], references: [name], onDelete: Cascade)
   interactionName String
+}
+
+model Channel {
+  id        String @id
+  name      String
+  jokes     Boolean @default(true)
+  server    Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId  String
 }
 
 model Twitch {
