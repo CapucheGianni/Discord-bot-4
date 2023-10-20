@@ -74,7 +74,8 @@ module.exports = {
             .setDescription("Active ou désactive les blagues sur un salon spécifique")
             .addChannelOption((option) => option
                 .setName("picker")
-                .setDescription("Nom du salon"))
+                .setDescription("Nom du salon")
+                .setRequired(true))
             .addBooleanOption((option) => option
                 .setName("enable")
                 .setDescription("true/false")))
