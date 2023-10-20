@@ -73,3 +73,8 @@ model Twitch {
   id    String @id @default("1")
   token String
 }
+
+model Bot {
+  id              String @id
+  startTimestamp  String
+}

@@ -4,6 +4,7 @@ const getInteractions = require('./utils/getInteractions.js');
 const getCommands = require('./utils/getCommands.js');
 const getEvents = require('./utils/getEvents.js');
 const { dbDisconnect } = require('./db/main.js');
+const getStartTimestamp = require('./utils/getStartTimestamp.js');
 require('dotenv').config();
 
 const client = new Client({
@@ -30,6 +31,8 @@ const client = new Client({
 client.interactions = new Collection();
 client.commands = new Collection();
 client.cooldowns = new Collection();
+
+getStartTimestamp();
 
 // Get all the interactions, commands, and events and put them in a collection
 getInteractions(client);

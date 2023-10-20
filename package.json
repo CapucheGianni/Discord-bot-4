@@ -1,6 +1,6 @@
 {
     "name": "kaide",
-    "version": "1.4.0",
+    "version": "1.5.1",
     "description": "Un bot pour découvrir d.js",
     "main": "src/bot.js",
     "author": "CapucheGianni",
@@ -15,5 +15,8 @@
     },
     "devDependencies": {
         "prisma": "^5.4.2"
+    },
+    "prisma": {
+        "seed": "prisma/seed.js"
     }
 }
