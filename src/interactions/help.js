@@ -11,7 +11,7 @@ module.exports = {
     stats: {
         category: "Utilitaire",
         permissions: [],
-        id: interactionsIds.help
+        id: interactionsIds.help || 'help'
     },
     async execute(client, interaction) {
         try {

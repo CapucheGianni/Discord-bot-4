@@ -11,7 +11,7 @@ module.exports = {
     stats: {
         category: "Image",
         permissions: [],
-        id: interactionsIds.banner
+        id: interactionsIds.banner || 'banner'
     },
     async execute(client, interaction) {
         try {

@@ -10,7 +10,7 @@ module.exports = {
     stats: {
         category: 'Utilitaire',
         permissions: [],
-        id: interactionsIds.prefix
+        id: interactionsIds.prefix || 'prefix'
     },
     async execute(client, interaction) {
         try {

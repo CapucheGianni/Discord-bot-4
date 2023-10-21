@@ -89,7 +89,7 @@ module.exports = {
     stats: {
         category: "Utilitaire",
         permissions: [],
-        id: interactionsIds.jokes
+        id: interactionsIds.jokes || 'jokes'
     },
     execute(client, interaction) {
         try {

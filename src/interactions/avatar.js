@@ -9,7 +9,7 @@ module.exports = {
     stats: {
         category: "Image",
         permissions: [],
-        id: interactionsIds.avatar
+        id: interactionsIds.avatar || 'avatar'
     },
     execute(client, interaction) {
         try {

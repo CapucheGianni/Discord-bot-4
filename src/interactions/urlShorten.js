@@ -11,7 +11,7 @@ module.exports = {
     stats: {
         category: "Utilitaire",
         permissions: [],
-        id: interactionsIds.urlShorten
+        id: interactionsIds.urlShorten || 'urlshorten'
     },
     async execute(client, interaction) {
         try {

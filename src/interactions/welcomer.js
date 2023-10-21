@@ -143,7 +143,7 @@ module.exports = {
     stats: {
         category: "Configuration",
         permissions: [ "ManageChannels" ],
-        id: interactionsIds.welcomer
+        id: interactionsIds.welcomer || 'welcomer'
     },
     execute(client, interaction) {
         try {

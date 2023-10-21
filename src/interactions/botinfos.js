@@ -11,7 +11,7 @@ module.exports = {
     stats: {
         category: "Utilitaire",
         permissions: [],
-        id: interactionsIds.botinfos
+        id: interactionsIds.botinfos || 'botinfos'
     },
     async execute(client, interaction) {
         try {

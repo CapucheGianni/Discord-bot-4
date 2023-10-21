@@ -119,7 +119,7 @@ module.exports = {
     stats: {
         category: "Configuration",
         permissions: [ "ManageChannels" ],
-        id: interactionsIds.leaver
+        id: interactionsIds.leaver || 'leaver'
     },
     execute(client, interaction) {
         try {
