@@ -47,6 +47,7 @@ model LeaveChannel {
 model Interaction {
   name          String @id
   description   String?
+  disabled       Boolean @default(false)
   options       InteractionOption[]
   interactionId String @unique
 }

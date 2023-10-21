@@ -3,3 +3,4 @@
 src/lang.json
 settings.json
 test.js
+prisma/migrations/

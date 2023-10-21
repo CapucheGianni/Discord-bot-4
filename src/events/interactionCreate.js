@@ -1,6 +1,7 @@
 const { Events, EmbedBuilder, Collection } = require('discord.js');
 const { addUserInteraction } = require('../db/addUser.js');
 const { interactionErrorLog } = require('../utils/errorLog.js');
+const { prisma } = require('../db/main.js')
 require('dotenv').config();
 
 const interactionLog = async (client, interaction) => {
@@ -65,12 +66,11 @@ const initInteractionsCooldowns = (client, interaction, getInteraction) => {
 module.exports = {
     name: Events.InteractionCreate,
     async execute(client, interaction) {
-        if (!interaction.isCommand()) {
-            return;
-        }
-        if (!interaction.guildId) {
-            return interaction.reply({ content: "Les intéractions ne sont pas disponibles en message privé !" });
-        }
+        let dbInteraction = await prisma.interaction.findUnique({ where: { name: interaction.commandName } });
+
+        if (!interaction.isCommand()) return;
+        if (!interaction.guildId) return interaction.reply({ content: "Les intéractions ne sont pas disponibles en message privé !" });
+        if (dbInteraction?.disabled) return interaction.reply({ content: "Cette intéraction est désactivée !" });
 
         const getInteraction = client.interactions.get(interaction.commandName);
 
