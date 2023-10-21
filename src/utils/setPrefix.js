@@ -22,7 +22,7 @@ const getPrefix = async (guildId) => {
                 id: guildId
             }
         });
-        return server.prefix;
+        return server?.prefix || 'k!';
     } catch (e) {
         console.error(e);
     }
