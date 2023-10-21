@@ -1,11 +1,19 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { prisma } = require('../db/main.js');
 const { interactionsIds } = require('../../settings.json');
+const { ChannelType } = require('discord.js');
+require('dotenv').config();
 
 const serverUpdate = async (interaction) => {
     const choice = interaction.options.getBoolean("enable") ?? false;
     let res = "";
 
+    if (!interaction.member.permissions.has("ManageChannels")) {
+        return interaction.reply({
+            content: "Vous n'avez pas la permission de modifier les paramètres du serveur",
+            ephemeral: true
+        });
+    }
     await prisma.server.update({
         where: {
             id: interaction.guildId
@@ -14,7 +22,7 @@ const serverUpdate = async (interaction) => {
             jokes: choice
         }
     });
-    choice ? res = "Les blagues ont été activées avec succès" : res = "Les blagues ont été désactivées avec succès";
+    res = choice ? "Les blagues ont été activées avec succès" : "Les blagues ont été désactivées avec succès";
     return interaction.reply(res);
 }
 
@@ -23,6 +31,12 @@ const channelUpdate = async (interaction) => {
     const channel = interaction.options.getChannel("picker");
     let res = "";
 
+    if (!interaction.member.permissions.has("ManageChannels")) {
+        return interaction.reply({
+            content: "Vous n'avez pas la permission de modifier les paramètres de ce salon",
+            ephemeral: true
+        });
+    }
     await prisma.channel.upsert({
         where: {
             id: channel.id
@@ -37,7 +51,7 @@ const channelUpdate = async (interaction) => {
             serverId: interaction.guildId
         }
     });
-    choice ? res = `Les blagues ont été activées sur <#${channel.id}> avec succès` : res = `Les blagues ont été désactivées sur <#${channel.id}> avec succès`;
+    res = choice ? `Les blagues ont été activées sur <#${channel.id}> avec succès` : `Les blagues ont été désactivées sur <#${channel.id}> avec succès`;
     return interaction.reply(res);
 }
 
@@ -53,7 +67,7 @@ const userUpdate = async (interaction) => {
             jokes: choice
         }
     });
-    choice ? res = "Kaide pourra maintenant répondre à vos messages" : res = "Kaide ne pourra plus répondre à vos messages";
+    res = choice ? `<@${process.env.CLIENT_ID}> pourra maintenant répondre à vos messages` : `<@${process.env.CLIENT_ID}> ne pourra plus répondre à vos messages`;
     return interaction.reply(res);
 }
 
@@ -75,6 +89,7 @@ module.exports = {
             .addChannelOption((option) => option
                 .setName("picker")
                 .setDescription("Nom du salon")
+                .addChannelTypes(ChannelType.GuildText)
                 .setRequired(true))
             .addBooleanOption((option) => option
                 .setName("enable")
