@@ -10,7 +10,7 @@ module.exports = {
             return;
         }
         embed.setTitle("Message supprimé 🗑️")
-            .setDescription(`>>> ${message.content}`)
+            .setDescription(`${message.content}`)
             .addFields({
                 name: "Date d'envoi",
                 value: `<t:${message.createdTimestamp.toString().slice(0, 10)}> (<t:${message.createdTimestamp.toString().slice(0, 10)}:R>)`
