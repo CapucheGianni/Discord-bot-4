@@ -21,7 +21,7 @@ module.exports = {
 
             embed.setTitle("Bot informations")
                 .addFields(
-                    { name: "Uptime", value: `The bot is up since <t:${new Date(startTimestamp).getTime().toString().slice(0, 10)}:R>`, inline: true },
+                    { name: "Uptime", value: `The bot has been started <t:${new Date(startTimestamp).getTime().toString().slice(0, 10)}:R>`, inline: true },
                     { name: "Start date", value: new Date(startTimestamp).toLocaleString(), inline: true },
                     { name: "Ram usage", value: `L'utilisation de la RAM est actuellement de ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100}MB.` },
                     { name: "Ping", value: `${client.ws.ping}ms`, inline: true },
