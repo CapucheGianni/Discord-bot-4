@@ -3,9 +3,28 @@ const { prisma } = require('../db/main.js');
 const { ChannelType } = require('discord.js');
 const { interactionsIds } = require('../../settings.json');
 
+const updateChannel = async (channel, guildId) => {
+    await prisma.channel.upsert({
+        where: {
+            id: channel.id
+        },
+        create: {
+            id: channel.id,
+            name: channel.name,
+            serverId: guildId
+        },
+        update: {
+            id: channel.id,
+            name: channel.name
+        }
+    });
+}
+
 const enableSubCommand = async (client, interaction) => {
     const isEnabled = interaction.options.getBoolean("activate") ?? true;
+    const channel = client.channels.cache.get(interaction.channelId);
 
+    updateChannel(channel, interaction.guildId);
     await prisma.welcomeChannel.upsert({
         where: {
             serverId: interaction.guildId
@@ -25,6 +44,7 @@ const enableSubCommand = async (client, interaction) => {
 const channelsSubCommand = async (client, interaction) => {
     const channel = interaction.options.getChannel("channel");
     const isDms = interaction.options.getBoolean("dm") ?? false;
+    const res = isDms ? "Votre message de bienvenue sera maintenant envoyé par message privé." : `Le message de bienvenue sera désormais envoyé dans <#${channel.id}>!`;
 
     if (!channel && !isDms) {
         return interaction.reply({
@@ -32,46 +52,32 @@ const channelsSubCommand = async (client, interaction) => {
             ephemeral: "true"
         });
     }
-    if (isDms) {
-        await prisma.welcomeChannel.upsert({
-            where: {
-                serverId: interaction.guildId
-            },
-            create: {
-                id: interaction.channelId,
-                dm: isDms,
-                serverId: interaction.guildId,
-                isActivated: true
-            },
-            update: {
-                dm: isDms,
-                isActivated: true
-            }
-        });
-        return interaction.reply(`Votre message de bienvenue sera maintenant envoyé par message privé.`);
-    }
+    if (!isDms)
+        updateChannel(channel, interaction.guildId);
     await prisma.welcomeChannel.upsert({
         where: {
             serverId: interaction.guildId
         },
         create: {
-            id: channel.id,
+            id: channel?.id || interaction.channelId,
             dm: isDms,
             serverId: interaction.guildId,
             isActivated: true
         },
         update: {
-            id: channel.id,
+            id: channel?.id || interaction.channelId,
             dm: isDms,
             isActivated: true
         }
     });
-    interaction.reply(`Le message de bienvenue sera désormais envoyé dans <#${channel.id}>!`);
+    interaction.reply(res);
 };
 
 const messageSubCommand = async (client, interaction) => {
-    const message = interaction.options.getString("message") ?? "Bienvenue sur le serveur !";
+    const message = interaction.options.getString("message");
+    const channel = client.channels.cache.get(interaction.channelId);
 
+    updateChannel(channel, interaction.guildId);
     await prisma.welcomeChannel.upsert({
         where: {
             serverId: interaction.guildId
@@ -91,15 +97,9 @@ const messageSubCommand = async (client, interaction) => {
 };
 
 const testSubCommand = async (client, interaction) => {
-    const infos = await prisma.welcomeChannel.findUnique({
-        where: {
-            serverId: interaction.guildId
-        }
-    });
+    const infos = await prisma.welcomeChannel.findUnique({ where: { serverId: interaction.guildId } });
 
-    if (!infos) {
-        return interaction.reply("Vous n'avez renseigné aucune information concernant votre message d'arrivée.");
-    }
+    if (!infos) return interaction.reply("Vous n'avez renseigné aucune information concernant votre message d'arrivée.");
 
     const { id, welcomeMessage, dm, isActivated } = infos;
 

@@ -3,9 +3,28 @@ const { prisma } = require('../db/main.js');
 const { ChannelType } = require('discord.js');
 const { interactionsIds } = require('../../settings.json');
 
+const updateChannel = async (channel, guildId) => {
+    await prisma.channel.upsert({
+        where: {
+            id: channel.id
+        },
+        create: {
+            id: channel.id,
+            name: channel.name,
+            serverId: guildId
+        },
+        update: {
+            id: channel.id,
+            name: channel.name
+        }
+    });
+}
+
 const enableSubCommand = async (client, interaction) => {
     const isEnabled = interaction.options.getBoolean("activate") ?? true;
+    const channel = client.channels.cache.get(interaction.channelId);
 
+    updateChannel(channel, interaction.guildId);
     await prisma.leaveChannel.upsert({
         where: {
             serverId: interaction.guildId
@@ -31,6 +50,7 @@ const channelsSubCommand = async (client, interaction) => {
             ephemeral: "true"
         });
     }
+    updateChannel(channel, interaction.guildId);
     await prisma.leaveChannel.upsert({
         where: {
             serverId: interaction.guildId
@@ -49,8 +69,10 @@ const channelsSubCommand = async (client, interaction) => {
 };
 
 const messageSubCommand = async (client, interaction) => {
-    const message = interaction.options.getString("message") ?? "Goodbye my friend";
+    const message = interaction.options.getString("message");
+    const channel = client.channels.cache.get(interaction.channelId);
 
+    updateChannel(channel, interaction.guildId);
     await prisma.leaveChannel.upsert({
         where: {
             serverId: interaction.guildId
@@ -70,15 +92,9 @@ const messageSubCommand = async (client, interaction) => {
 };
 
 const testSubCommand = async (client, interaction) => {
-    const infos = await prisma.leaveChannel.findUnique({
-        where: {
-            serverId: interaction.guildId
-        }
-    });
+const infos = await prisma.leaveChannel.findUnique({ where: { serverId: interaction.guildId } });
 
-    if (!infos) {
-        return interaction.reply("Vous n'avez renseigné aucune information concernant votre message de départ.");
-    }
+    if (!infos) return interaction.reply("Vous n'avez renseigné aucune information concernant votre message de départ.");
 
     const { id, leaveMessage, isActivated } = infos;
 
