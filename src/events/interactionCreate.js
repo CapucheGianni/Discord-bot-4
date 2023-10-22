@@ -66,39 +66,34 @@ const initInteractionsCooldowns = (client, interaction, getInteraction) => {
 module.exports = {
     name: Events.InteractionCreate,
     async execute(client, interaction) {
-        let dbInteraction = await prisma.interaction.findUnique({ where: { name: interaction.commandName } });
+        if (interaction.isCommand()) {
+            if (!interaction.guildId) return interaction.reply({ content: "Les intéractions ne sont pas disponibles en message privé !" });
+            let dbInteraction = await prisma.interaction.findUnique({ where: { name: interaction.commandName } });
+            if (dbInteraction?.disabled) return interaction.reply({ content: "Cette intéraction est désactivée !" });
 
-        if (!interaction.isCommand()) return;
-        if (!interaction.guildId) return interaction.reply({ content: "Les intéractions ne sont pas disponibles en message privé !" });
-        if (dbInteraction?.disabled) return interaction.reply({ content: "Cette intéraction est désactivée !" });
+            const getInteraction = client.interactions.get(interaction.commandName);
 
-        const getInteraction = client.interactions.get(interaction.commandName);
+            if (!getInteraction) return console.error(`No interaction matching ${interaction.commandName} was found.`);
+            await addUserInteraction(client, interaction);
+            try {
+                const currentDate = new Date();
+                const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
+                const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
+                const isCd = initInteractionsCooldowns(client, interaction, getInteraction);
+                const perms = checkPermissions(getInteraction, interaction);
 
-        if (!getInteraction) {
-            console.error(`No interaction matching ${interaction.commandName} was found.`);
-            return;
-        }
-        await addUserInteraction(client, interaction);
-        try {
-            const currentDate = new Date();
-            const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
-            const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
-            const isCd = initInteractionsCooldowns(client, interaction, getInteraction);
-            const perms = checkPermissions(getInteraction, interaction);
-
-            if (isCd || perms) {
-                return;
+                if (isCd || perms) return;
+                await getInteraction.execute(client, interaction);
+                await interactionLog(client, interaction);
+                console.log(`${interaction.commandName} interaction executed by ${interaction.user.username} (${interaction.user.id}) in ${interaction.guild.name} (${interaction.guild.id}) at ${date} ${time}`);
+            } catch (error) {
+                console.error(`Error executing ${interaction.commandName}`);
+                interactionErrorLog(client, error, interaction);
+                await interaction.reply({
+                    content: `Une erreur est survenue lors de l'exécution de l'interaction \`${interaction.commandName}\`\n\n Veuillez contacter **__${client.users.cache.get(process.env.OWNER_ID).username}__** si l'erreur survient à plusieurs reprises. !`,
+                    ephemeral: true
+                });
             }
-            await getInteraction.execute(client, interaction);
-            await interactionLog(client, interaction);
-            console.log(`${interaction.commandName} interaction executed by ${interaction.user.username} (${interaction.user.id}) in ${interaction.guild.name} (${interaction.guild.id}) at ${date} ${time}`);
-        } catch (error) {
-            console.error(`Error executing ${interaction.commandName}`);
-            interactionErrorLog(client, error, interaction);
-            await interaction.reply({
-                content: `Une erreur est survenue lors de l'exécution de l'interaction \`${interaction.commandName}\`\n\n Veuillez contacter **__${client.users.cache.get(process.env.OWNER_ID).username}__** si l'erreur survient à plusieurs reprises. !`,
-                ephemeral: true
-            });
         }
     }
 };
