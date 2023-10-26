@@ -5,7 +5,7 @@
     "main": "src/bot.js",
     "author": "CapucheGianni",
     "dependencies": {
-        "@prisma/client": "^5.4.2",
+        "@prisma/client": "^5.5.2",
         "@sindresorhus/is": "^5.2.0",
         "axios": "^1.4.0",
         "discord-api-types": "^0.35.0",
@@ -13,10 +13,10 @@
         "dotenv": "^16.3.1",
         "node-fetch": "^2.6.12"
     },
-    "devDependencies": {
-        "prisma": "^5.4.2"
-    },
     "prisma": {
         "seed": "prisma/seed.js"
+    },
+    "devDependencies": {
+        "prisma": "^5.5.2"
     }
 }
