@@ -10,14 +10,14 @@ module.exports = {
     },
     run(client, command, args) {
         try {
+            if (args.length < 1) command.react('❌');
+
             const { interactions } = client;
-            const commandName = args[ 0 ].toLowerCase();
+            const commandName = args[0]?.toLowerCase();
             const interaction = interactions.get(commandName);
 
-            if (!interaction) {
-                return command.reply(`There is no command named \`${commandName}\`!`);
-            }
-            delete require.cache[ require.resolve(`../interactions/${interaction.data.name}.js`) ];
+            if (!interaction) return command.react('❌');
+            delete require.cache[require.resolve(`../interactions/${interaction.data.name}.js`)];
             try {
                 client.interactions.delete(interaction.data.name);
 
@@ -25,10 +25,12 @@ module.exports = {
 
                 client.interactions.set(newInteraction.data.name, newInteraction);
             } catch (e) {
+                command.react('❌');
                 throw new Error(e);
             }
-            command.reply(`L'intéraction \`${commandName}\` a été rechargée avec succès !`);
+            return command.react('✅');
         } catch (e) {
+            command.react('❌');
             throw new Error(e);
         }
     }

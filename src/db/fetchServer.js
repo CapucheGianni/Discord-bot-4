@@ -16,7 +16,8 @@ const fetchServers = (client) => {
                     },
                     create: {
                         id: guild.id,
-                        name: guild.name
+                        name: guild.name,
+                        prefix: 'k!'
                     }
                 });
             })

@@ -6,11 +6,10 @@ module.exports = {
     permissions: [ 'OWNER' ],
     stats: {
         category: 'Owner',
-        usage: 'interaction'
+        usage: 'interaction [interaction] [enable/disable]'
     },
     async run(client, message, args) {
         try {
-            if (args.length < 1) return message.react('❌');
             if (args.length < 2) return message.react('❌');
 
             const commandName = args[0];

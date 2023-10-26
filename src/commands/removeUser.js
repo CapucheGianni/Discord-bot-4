@@ -10,16 +10,10 @@ module.exports = {
     },
     async run(client, command, args) {
         try {
-            const user = await prisma.user.delete({
-                where: {
-                    id: args[ 0 ]
-                }
-            });
-            command.reply(`L'utilisateur ${user.name} a été retiré de la base de données !`);
+            await prisma.user.delete({ where: { id: args[0] } });
+            command.react("✅");
         } catch (e) {
-            if (e.code === "P2025") {
-                return command.reply("Merci de spécifier l'id d'un utilisateur présent dans la db.");
-            }
+            command.react("❌");
             throw new Error(e);
         }
     }
