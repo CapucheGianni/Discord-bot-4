@@ -6,7 +6,8 @@ module.exports = {
     permissions: [],
     stats: {
         category: 'Fun',
-        usage: 'ratio <user>'
+        usage: 'ratio <user>',
+        alias: []
     },
     async run(client, message, args) {
         try {

@@ -84,8 +84,9 @@ module.exports = {
 
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
         const commandName = args.shift().toLowerCase();
-        const command = client.commands.get(commandName);
+        let command = client.commands.get(commandName);
 
+        if (!command) command = client.commands.find((cmd) => cmd.stats.alias && cmd.stats.alias.includes(commandName));
         if (!command) return;
         try {
             const currentDate = new Date();

@@ -8,7 +8,8 @@ module.exports = {
     permissions: [],
     stats: {
         category: "Utilitaire",
-        usage: "botinfos"
+        usage: "botinfos",
+        alias: ['bi']
     },
     async run(client, command, args) {
         try {

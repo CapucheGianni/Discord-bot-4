@@ -8,7 +8,8 @@ module.exports = {
     permissions: [],
     stats: {
         category: 'Utilitaire',
-        usage: 'help [command]'
+        usage: 'help [command]',
+        alias: ['h', 'aide']
     },
     async run(client, command, args) {
         try {

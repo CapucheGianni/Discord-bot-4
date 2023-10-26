@@ -7,7 +7,8 @@ module.exports = {
     permissions: [],
     stats: {
         category: "Image",
-        usage: "banner [color] [membre]"
+        usage: "banner [color] [membre]",
+        alias: ['bannière']
     },
     async run(client, command, args) {
         try {

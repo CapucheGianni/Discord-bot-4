@@ -6,7 +6,8 @@ module.exports = {
     permissions: [],
     stats: {
         category: "Image",
-        usage: "avatar [membre]"
+        usage: "avatar [membre]",
+        alias: ['pp', 'pdp', 'pfp']
     },
     async run(client, command, args) {
         try {

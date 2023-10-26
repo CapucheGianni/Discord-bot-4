@@ -7,7 +7,8 @@ module.exports = {
     permissions: [],
     stats: {
         category: 'Utilitaire',
-        usage: 'ping'
+        usage: 'ping',
+        alias: []
     },
     async run(client, command) {
         try {
