@@ -5,9 +5,9 @@ const { commandErrorLog } = require('../utils/errorLog.js');
 const getPun = require('../fun/pun.js');
 require('dotenv').config();
 
-const detectName = (message, prefix) => {
-    if (message.content.toLowerCase() === "kaide") {
-        message.channel.send(`Bonjour!\n\nJe suis **Kaide** le bot du goat __capuchegianni__.\nLe préfixe du bot est \`${prefix}\` mais il est tout à fait possible de le modifier.`);
+const detectName = (client, message, prefix) => {
+    if (message.content.toLowerCase() === client.user.username.toLowerCase()) {
+        message.channel.send(`Bonjour!\n\nJe suis **${client.user.username}** le bot du goat __capuchegianni__.\nLe préfixe du bot est \`${prefix}\` mais il est tout à fait possible de le modifier.`);
         if (!message.guild) {
             message.channel.send("Je ne suis utilisable que sur un serveur !");
         }
@@ -75,12 +75,12 @@ module.exports = {
         let prefix = await getPrefix(message.guildId);
 
         if (message.author.bot) return;
-        detectName(message, prefix);
+        detectName(client, message, prefix);
         if (!message.guild) return;
         await addUserMessage(client, message);
         getPun(message);
-        if (!message.content.startsWith(prefix) && !message.content.startsWith("kaide")) return;
-        if (message.content.startsWith("kaide")) prefix = "kaide";
+        if (!message.content.startsWith(prefix) && !message.content.startsWith(client.user.username.toLowerCase())) return;
+        if (message.content.startsWith(client.user.username.toLowerCase())) prefix = client.user.username;
 
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
         const commandName = args.shift().toLowerCase();
