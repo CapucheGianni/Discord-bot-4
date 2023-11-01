@@ -1,30 +1,30 @@
 const { EmbedBuilder } = require('discord.js');
-const { version } = require('../../package.json');
-const { getPrefix } = require('../utils/setPrefix.js');
+const { version } = require('../../../package.json');
+const { getPrefix } = require('../../utils/setPrefix.js');
 
 module.exports = {
     name: "help",
     description: "Affiche la liste des commandes disponibles",
     permissions: [],
     stats: {
-        category: 'Utilitaire',
+        category: 'Informations',
         usage: 'help [command]',
         alias: ['h', 'aide']
     },
     async run(client, command, args) {
         try {
-            const commandName = args[ 0 ];
+            const commandName = args[0];
             const embed = new EmbedBuilder();
-            const cmdList = client.commands.filter((cmd) => cmd.permissions[ 0 ] !== "OWNER");
+            const cmdList = client.commands.filter((cmd) => cmd.permissions[0] !== "OWNER");
             const prefix = await getPrefix(command.guildId);
 
-            if (args[ 1 ]) {
+            if (args[1]) {
                 return command.reply("Merci de n'indiquer qu'une seule commande");
             }
             if (commandName) {
                 const cmd = client.commands.find((comm) => comm.name === commandName);
 
-                if (!cmd || cmd.permissions[ 0 ] === "OWNER") {
+                if (!cmd || cmd.permissions[0] === "OWNER") {
                     return command.reply(`La command \`${commandName}\` n'existe pas !`);
                 }
                 embed.setTitle(`Commande \`${commandName}\` 📚`)
@@ -68,7 +68,7 @@ module.exports = {
                     .setTimestamp()
                     .setColor(`#ffc800`);
             }
-            await command.reply({ embeds: [ embed ] });
+            await command.reply({ embeds: [embed] });
         } catch (e) {
             throw new Error(e);
         }

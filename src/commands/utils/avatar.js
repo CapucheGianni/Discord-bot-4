@@ -1,17 +1,17 @@
-const getUser = require('../utils/getUser');
+const getUser = require('../../utils/getUser');
 
 module.exports = {
     name: "avatar",
     description: "Affiche l'avatar d'un utilisateur",
     permissions: [],
     stats: {
-        category: "Image",
+        category: "Utilitaire",
         usage: "avatar [membre]",
         alias: ['pp', 'pdp', 'pfp']
     },
     async run(client, command, args) {
         try {
-            const user = await getUser(client, command, args[ 0 ]);
+            const user = await getUser(client, command, args[0]);
 
             if (user) {
                 return command.reply({

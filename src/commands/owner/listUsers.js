@@ -1,9 +1,9 @@
-const { prisma } = require('../db/main.js');
+const { prisma } = require('../../db/main.js');
 
 module.exports = {
-    name: "lusers",
+    name: "listusers",
     description: "Liste les utilisateurs de la base de données.",
-    permissions: [ "OWNER" ],
+    permissions: ["OWNER"],
     stats: {
         category: "Owner",
         usage: "lusers",

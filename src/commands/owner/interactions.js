@@ -1,28 +1,28 @@
-const { prisma } = require('../db/main.js');
+const { prisma } = require('../../db/main.js');
 
 module.exports = {
-    name: 'interaction',
+    name: 'interactions',
     description: 'Enable and disable interactions',
-    permissions: [ 'OWNER' ],
+    permissions: ['OWNER'],
     stats: {
         category: 'Owner',
-        usage: 'interaction [interaction] [enable/disable]'
+        usage: 'interactions <interaction> <enable/disable>'
     },
-    async run(client, message, args) {
+    async run(client, command, args) {
         try {
-            if (args.length < 2) return message.react('❌');
+            if (args.length < 2) return command.react('❌');
 
             const commandName = args[0];
             const action = args[1];
 
-            if (!client.interactions.has(commandName)) return message.react('❌');
+            if (!client.interactions.has(commandName)) return command.react('❌');
             await prisma.interaction.update({
                 where: { name: commandName },
                 data: { disabled: action === 'disable' }
             });
-            message.react('✅');
+            command.react('✅');
         } catch (e) {
-            message.react('❌');
+            command.react('❌');
             throw new Error(e);
         }
     }

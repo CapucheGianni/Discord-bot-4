@@ -1,12 +1,12 @@
 const { EmbedBuilder } = require('discord.js');
-const { version } = require('../../package.json');
+const { version } = require('../../../package.json');
 
 module.exports = {
     name: "ping",
     description: "Affiche le ping du bot",
     permissions: [],
     stats: {
-        category: 'Utilitaire',
+        category: 'Informations',
         usage: 'ping',
         alias: []
     },
@@ -28,7 +28,7 @@ module.exports = {
 
             return sent.edit({
                 content: "Pinged successfully !",
-                embeds: [ embed ]
+                embeds: [embed]
             });
         } catch (e) {
             throw new Error(e);

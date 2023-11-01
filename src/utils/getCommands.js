@@ -1,20 +1,42 @@
 const fs = require('node:fs');
-const path = require('node:path');
+const util = require('node:util');
+const readdir = util.promisify(fs.readdir);
 
-const getCommands = (client) => {
-    const commandsPath = path.join(__dirname, '../commands');
-    const commandsFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
+const getCommands = async (client) => {
+    const directories = await readdir('./src/commands/');
 
-    for (const file of commandsFiles) {
-        const filePath = path.join(commandsPath, file);
-        const command = require(filePath);
+    for (const dir of directories) {
+        const commands = await readdir(`./src/commands/${dir}/`);
 
-        if ('name' in command && 'run' in command) {
-            client.commands.set(command.name, command);
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "name" or "run" property.`);
-        }
-    }
+        commands.filter((cmd) => cmd.split('.').pop() === 'js').forEach((cmd) => {
+            const command = require(`../commands/${dir}/${cmd}`);
+
+            if ('name' in command && 'run' in command) {
+                client.commands.set(command.name, command);
+            } else {
+                console.log(`[WARNING] The command at ./src/commands/${dir}/${cmd} is missing a required "name" or "run" property.`);
+            }
+        });
+    };
 };
 
-module.exports = getCommands;
+const getCommandPath = async (commandName) => {
+    const directories = await readdir('./src/commands/');
+    let path = '';
+
+    for (const dir of directories) {
+        const commands = await readdir(`./src/commands/${dir}/`);
+
+        commands.filter((cmd) => cmd.split('.').pop() === 'js').forEach((cmd) => {
+            const command = require(`../commands/${dir}/${cmd}`);
+
+            if (command.name === commandName) path = `commands/${dir}/${cmd}`;
+        });
+    };
+    return path;
+}
+
+module.exports = {
+    getCommands,
+    getCommandPath
+};

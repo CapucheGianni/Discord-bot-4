@@ -9,19 +9,19 @@ module.exports = {
         usage: 'ratio <user>',
         alias: []
     },
-    async run(client, message, args) {
+    async run(client, command, args) {
         try {
-            if (args.length === 0) return message.reply('Pas capable de mentionner quelqu\'un ?');
+            if (args.length === 0) return command.reply('Pas capable de mentionner quelqu\'un ?');
 
             let ratioNbr = 0;
             let flopNbr = 0;
             const users = [];
-            const user = await message.author.fetch();
-            const userToRatio = await message.mentions.users.first().fetch();
+            const user = await command.author.fetch();
+            const userToRatio = await command.mentions.users.first().fetch();
             const ratio = new ButtonBuilder().setCustomId('ratio').setLabel(ratioNbr + ' ratio').setStyle(ButtonStyle.Success);
             const flop = new ButtonBuilder().setCustomId('flop').setLabel(flopNbr + ' flop').setStyle(ButtonStyle.Danger);
             const row = new ActionRowBuilder().addComponents(ratio, flop);
-            const msg = await message.reply({
+            const msg = await command.reply({
                 content: `<@${user.id}> veut ratio <@${userToRatio.id}>\n1 minute pour savoir si c'est mérité`,
                 components: [row]
             });
@@ -51,7 +51,7 @@ module.exports = {
             });
             setTimeout(() => {
                 msg.edit({ components: [] });
-                message.channel.send(ratioNbr > flopNbr ? `RATIOOOOOO <@${userToRatio.id}>` : `FLOOOOOOOOP <@${user.id}>`);
+                command.channel.send(ratioNbr > flopNbr ? `RATIOOOOOO <@${userToRatio.id}>` : `FLOOOOOOOOP <@${user.id}>`);
             }, 1000 * 60);
         } catch (e) {
             throw new Error(e);

@@ -1,14 +1,14 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
-const { version } = require('../../package.json');
-const { interactionsIds } = require('../../settings.json');
+const { version } = require('../../../package.json');
+const { interactionsIds } = require('../../../settings.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("ping")
         .setDescription("Affiche le ping du bot"),
     stats: {
-        category: "Utilitaire",
+        category: "Informations",
         permissions: [],
         id: interactionsIds.ping || 'ping'
     },
@@ -30,7 +30,7 @@ module.exports = {
 
             return interaction.editReply({
                 content: "Pinged successfully !",
-                embeds: [ embed ]
+                embeds: [embed]
             });
         } catch (e) {
             throw new Error(e);

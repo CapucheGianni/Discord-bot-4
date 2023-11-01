@@ -1,4 +1,4 @@
-const { getPrefix, setPrefix } = require('../utils/setPrefix.js');
+const { getPrefix, setPrefix } = require('../../utils/setPrefix.js');
 
 module.exports = {
     name: "prefix",
@@ -11,7 +11,7 @@ module.exports = {
     },
     async run(client, command, args) {
         try {
-            const newPrefix = args[ 0 ];
+            const newPrefix = args[0];
             const prefix = await getPrefix(command.guildId);
             const maxLength = 3;
 

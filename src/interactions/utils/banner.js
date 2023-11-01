@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
-const { interactionsIds } = require('../../settings.json');
+const { interactionsIds } = require('../../../settings.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,7 +9,7 @@ module.exports = {
         .addUserOption((option) => option.setName("membre").setDescription("La bannière du membre voulu"))
         .addBooleanOption((option) => option.setName("couleur").setDescription("Affiche la couleur de la bannière")),
     stats: {
-        category: "Image",
+        category: "Utilitaire",
         permissions: [],
         id: interactionsIds.banner || 'banner'
     },

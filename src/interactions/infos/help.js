@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
-const { version } = require('../../package.json');
-const { interactionsIds } = require('../../settings.json');
+const { version } = require('../../../package.json');
+const { interactionsIds } = require('../../../settings.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,7 +9,7 @@ module.exports = {
         .setDescription("Affiche la liste des commandes disponibles")
         .addStringOption((option) => option.setName("commande").setDescription("La commande à afficher")),
     stats: {
-        category: "Utilitaire",
+        category: "Informations",
         permissions: [],
         id: interactionsIds.help || 'help'
     },
@@ -71,7 +71,7 @@ module.exports = {
                     .setTimestamp()
                     .setColor(`#ffc800`);
             }
-            await interaction.reply({ embeds: [ embed ] });
+            await interaction.reply({ embeds: [embed] });
 
         } catch (e) {
             throw new Error(e);

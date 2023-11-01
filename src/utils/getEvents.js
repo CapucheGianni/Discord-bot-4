@@ -9,6 +9,7 @@ const getEvents = (client) => {
         const filePath = path.join(eventsPath, file);
         const event = require(filePath);
 
+        client.events.set(event.name, event)
         if (event.once) {
             client.once(event.name, (...args) => event.execute(client, ...args));
         } else {

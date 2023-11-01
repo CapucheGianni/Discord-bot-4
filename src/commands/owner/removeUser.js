@@ -1,9 +1,9 @@
-const { prisma } = require('../db/main.js');
+const { prisma } = require('../../db/main.js');
 
 module.exports = {
-    name: "rmuser",
+    name: "removeuser",
     description: "Retire un utilisateur de la base de données.",
-    permissions: [ "OWNER" ],
+    permissions: ["OWNER"],
     stats: {
         category: "Owner",
         usage: "rmuser [userid]",

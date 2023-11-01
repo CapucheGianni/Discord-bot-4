@@ -1,19 +1,19 @@
 const { EmbedBuilder } = require('discord.js');
-const getUser = require('../utils/getUser');
+const getUser = require('../../utils/getUser');
 
 module.exports = {
     name: "banner",
     description: "Affiche votre bannière ou celle d\'un membre du serveur",
     permissions: [],
     stats: {
-        category: "Image",
+        category: "Utilitaire",
         usage: "banner [color] [membre]",
         alias: ['bannière']
     },
     async run(client, command, args) {
         try {
-            if (args[ 0 ] === "color") {
-                let user = await getUser(client, command, args[ 1 ]);
+            if (args[0] === "color") {
+                let user = await getUser(client, command, args[1]);
 
                 if (user) {
                     user = await user.fetch();
@@ -30,7 +30,7 @@ module.exports = {
                 }
                 return command.reply("Merci d'indiquer un utilisateur valide.");
             }
-            let user = await getUser(client, command, args[ 0 ]);
+            let user = await getUser(client, command, args[0]);
 
             if (user) {
                 user = await user.fetch();

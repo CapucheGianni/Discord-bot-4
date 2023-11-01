@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { prisma } = require('../db/main.js');
-const { interactionsIds } = require('../../settings.json');
+const { prisma } = require('../../db/main.js');
+const { interactionsIds } = require('../../../settings.json');
 const { ChannelType } = require('discord.js');
 require('dotenv').config();
 
@@ -102,7 +102,7 @@ module.exports = {
                 .setName("enable")
                 .setDescription("true/false"))),
     stats: {
-        category: "Utilitaire",
+        category: "Fun",
         permissions: [],
         id: interactionsIds.jokes || 'jokes'
     },

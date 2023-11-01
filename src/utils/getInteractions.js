@@ -1,20 +1,42 @@
 const fs = require('node:fs');
-const path = require('node:path');
+const util = require('node:util');
+const readdir = util.promisify(fs.readdir);
 
-const getInteractions = (client) => {
-    const interactionsPath = path.join(__dirname, '../interactions');
-    const interactionsFiles = fs.readdirSync(interactionsPath).filter((file) => file.endsWith('.js'));
+const getInteractions = async (client) => {
+    const directories = await readdir('./src/interactions/');
 
-    for (const file of interactionsFiles) {
-        const filePath = path.join(interactionsPath, file);
-        const interaction = require(filePath);
+    directories.forEach(async (dir) => {
+        const interactions = await readdir(`./src/interactions/${dir}/`);
 
-        if ('data' in interaction && 'execute' in interaction) {
-            client.interactions.set(interaction.data.name, interaction);
-        } else {
-            console.log(`[WARNING] The interaction at ${filePath} is missing a required "data" or "execute" property.`);
-        }
-    }
+        interactions.filter((interaction) => interaction.split('.').pop() === 'js').forEach((interaction) => {
+            const int = require(`../interactions/${dir}/${interaction}`);
+
+            if ('data' in int && 'execute' in int) {
+                client.interactions.set(int.data.name, int);
+            } else {
+                console.log(`[WARNING] The interaction at ./src/interactions/${dir}/${interaction} is missing a required "data" or "execute" property.`);
+            }
+        });
+    });
 };
 
-module.exports = getInteractions;
+const getInteractionPath = async (interactionName) => {
+    const directories = await readdir('./src/interactions/');
+    let path = '';
+
+    for (const dir of directories) {
+        const interactions = await readdir(`./src/interactions/${dir}/`);
+
+        interactions.filter((interaction) => interaction.split('.').pop() === 'js').forEach((interaction) => {
+            const int = require(`../interactions/${dir}/${interaction}`);
+
+            if (int.data.name === interactionName) path = `interactions/${dir}/${interaction}`;
+        });
+    }
+    return path;
+}
+
+module.exports = {
+    getInteractions,
+    getInteractionPath
+};
