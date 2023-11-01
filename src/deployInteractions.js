@@ -1,8 +1,9 @@
-const fs = require('node:fs');
-const path = require('node:path');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
 const { prisma } = require('./db/main.js');
+const { getInteractions } = require('./utils/getInteractions.js');
+const { getCommands } = require('./utils/getCommands.js');
+const getEvents = require('./utils/getEvents.js');
 require('dotenv').config();
 
 const fetchInteractions = async (interactions) => {
@@ -60,17 +61,14 @@ const fetchInteractions = async (interactions) => {
 };
 
 const deployInteractions = async (client) => {
-    const interactions = [];
-    const interactionsPath = path.join(__dirname, 'interactions');
-    const interactionFiles = fs.readdirSync(interactionsPath).filter((file) => file.endsWith('.js'));
     const rest = new REST().setToken(process.env.TOKEN);
 
-    for (const file of interactionFiles) {
-        const filePath = path.join(interactionsPath, file);
-        const interaction = require(filePath);
-        interactions.push(interaction.data.toJSON());
-    }
+    await getInteractions(client);
+    await getCommands(client);
+    getEvents(client);
     try {
+        const interactions = client.interactions.map((interaction) => interaction.data.toJSON());
+
         await fetchInteractions(client.interactions);
         await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: interactions });
         console.log('Successfully registered application commands.');
