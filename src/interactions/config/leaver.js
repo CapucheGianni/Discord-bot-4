@@ -1,29 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { ChannelType } = require('discord.js');
 const { interactionsIds } = require('../../../settings.json');
-
-const updateChannel = async (client, channel, guildId) => {
-    await client.prisma.channel.upsert({
-        where: {
-            id: channel.id
-        },
-        create: {
-            id: channel.id,
-            name: channel.name,
-            serverId: guildId
-        },
-        update: {
-            id: channel.id,
-            name: channel.name
-        }
-    });
-}
+const { createChannelFromId } = require('../../utils/createChannel');
 
 const enableSubCommand = async (client, interaction) => {
     const isEnabled = interaction.options.getBoolean("activate") ?? true;
-    const channel = client.channels.cache.get(interaction.channelId);
 
-    updateChannel(client, channel, interaction.guildId);
+    await createChannelFromId(client, interaction.channelId);
     await client.prisma.leaveChannel.upsert({
         where: {
             serverId: interaction.guildId
@@ -45,11 +28,11 @@ const channelsSubCommand = async (client, interaction) => {
 
     if (!channel) {
         return interaction.reply({
-            content: "Merci d'indiquer un salon du serveur",
+            content: "Merci d'indiquer un salon",
             ephemeral: "true"
         });
     }
-    updateChannel(client, channel, interaction.guildId);
+    await createChannelFromId(client, channel.channelId);
     await client.prisma.leaveChannel.upsert({
         where: {
             serverId: interaction.guildId
@@ -69,9 +52,8 @@ const channelsSubCommand = async (client, interaction) => {
 
 const messageSubCommand = async (client, interaction) => {
     const message = interaction.options.getString("message");
-    const channel = client.channels.cache.get(interaction.channelId);
 
-    updateChannel(client, channel, interaction.guildId);
+    await createChannelFromId(client, interaction.channelId);
     await client.prisma.leaveChannel.upsert({
         where: {
             serverId: interaction.guildId

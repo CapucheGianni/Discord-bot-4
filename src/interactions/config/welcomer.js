@@ -1,29 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { ChannelType } = require('discord.js');
 const { interactionsIds } = require('../../../settings.json');
-
-const updateChannel = async (client, channel, guildId) => {
-    await client.prisma.channel.upsert({
-        where: {
-            id: channel.id
-        },
-        create: {
-            id: channel.id,
-            name: channel.name,
-            serverId: guildId
-        },
-        update: {
-            id: channel.id,
-            name: channel.name
-        }
-    });
-}
+const { createChannelFromId } = require('../../utils/createChannel');
 
 const enableSubCommand = async (client, interaction) => {
     const isEnabled = interaction.options.getBoolean("activate") ?? true;
-    const channel = client.channels.cache.get(interaction.channelId);
 
-    updateChannel(client, channel, interaction.guildId);
+    createChannelFromId(client, interaction.channelId);
     await client.prisma.welcomeChannel.upsert({
         where: {
             serverId: interaction.guildId
@@ -51,8 +34,7 @@ const channelsSubCommand = async (client, interaction) => {
             ephemeral: "true"
         });
     }
-    if (!isDms)
-        updateChannel(client, channel, interaction.guildId);
+    if (!isDms) createChannelFromId(client, channel.id);
     await client.prisma.welcomeChannel.upsert({
         where: {
             serverId: interaction.guildId
@@ -74,9 +56,8 @@ const channelsSubCommand = async (client, interaction) => {
 
 const messageSubCommand = async (client, interaction) => {
     const message = interaction.options.getString("message");
-    const channel = client.channels.cache.get(interaction.channelId);
 
-    updateChannel(client, channel, interaction.guildId);
+    createChannelFromId(client, interaction.channelId);
     await client.prisma.welcomeChannel.upsert({
         where: {
             serverId: interaction.guildId
