@@ -60,15 +60,36 @@ const fetchInteractions = async (interactions) => {
     }
 };
 
+const checkIfAnyChanges = async (client) => {
+    const interactionsInDb = await prisma.interaction.findMany({ include: { options: true } });
+    const interactionsInClient = client.interactions.map((interaction) => interaction.data.toJSON()).sort((a, b) => a.name.localeCompare(b.name));
+
+    if (interactionsInDb.length !== interactionsInClient.length) return true;
+    for (let i = 0; i < interactionsInDb.length; i++) {
+        const interactionsOptionsInClient = interactionsInClient[i].options.sort((a, b) => a.name.localeCompare(b.name));
+
+        if (interactionsInDb[i].name !== interactionsInClient[i].name) return true;
+        if (interactionsInDb[i].description !== interactionsInClient[i].description) return true;
+        if (interactionsInDb[i].options.length !== interactionsInClient[i].options.length) return true;
+        for (let j = 0; j < interactionsInDb[i].options.length; j++) {
+            if (interactionsInDb[i].options[j].name !== interactionsOptionsInClient[j].name) return true;
+            if (interactionsInDb[i].options[j].description !== interactionsOptionsInClient[j].description) return true;
+        }
+    }
+    return false;
+}
+
 const deployInteractions = async (client) => {
     const rest = new REST().setToken(process.env.TOKEN);
 
     await getInteractions(client);
     await getCommands(client);
     getEvents(client);
+    if (!await checkIfAnyChanges(client)) return;
     try {
         const interactions = client.interactions.map((interaction) => interaction.data.toJSON());
 
+        console.log('Started refreshing application (/) commands.');
         await fetchInteractions(client.interactions);
         await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: interactions });
         console.log('Successfully registered application commands.');
