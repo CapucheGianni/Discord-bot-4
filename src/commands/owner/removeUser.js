@@ -1,5 +1,3 @@
-const { prisma } = require('../../db/main.js');
-
 module.exports = {
     name: "removeuser",
     description: "Retire un utilisateur de la base de données.",
@@ -11,7 +9,7 @@ module.exports = {
     },
     async run(client, command, args) {
         try {
-            await prisma.user.delete({ where: { id: args[0] } });
+            await client.prisma.user.delete({ where: { id: args[0] } });
             command.react("✅");
         } catch (e) {
             command.react("❌");

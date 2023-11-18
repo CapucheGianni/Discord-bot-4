@@ -1,10 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { prisma } = require('../../db/main.js');
 const { interactionsIds } = require('../../../settings.json');
 const { ChannelType } = require('discord.js');
 require('dotenv').config();
 
-const serverUpdate = async (interaction) => {
+const serverUpdate = async (client, interaction) => {
     const choice = interaction.options.getBoolean("enable") ?? false;
     let res = "";
 
@@ -14,7 +13,7 @@ const serverUpdate = async (interaction) => {
             ephemeral: true
         });
     }
-    await prisma.server.update({
+    await client.prisma.server.update({
         where: {
             id: interaction.guildId
         },
@@ -26,7 +25,7 @@ const serverUpdate = async (interaction) => {
     return interaction.reply(res);
 }
 
-const channelUpdate = async (interaction) => {
+const channelUpdate = async (client, interaction) => {
     const choice = interaction.options.getBoolean("enable") ?? false;
     const channel = interaction.options.getChannel("picker");
     let res = "";
@@ -37,7 +36,7 @@ const channelUpdate = async (interaction) => {
             ephemeral: true
         });
     }
-    await prisma.channel.upsert({
+    await client.prisma.channel.upsert({
         where: {
             id: channel.id
         },
@@ -55,11 +54,11 @@ const channelUpdate = async (interaction) => {
     return interaction.reply(res);
 }
 
-const userUpdate = async (interaction) => {
+const userUpdate = async (client, interaction) => {
     const choice = interaction.options.getBoolean("enable") ?? false;
     let res = "";
 
-    await prisma.user.update({
+    await client.prisma.user.update({
         where: {
             id: interaction.user.id
         },
@@ -112,11 +111,11 @@ module.exports = {
 
             switch (subcommands) {
                 case 'server':
-                    return serverUpdate(interaction);
+                    return serverUpdate(client, interaction);
                 case 'channel':
-                    return channelUpdate(interaction);
+                    return channelUpdate(client, interaction);
                 case 'user':
-                    return userUpdate(interaction);
+                    return userUpdate(client, interaction);
             }
         } catch (e) {
             throw new Error(e);

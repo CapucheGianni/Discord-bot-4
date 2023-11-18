@@ -89,6 +89,13 @@ const reloadInteraction = async (client, command, interactionName) => {
             const updatedInteraction = require(`../../${path}`);
 
             client.interactions.set(updatedInteraction.data.name, updatedInteraction);
+            client.mySet.forEach((value) => {
+                const infos = JSON.parse(value);
+
+                if (infos.name === interactionName && infos.type === 'interaction') {
+                    client.mySet.delete(value);
+                }
+            });
             command.react('✅');
         }
     } catch (e) {
@@ -102,7 +109,8 @@ module.exports = {
     permissions: ["OWNER"],
     stats: {
         category: "Owner",
-        usage: "reload <type> [file]"
+        usage: "reload <type> [file]",
+        alias: ['rl']
     },
     run(client, command, args) {
         if (args.length < 1) command.react('❌');

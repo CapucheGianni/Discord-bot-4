@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { interactionsIds } = require('../../../settings.json');
-const { prisma } = require('../../db/main');
 const { EmbedBuilder } = require('discord.js');
 const { version } = require('../../../package.json');
 
@@ -15,7 +14,7 @@ module.exports = {
     },
     async execute(client, interaction) {
         try {
-            const { startTimestamp } = await prisma.bot.findUnique({ where: { id: process.env.CLIENT_ID } });
+            const { startTimestamp } = await client.prisma.bot.findUnique({ where: { id: process.env.CLIENT_ID } });
             const user = await interaction.user.fetch();
             const embed = new EmbedBuilder();
 

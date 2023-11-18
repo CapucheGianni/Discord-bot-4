@@ -1,4 +1,3 @@
-const { prisma } = require('../../db/main');
 const { EmbedBuilder } = require('discord.js');
 const { version } = require('../../../package.json');
 
@@ -13,7 +12,7 @@ module.exports = {
     },
     async run(client, command, args) {
         try {
-            const { startTimestamp } = await prisma.bot.findUnique({ where: { id: process.env.CLIENT_ID } });
+            const { startTimestamp } = await client.prisma.bot.findUnique({ where: { id: process.env.CLIENT_ID } });
             const user = await command.author.fetch();
             const embed = new EmbedBuilder();
 

@@ -78,7 +78,7 @@ module.exports = {
         detectName(client, message, prefix);
         if (!message.guild) return;
         await addUserMessage(client, message);
-        getPun(message);
+        getPun(client, message);
         if (!message.content.startsWith(prefix) && !message.content.startsWith(client.user.username.toLowerCase())) return;
         if (message.content.startsWith(client.user.username.toLowerCase())) prefix = client.user.username;
 

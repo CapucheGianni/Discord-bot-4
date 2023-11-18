@@ -1,8 +1,6 @@
-const { prisma } = require('./main.js');
-
 const addUserMessage = async (client, message) => {
     try {
-        await prisma.user.upsert({
+        await client.prisma.user.upsert({
             where: {
                 id: message.author.id
             },
@@ -21,7 +19,7 @@ const addUserMessage = async (client, message) => {
 
 const addUserInteraction = async (client, interaction) => {
     try {
-        await prisma.user.upsert({
+        await client.prisma.user.upsert({
             where: {
                 id: interaction.user.id
             },

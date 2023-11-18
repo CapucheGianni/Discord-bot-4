@@ -1,5 +1,3 @@
-const { prisma } = require('../../db/main.js');
-
 module.exports = {
     name: "listservers",
     description: "Liste les serveurs de la base de données.",
@@ -11,7 +9,7 @@ module.exports = {
     },
     async run(client, command) {
         try {
-            const servers = await prisma.server.findMany();
+            const servers = await client.prisma.server.findMany();
             command.reply(`Voici la liste des utilisateurs de la base de données : \n\n${servers.sort((a, b) => {
                 if (a.name.toLowerCase() > b.name.toLowerCase()) {
                     return 1;

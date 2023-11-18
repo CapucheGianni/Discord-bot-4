@@ -1,5 +1,4 @@
 const { Events, EmbedBuilder } = require('discord.js');
-const { prisma } = require('../db/main.js');
 require('dotenv').config();
 
 module.exports = {
@@ -8,7 +7,7 @@ module.exports = {
         try {
             const { guild, user } = member;
             const fetchedUser = await user.fetch();
-            const channel = await prisma.welcomeChannel.findUnique({
+            const channel = await client.prisma.welcomeChannel.findUnique({
                 where: {
                     serverId: guild.id
                 }

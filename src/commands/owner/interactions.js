@@ -1,5 +1,3 @@
-const { prisma } = require('../../db/main.js');
-
 module.exports = {
     name: 'interactions',
     description: 'Enable and disable interactions',
@@ -16,7 +14,7 @@ module.exports = {
             const action = args[1];
 
             if (!client.interactions.has(commandName)) return command.react('❌');
-            await prisma.interaction.update({
+            await client.prisma.interaction.update({
                 where: { name: commandName },
                 data: { disabled: action === 'disable' }
             });

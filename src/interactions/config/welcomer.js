@@ -1,10 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { prisma } = require('../../db/main.js');
 const { ChannelType } = require('discord.js');
 const { interactionsIds } = require('../../../settings.json');
 
-const updateChannel = async (channel, guildId) => {
-    await prisma.channel.upsert({
+const updateChannel = async (client, channel, guildId) => {
+    await client.prisma.channel.upsert({
         where: {
             id: channel.id
         },
@@ -24,8 +23,8 @@ const enableSubCommand = async (client, interaction) => {
     const isEnabled = interaction.options.getBoolean("activate") ?? true;
     const channel = client.channels.cache.get(interaction.channelId);
 
-    updateChannel(channel, interaction.guildId);
-    await prisma.welcomeChannel.upsert({
+    updateChannel(client, channel, interaction.guildId);
+    await client.prisma.welcomeChannel.upsert({
         where: {
             serverId: interaction.guildId
         },
@@ -53,8 +52,8 @@ const channelsSubCommand = async (client, interaction) => {
         });
     }
     if (!isDms)
-        updateChannel(channel, interaction.guildId);
-    await prisma.welcomeChannel.upsert({
+        updateChannel(client, channel, interaction.guildId);
+    await client.prisma.welcomeChannel.upsert({
         where: {
             serverId: interaction.guildId
         },
@@ -77,8 +76,8 @@ const messageSubCommand = async (client, interaction) => {
     const message = interaction.options.getString("message");
     const channel = client.channels.cache.get(interaction.channelId);
 
-    updateChannel(channel, interaction.guildId);
-    await prisma.welcomeChannel.upsert({
+    updateChannel(client, channel, interaction.guildId);
+    await client.prisma.welcomeChannel.upsert({
         where: {
             serverId: interaction.guildId
         },
@@ -97,7 +96,7 @@ const messageSubCommand = async (client, interaction) => {
 };
 
 const testSubCommand = async (client, interaction) => {
-    const infos = await prisma.welcomeChannel.findUnique({ where: { serverId: interaction.guildId } });
+    const infos = await client.prisma.welcomeChannel.findUnique({ where: { serverId: interaction.guildId } });
 
     if (!infos) return interaction.reply("Vous n'avez renseigné aucune information concernant votre message d'arrivée.");
 

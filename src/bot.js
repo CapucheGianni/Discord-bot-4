@@ -1,6 +1,7 @@
 const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const { deployInteractions } = require('./deployInteractions.js');
 const { dbDisconnect } = require('./db/main.js');
+const { prisma } = require('./db/main.js');
 const getStartTimestamp = require('./utils/getStartTimestamp.js');
 require('dotenv').config();
 
@@ -29,6 +30,8 @@ client.interactions = new Collection();
 client.commands = new Collection();
 client.events =  new Collection();
 client.cooldowns = new Collection();
+client.mySet = new Set();
+client.prisma = prisma;
 
 getStartTimestamp();
 
