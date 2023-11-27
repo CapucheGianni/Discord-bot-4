@@ -1,9 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
 const axios = require('axios');
-let check = 0;
-const infos = {
-    oldGame: ""
-};
 const { twitch } = require("../../settings.json");
 require('dotenv').config();
 const { prisma } = require('../db/main.js');
@@ -18,9 +14,8 @@ const getTwitchAccessToken = async (error) => {
     const oldToken = await prisma.twitch.findMany();
 
     try {
-        if (oldToken.length && !error) {
-            return oldToken[ 0 ].token;
-        }
+        if (oldToken.length && !error) return oldToken[0].token;
+
         const response = await axios.post(twitchAPIURL, null, { params });
         const { data } = response;
 
@@ -35,10 +30,12 @@ const getTwitchAccessToken = async (error) => {
     }
 }
 
-const setEmbed = (client, title, viewer_count, game_name) => {
-    const embed = new EmbedBuilder()
-        .setTitle(`${title}`)
-        .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${twitch.TWITCH_USER_LOGIN}-1920x1080.jpg?cacheBypass=${Date.now()}`)
+const setEmbed = (client, data) => {
+    const { title, viewer_count, game_name, user_login, user_name, tags } = data;
+
+    return new EmbedBuilder()
+        .setTitle(title)
+        .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${user_login}-1920x1080.jpg?cacheBypass=${Date.now()}`)
         .addFields(
             {
                 name: 'Viewers',
@@ -47,34 +44,40 @@ const setEmbed = (client, title, viewer_count, game_name) => {
             },
             {
                 name: 'Lien',
-                value: `https://twitch.tv/${twitch.TWITCH_USER_LOGIN}`,
+                value: `https://twitch.tv/${user_login}`,
                 inline: true
             },
             {
                 name: 'Jeu',
                 value: `${game_name}`,
                 inline: true
+            },
+            {
+                name: 'Tags',
+                value: tags.join(' / ') || 'Aucun tag configuré',
             }
         )
         .setFooter({
-            text: `Stream de ${twitch.TWITCH_USER_LOGIN} | ${client.user.username}`,
+            text: `${user_name} est en live | ${client.user.username}`,
             iconURL: client.user.displayAvatarURL({ dynamic: true })
         })
         .setTimestamp()
         .setColor(`#6441a5`);
-
-    return embed;
 };
 
-const sendMessage = async (client, content, embed) => {
-    await client.channels.cache.get('873663564135690352').send({
-        content: content,
-        embeds: [ embed ],
-        allowedMentions: { parse: [ 'everyone' ] }
+const sendMessage = async (client, infos, embed, message) => {
+    const mention = infos.roleId ? `<@&${infos.roleId}>` : null;
+    let finalMessage = message?.replace('{streamer}', infos.streamer);
+
+    if (mention) finalMessage = `||${mention}||\n\n${finalMessage}`;
+    await client.channels.cache.get(infos.channelId).send({
+        content: finalMessage,
+        embeds: [embed],
+        allowedMentions: { parse: ['roles'] }
     });
 };
 
-const sendTwitchEmbed = async (client, params, headers) => {
+const sendTwitchEmbed = async (client, params, headers, infos) => {
     const TWITCH_API_URL = 'https://api.twitch.tv/helix/streams';
     const response = await axios.get(TWITCH_API_URL, {
         params,
@@ -82,48 +85,75 @@ const sendTwitchEmbed = async (client, params, headers) => {
     });
     const { data } = response;
 
+    if (!infos.id) return;
     if (data.data.length) {
-        const { title, viewer_count, game_name } = data.data[ 0 ];
-        const embed = setEmbed(client, title, viewer_count, game_name);
+        const embed = setEmbed(client, data.data[0], infos);
 
-        if (check === 1) {
-            if (game_name !== infos.oldGame && check === 1) {
-                await sendMessage(client, `Changement de plan, **${twitch.TWITCH_USER_LOGIN}** joue maintenant à __${game_name}__!`, embed);
-                infos.oldGame = game_name;
-            }
-            return;
+        if (!infos.isStreaming) {
+            await sendMessage(client, infos, embed, infos.message);
+        } else {
+            if (infos.title !== data.data[0].title) await sendMessage(client, infos, embed, infos.updateMessage);
+            else return;
         }
-        check = 1;
-        await sendMessage(client, `Coucou @everyone! **${twitch.TWITCH_USER_LOGIN}** est en live sur Twitch!`, embed);
-        infos.oldGame = game_name;
+        if (infos.id) {
+            await prisma.twitchNotification.update({
+                where: { id: infos.id },
+                data: {
+                    isStreaming: true,
+                    title: data.data[0].title,
+                }
+            });
+        }
     } else {
-        infos.oldGame = "";
-        check = 0;
+        if (infos.id) {
+            await prisma.twitchNotification.update({
+                where: { id: infos.id },
+                data: {
+                    isStreaming: false,
+                    title: null
+                }
+            });
+        }
     }
 }
 
 const getTwitchStream = async (client) => {
     let twitchAccessToken = await getTwitchAccessToken(false);
-    const params = { user_login: twitch.TWITCH_USER_LOGIN };
     const headers = {
         'Client-ID': twitch.TWITCH_CLIENT_ID,
         'Authorization': `Bearer ${twitchAccessToken}`
     };
 
+    await setStreamStatusOnStart();
     setInterval(async () => {
-        try {
-            await sendTwitchEmbed(client, params, headers);
-        } catch (e) {
-            try {
-                twitchAccessToken = await getTwitchAccessToken(true);
+        const streamers = await prisma.twitchNotification.findMany();
 
-                headers.Authorization = `Bearer ${twitchAccessToken}`;
-                await sendTwitchEmbed(client, params, headers);
-            } catch (err) {
-                console.log(err);
+        streamers.forEach(async (streamer) => {
+            const params = { user_login: streamer.streamer.toLowerCase() };
+
+            try {
+                await sendTwitchEmbed(client, params, headers, streamer);
+            } catch (e) {
+                try {
+                    twitchAccessToken = await getTwitchAccessToken(true);
+
+                    headers.Authorization = `Bearer ${twitchAccessToken}`;
+                    await sendTwitchEmbed(client, params, headers, streamer.channelId);
+                } catch (err) {
+                    console.log(err);
+                }
             }
-        }
-    }, 1000 * 60 * 5);
+        });
+    }, 1000 * 60);
 };
+
+const setStreamStatusOnStart = async () => {
+    await prisma.twitchNotification.updateMany({
+        data: {
+            isStreaming: false,
+            title: null
+        }
+    });
+}
 
 module.exports = getTwitchStream;
