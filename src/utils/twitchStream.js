@@ -144,7 +144,7 @@ const getTwitchStream = async (client) => {
                 }
             }
         });
-    }, 1000 * 60);
+    }, 1000 * 60 * 10);
 };
 
 const setStreamStatusOnStart = async () => {
