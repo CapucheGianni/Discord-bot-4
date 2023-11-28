@@ -6,7 +6,6 @@ module.exports = {
     async execute(client, member) {
         try {
             const { guild, user } = member;
-            const fetchedUser = await user.fetch();
             const channel = await client.prisma.welcomeChannel.findUnique({
                 where: {
                     serverId: guild.id
@@ -25,7 +24,7 @@ module.exports = {
                     iconURL: client.user.displayAvatarURL({ dynamic: true })
                 })
                 .setTimestamp()
-                .setColor(fetchedUser.hexAccentColor || "#000")
+                .setColor("DarkBlue");
             if (channel.dm) {
                 user.send({ embeds: [ embed ] });
             } else {
