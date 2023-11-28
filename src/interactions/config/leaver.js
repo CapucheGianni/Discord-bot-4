@@ -32,7 +32,7 @@ const channelsSubCommand = async (client, interaction) => {
             ephemeral: "true"
         });
     }
-    await createChannelFromId(client, channel.channelId);
+    await createChannelFromId(client, channel.id);
     await client.prisma.leaveChannel.upsert({
         where: {
             serverId: interaction.guildId
