@@ -65,11 +65,11 @@ const setEmbed = (client, data) => {
         .setColor(`#6441a5`);
 };
 
-const sendMessage = async (client, infos, embed, message) => {
+const sendMessage = async (client, infos, embed, message, isUpdate) => {
     const mention = infos.roleId ? `<@&${infos.roleId}>` : null;
     let finalMessage = message?.replace('{streamer}', infos.streamer);
 
-    if (mention) finalMessage = `||${mention}||\n\n${finalMessage}`;
+    if (mention && !isUpdate) finalMessage = `||${mention}||\n\n${finalMessage}`;
     await client.channels.cache.get(infos.channelId).send({
         content: finalMessage,
         embeds: [embed],
@@ -90,9 +90,9 @@ const sendTwitchEmbed = async (client, params, headers, infos) => {
         const embed = setEmbed(client, data.data[0], infos);
 
         if (!infos.isStreaming) {
-            await sendMessage(client, infos, embed, infos.message);
+            await sendMessage(client, infos, embed, infos.message, false);
         } else {
-            if (infos.title !== data.data[0].title) await sendMessage(client, infos, embed, infos.updateMessage);
+            if (infos.title !== data.data[0].title) await sendMessage(client, infos, embed, infos.updateMessage, true);
             else return;
         }
         if (infos.id) {
@@ -138,7 +138,7 @@ const getTwitchStream = async (client) => {
                     twitchAccessToken = await getTwitchAccessToken(true);
 
                     headers.Authorization = `Bearer ${twitchAccessToken}`;
-                    await sendTwitchEmbed(client, params, headers, streamer.channelId);
+                    await sendTwitchEmbed(client, params, headers, streamer);
                 } catch (err) {
                     console.log(err);
                 }

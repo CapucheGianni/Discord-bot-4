@@ -128,7 +128,6 @@ const setTwitchNotification = async (client, interaction, infos, editStreamColle
             case 'register':
                 try {
                     await createChannelFromId(client, infos.channel ?? interaction.channelId);
-                    console.log(infos.channel, interaction.channelId);
                     await client.prisma.twitchNotification.upsert({
                         where: { id: interaction.guildId},
                         create: {
@@ -153,7 +152,6 @@ const setTwitchNotification = async (client, interaction, infos, editStreamColle
                         content: 'Tous vos changements ont été enregistrés avec succès !'
                     });
                 } catch (e) {
-                    console.log(e);
                     message.edit({
                         content: 'Création de la notification impossible, veuillez réessayer',
                         components: [],
@@ -356,7 +354,6 @@ const createStreamNotification = async (client, interaction, notification) => {
         infos.mention = notification.roleId;
         infos.channel = notification.channelId;
         await setTwitchNotification(client, interaction, infos, editStreamCollector, rows, embed, message);
-        // console.log(notification);
     }
 }
 
