@@ -38,7 +38,7 @@ const setMessage = async (i) => {
     }
 }
 
-const getMessage = async (client, interaction, i, infos) => {
+const getMessage = async (interaction, i, infos) => {
     const filter = (m) => m.author.id === interaction.user.id;
     const msg = await setMessage(i);
 
@@ -163,7 +163,7 @@ const setTwitchNotification = async (client, interaction, infos, editStreamColle
             default:
                 rows[rowId].components.forEach((button) => button.setDisabled(true));
                 message.edit({ components: [rows[rowId]] });
-                getMessage(client, interaction, i, infos).then(() => {
+                getMessage(interaction, i, infos).then(() => {
                     let notifMessage = '';
 
                     embed.setTitle(`Quand est-ce que ${infos.streamer ?? 'CapucheGianni'} est en live ?`)
@@ -294,8 +294,7 @@ const createStreamNotification = async (client, interaction, notification) => {
                 message.edit({
                     content: `CapucheGianni est en live !`,
                     components: [rows[0]],
-                    embeds: [embed],
-                    allowedMentions: []
+                    embeds: [embed]
                 });
                 await setTwitchNotification(client, interaction, infos, editStreamCollector, rows, embed, message);
             }
@@ -337,8 +336,7 @@ const createStreamNotification = async (client, interaction, notification) => {
         const message = await interaction.reply({
             content: notification.message?.replace('{streamer}', notification.streamer),
             components: [rows[0]],
-            embeds: [embed],
-            allowedMentions: []
+            embeds: [embed]
         });
         const filter = (i) => i.user.id === interaction.user.id;
         const editStreamCollector = message.createMessageComponentCollector({
