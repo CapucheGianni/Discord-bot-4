@@ -7,12 +7,13 @@
     "dependencies": {
         "@prisma/client": "^5.5.2",
         "@sindresorhus/is": "^5.2.0",
+        "@top-gg/sdk": "^3.1.6",
         "axios": "^1.4.0",
-        "dblapi.js": "^2.4.1",
         "discord-api-types": "^0.35.0",
         "discord.js": "^14.7.1",
         "dotenv": "^16.3.1",
-        "node-fetch": "^2.6.12"
+        "node-fetch": "^2.6.12",
+        "topgg-autoposter": "^2.0.1"
     },
     "prisma": {
         "seed": "prisma/seed.js"
