@@ -7,7 +7,6 @@
     "dependencies": {
         "@prisma/client": "^5.5.2",
         "@sindresorhus/is": "^5.2.0",
-        "@top-gg/sdk": "^3.1.6",
         "axios": "^1.4.0",
         "discord-api-types": "^0.35.0",
         "discord.js": "^14.7.1",
