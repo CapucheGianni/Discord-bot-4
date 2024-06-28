@@ -2,7 +2,6 @@ const { Events, EmbedBuilder } = require('discord.js');
 const { dbConnect } = require('../db/main.js');
 const fetchServer = require('../db/fetchServer.js');
 const getTwitchStream = require('../utils/twitchStream.js');
-const setTopGg = require('../utils/topgg.js');
 require('dotenv').config();
 
 module.exports = {
@@ -14,7 +13,6 @@ module.exports = {
 
             getTwitchStream(client);
             fetchServer(client);
-            setTopGg(client);
             embed.setTitle('Bot is online !')
                 .setDescription(`The bot is available on ${client.guilds.cache.size} servers with approximatively ${client.users.cache.size} members.\n\nThe RAM usage is currently at ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100}MB.`)
                 .setColor(`#00ff00`)
