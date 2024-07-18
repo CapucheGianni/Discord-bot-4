@@ -1,23 +1,35 @@
 {
-    "name": "kaide",
-    "version": "1.5.2",
-    "description": "Un bot pour découvrir d.js",
-    "main": "src/bot.js",
-    "author": "CapucheGianni",
-    "dependencies": {
-        "@prisma/client": "^5.5.2",
-        "@sindresorhus/is": "^5.2.0",
-        "axios": "^1.4.0",
-        "discord-api-types": "^0.35.0",
-        "discord.js": "^14.7.1",
-        "dotenv": "^16.3.1",
-        "node-fetch": "^2.6.12",
-        "topgg-autoposter": "^2.0.1"
-    },
-    "prisma": {
-        "seed": "prisma/seed.js"
-    },
-    "devDependencies": {
-        "prisma": "^5.5.2"
-    }
+   "name": "kaide",
+   "version": "1.6.3",
+   "description": "A new fully open source discord bot",
+   "author": "CapucheGianni",
+   "private": true,
+   "license": "MIT",
+   "type": "module",
+   "main": "build/main.js",
+   "scripts": {
+      "build": "tsc",
+      "dev": "node --loader ts-node/esm/transpile-only src/Main.ts",
+      "start": "ts-node build/main.js",
+      "watch": "nodemon --exec npm run dev --watch src --ext ts"
+   },
+   "dependencies": {
+      "@types/glob": "^8.1.0",
+      "discord.js": "^14.15.3",
+      "dotenv": "^16.4.5",
+      "glob": "^10.4.5",
+      "mysql2": "^3.10.3",
+      "node-fetch": "^3.3.2",
+      "nodemon": "^3.1.4",
+      "reflect-metadata": "^0.2.2",
+      "sequelize": "^6.37.3"
+   },
+   "devDependencies": {
+      "@types/node": "^20.14.11",
+      "ts-node": "^10.9.2"
+   },
+   "engines": {
+      "node": ">=16.0.0",
+      "npm": ">=7.0.0"
+   }
 }
