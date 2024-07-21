@@ -443,6 +443,44 @@ export default class Database {
         }
     }
 
+    public async addChannelFromInteraction(interaction: Interaction): Promise<void> {
+        try {
+            if (!interaction.channel || !interaction.channelId)
+                return
+            const channel = (await this.Channel.findByPk(interaction.channelId))?.get()
+            if (isChannel(channel) && channel.updatedAt > new Date(Date.now() - 60 * 60 * 24 * 1000))
+                return
+            if (!interaction.channel.isTextBased() || interaction.channel.isDMBased())
+                return
+
+            await this.Channel.upsert({
+                id: interaction.channelId,
+                name: interaction.channel.name,
+                serverId: interaction.channel.guildId
+            })
+        } catch (error) {
+            logger.simpleError(Error(`An error occured while adding a Channel from a message: ${error}`))
+        }
+    }
+
+    public async addServerFromInteraction(interaction: Interaction): Promise<void> {
+        try {
+            if (!interaction.guild || !interaction.guildId)
+                return
+
+            const server = (await this.Server.findByPk(interaction.guildId))?.get()
+            if (isServer(server) && server.updatedAt > new Date(Date.now() - 60 * 60 * 24 * 1000))
+                return
+
+            await this.Server.upsert({
+                id: interaction.guildId,
+                name: interaction.guild.name
+            })
+        } catch (error) {
+            logger.simpleError(Error(`An error occured while adding a Server from a message: ${error}`))
+        }
+    }
+
     public async addUserFromMessage(message: Message): Promise<void> {
         try {
             const user = await this.User.findByPk(message.author.id)
