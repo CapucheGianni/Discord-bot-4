@@ -103,9 +103,9 @@ export default class MessageCreate extends EventModule {
     }
 
     private _hasPermissions(user: GuildMember, command: CommandModule): boolean {
-        if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID'))
+        if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID') || !command.permissions.length)
             return true
-        if (!command.permissions.length || command.category === "owner")
+        if (command.category === "owner")
             return false
         for (const permission of command.permissions) {
             if (!user.permissions.has(permission))
@@ -120,12 +120,13 @@ export default class MessageCreate extends EventModule {
 
         const now = Date.now()
         const commandTimestamps = cooldowns.get(command.name)
+        const cooldown = command.cooldown * 1000
 
         if (commandTimestamps?.has(message.author.id)) {
             const timestamp = commandTimestamps.get(message.author.id)
 
             if (timestamp) {
-                const expirationTime = timestamp + command.cooldown
+                const expirationTime = timestamp + cooldown
                 if (now < expirationTime) {
                     const expiredTimestamp = Math.round(expirationTime / 1000)
 
@@ -135,7 +136,7 @@ export default class MessageCreate extends EventModule {
             }
         }
         commandTimestamps?.set(message.author.id, now)
-        setTimeout(() => commandTimestamps?.delete(message.author.id), command.cooldown)
+        setTimeout(() => commandTimestamps?.delete(message.author.id), cooldown)
         return true
     }
 
