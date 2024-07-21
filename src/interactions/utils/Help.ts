@@ -1,12 +1,13 @@
-import { SlashCommandBuilder, EmbedBuilder, CommandInteraction, CommandInteractionOptionResolver, AutocompleteInteraction } from 'discord.js'
+import { SlashCommandBuilder, EmbedBuilder, CommandInteraction, CommandInteractionOptionResolver, AutocompleteInteraction, PermissionsBitField } from 'discord.js'
 import { InteractionDecorator } from '../../utils/Decorators.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
 import { Bot } from '../../classes/Bot.js'
+import { isTruthy } from '../../utils/TypeGuards.js'
 
 @InteractionDecorator({
     name: 'help',
     description: 'Affiche les intéractions disponibles',
-    permissions: [],
+    cooldown: 3,
     category: 'utils',
     usage: 'help [interaction]',
     data: new SlashCommandBuilder()
@@ -17,6 +18,7 @@ import { Bot } from '../../classes/Bot.js'
             .setDescription('La commande à afficher')
             .setAutocomplete(true)
         )
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
 })
 export default class Help extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> {
@@ -58,7 +60,7 @@ export default class Help extends InteractionModule {
                     },
                     {
                         name: 'Permissions',
-                        value: cmd.permissions?.length ? cmd.permissions.map((perm) => `\`${perm}\``).join(', ') : 'Aucune permission requise',
+                        value: this._formatPermission(cmd.data.default_member_permissions),
                         inline: true
                     },
                     {
@@ -84,5 +86,15 @@ export default class Help extends InteractionModule {
                 .setColor(`#ffc800`)
         }
         await interaction.reply({ embeds: [embed] })
+    }
+
+    private _formatPermission(permissionValue: string | null | undefined): string {
+        if (!isTruthy(permissionValue))
+            return 'Aucune permission requise'
+
+        const permissionBigInt = BigInt(permissionValue)
+        return Object.keys(PermissionsBitField.Flags).find(key =>
+            PermissionsBitField.Flags[key as keyof typeof PermissionsBitField.Flags] === permissionBigInt
+        ) || 'Aucune permission requise'
     }
 }

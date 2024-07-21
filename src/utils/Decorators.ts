@@ -4,26 +4,26 @@ import { CommandModule } from '../classes/ModuleImports.js'
 import { TCategory } from '../types/Command.js'
 
 interface event {
-    name: TDiscordEvents,
+    name: TDiscordEvents
     eventType: TEventType
 }
 
 interface command {
-    name: string,
-    description: string,
-    cooldown: number,
-    permissions: PermissionsString[],
-    category: TCategory,
-    usage: string,
+    name: string
+    description: string
+    cooldown: number
+    permissions: PermissionsString[]
+    category: TCategory
+    usage: string
     aliases: string[]
 }
 
 interface interaction {
-    name: string,
-    description: string,
-    permissions: PermissionsString[],
-    category: TCategory,
-    usage: string,
+    name: string
+    description: string
+    cooldown: number
+    category: TCategory
+    usage: string
     data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder
 }
 

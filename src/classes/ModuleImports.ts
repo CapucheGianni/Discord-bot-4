@@ -51,7 +51,7 @@ export abstract class EventModule extends Module {
 export abstract class InteractionModule extends Module {
     public name: string = ''
     public description!: string
-    public permissions!: PermissionsString[]
+    public cooldown!: number
     public category!: TCategory
     public usage!: string
     public data!: SlashCommandBuilder

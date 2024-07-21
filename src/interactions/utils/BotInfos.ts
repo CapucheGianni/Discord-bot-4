@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, CommandInteraction, AutocompleteInteraction } from 'discord.js'
+import { SlashCommandBuilder, EmbedBuilder, CommandInteraction, AutocompleteInteraction, PermissionsBitField } from 'discord.js'
 import { InteractionDecorator } from '../../utils/Decorators.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
 import { Bot } from '../../classes/Bot.js'
@@ -7,15 +7,17 @@ import { isBot } from '../../utils/TypeGuards.js'
 @InteractionDecorator({
     name: 'botinfos',
     description: 'Affiche des informations utiles sur le bot.',
-    permissions: [],
+    cooldown: 1,
     category: 'utils',
     usage: 'botinfos',
     data: new SlashCommandBuilder()
         .setName('botinfos')
         .setDescription('Affiche des informations utiles sur le bot.')
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
 })
 export default class BotInfosInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
+
     public async execute(client: Bot, interaction: CommandInteraction): Promise<void> {
         const bot = (await client.database.Bot.findByPk(client.user!.id))?.get()
         if (!isBot(bot) || !client.user) {
@@ -23,7 +25,6 @@ export default class BotInfosInteraction extends InteractionModule {
             return
         }
 
-        const color = (await interaction.user.fetch()).hexAccentColor ?? '#000'
         const embed = new EmbedBuilder()
             .setTitle('Bot informations')
             .addFields(
@@ -38,7 +39,7 @@ export default class BotInfosInteraction extends InteractionModule {
                 { name: 'Node.js version', value: process.version, inline: true}
             )
             .setImage(client.user.displayAvatarURL())
-            .setColor(color)
+            .setColor('#ffc800')
             .setFooter({
                 text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} ${client.version}`,
                 iconURL: client.user.displayAvatarURL()
