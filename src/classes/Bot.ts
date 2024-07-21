@@ -19,7 +19,7 @@ export type ExecutedCommand = {
 
 export class Bot extends Client {
     public startedAt: Date
-    public cooldowns: Collection<string, number>
+    public cooldowns: Collection<string, Collection<string, number>>
     public set: Set<ExecutedCommand>
     public version: string
     private _modules: ModuleImports

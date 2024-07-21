@@ -51,8 +51,8 @@ const start = async (): Promise<void> => {
         await bot.login(getSafeEnv(process.env.TOKEN, 'TOKEN'))
 
         await bot.database.disconnectFromDatabase()
-    } catch (error) {
-        logger.simpleError(error as Error)
+    } catch (error: any) {
+        logger.simpleError(error)
         logger.logDiscordEmbed(client, new EmbedBuilder()
             .setTitle('Error')
             .setDescription(`\`\`\`js\n${error}\n\`\`\``)
