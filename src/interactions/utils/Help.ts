@@ -1,8 +1,8 @@
-import { SlashCommandBuilder, EmbedBuilder, CommandInteraction, CommandInteractionOptionResolver, AutocompleteInteraction, PermissionsBitField } from 'discord.js'
+import { SlashCommandBuilder, EmbedBuilder, CommandInteraction, CommandInteractionOptionResolver, AutocompleteInteraction, PermissionsBitField, Collection, GuildMember } from 'discord.js'
 import { InteractionDecorator } from '../../utils/Decorators.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
 import { Bot } from '../../classes/Bot.js'
-import { isTruthy } from '../../utils/TypeGuards.js'
+import { getSafeEnv, isTruthy } from '../../utils/TypeGuards.js'
 
 @InteractionDecorator({
     name: 'help',
@@ -24,7 +24,9 @@ export default class Help extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> {
         const options = interaction.options as CommandInteractionOptionResolver
         const focusedValue = options.getFocused()
-        const interactionNames = client.modules.interactions.filter(interaction => interaction.name.startsWith(focusedValue))
+        const interactionNames = this._removeInteractionWithNoAccess(interaction.member as GuildMember, client.modules.interactions).filter(interaction => {
+            return interaction.name.startsWith(focusedValue)
+        })
 
         await interaction.respond(
             interactionNames.map(choice => ({ name: choice.name, value: choice.name }))
@@ -77,7 +79,7 @@ export default class Help extends InteractionModule {
         } else {
             embed.setTitle('Liste des commandes 📚')
                 .setURL('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-                .setDescription(`Voici la liste des intéractions disponibles :\n\n${client.modules.interactions.map((interactions) => `\`/${interactions.data.name}\` - ${interactions.data.description}`).join('\n')}`)
+                .setDescription(`Voici la liste des intéractions disponibles :\n\n${this._removeInteractionWithNoAccess(interaction.member as GuildMember, client.modules.interactions).map((interactions) => `\`/${interactions.data.name}\` - ${interactions.data.description}`).join('\n')}`)
                 .setFooter({
                     text: `Commande effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
                     iconURL: interaction.user.displayAvatarURL()
@@ -96,5 +98,20 @@ export default class Help extends InteractionModule {
         return Object.keys(PermissionsBitField.Flags).find(key =>
             PermissionsBitField.Flags[key as keyof typeof PermissionsBitField.Flags] === permissionBigInt
         ) || 'Aucune permission requise'
+    }
+
+    private _removeInteractionWithNoAccess(user: GuildMember, interactions: Collection<string, InteractionModule>): Collection<string, InteractionModule> {
+        if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID'))
+            return interactions
+
+        const filteredInteractions = new Collection<string, InteractionModule>();
+        interactions.forEach((interaction, key) => {
+            if (!interaction.data.default_member_permissions)
+                return
+            if (user.permissions.has(BigInt(interaction.data.default_member_permissions)))
+                filteredInteractions.set(key, interaction)
+        })
+
+        return filteredInteractions
     }
 }

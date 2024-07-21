@@ -87,7 +87,7 @@ export default class Database {
     public async syncDatabase() {
         try {
             if (getSafeEnv(process.env.NODE_ENV, 'NODE_ENV') === 'development')
-                await this._sequelize.sync({ alter: true, force: false })
+                await this._sequelize.sync({ alter: false, force: false })
             logger.simpleLog('Successfully synced to the database.')
         } catch (error: any) {
             logger.simpleError(error)
