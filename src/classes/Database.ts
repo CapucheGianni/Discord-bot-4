@@ -1,9 +1,16 @@
 import { EmbedBuilder, Message, Interaction, Client } from 'discord.js'
 import { config } from 'dotenv'
 import { TServer } from '../types/Server'
-import { getSafeEnv, isServer, isServers } from '../utils/TypeGuards.js'
+import { getSafeEnv, isChannel, isServer, isServers } from '../utils/TypeGuards.js'
 import { Logger } from './Logger.js'
 import { DataTypes, Model, ModelStatic, Op, Sequelize } from 'sequelize'
+import { TAnnouncementChannel, TChannel } from '../types/Channel'
+import { TUser } from '../types/User'
+import { TAnnouncementEmbed, TEmbedField } from '../types/Embed'
+import { TInteraction } from '../types/Interaction'
+import { TCommand } from '../types/Command'
+import { TTwitch } from '../types/Twitch'
+import { TBot } from '../types/Bot'
 
 config()
 const logger: Logger = Logger.getInstance(
@@ -14,16 +21,16 @@ const logger: Logger = Logger.getInstance(
 export default class Database {
     private _sequelize: Sequelize
 
-    public User!: ModelStatic<Model<any, any>>
-    public Server!: ModelStatic<Model<any, any>>
-    public Channel!: ModelStatic<Model<any, any>>
-    public AnnouncementChannel!: ModelStatic<Model<any, any>>
-    public AnnouncementEmbed!: ModelStatic<Model<any, any>>
-    public EmbedField!: ModelStatic<Model<any, any>>
-    public Interaction!: ModelStatic<Model<any, any>>
-    public Command!: ModelStatic<Model<any, any>>
-    public TwitchNotification!: ModelStatic<Model<any, any>>
-    public Bot!: ModelStatic<Model<any, any>>
+    public User!: ModelStatic<Model<TUser, any>>
+    public Server!: ModelStatic<Model<TServer, any>>
+    public Channel!: ModelStatic<Model<TChannel, any>>
+    public AnnouncementChannel!: ModelStatic<Model<TAnnouncementChannel, any>>
+    public AnnouncementEmbed!: ModelStatic<Model<TAnnouncementEmbed, any>>
+    public EmbedField!: ModelStatic<Model<TEmbedField, any>>
+    public Interaction!: ModelStatic<Model<TInteraction, any>>
+    public Command!: ModelStatic<Model<TCommand, any>>
+    public TwitchNotification!: ModelStatic<Model<TTwitch, any>>
+    public Bot!: ModelStatic<Model<TBot, any>>
 
     constructor() {
         this._sequelize = new Sequelize(
@@ -77,99 +84,10 @@ export default class Database {
         })
     }
 
-    public async fetchServers(client: Client): Promise<void> {
-        setInterval(async () => {
-            const guilds: { id: string, name: string }[] = client.guilds.cache.map((guild) => ({
-                id: guild.id,
-                name: guild.name
-            }))
-            const guildIds: string[] = guilds.map((guild) => guild.id)
-            const t = await this._sequelize.transaction()
-
-            try {
-                for (const guild of guilds) {
-                    await this.Server.upsert(
-                        {
-                            id: guild.id,
-                            name: guild.name
-                        },
-                        { transaction: t }
-                    )
-                }
-                await this.Server.destroy({
-                    where: {
-                        id: {
-                            [Op.notIn]: guildIds
-                        }
-                    },
-                    transaction: t
-                })
-                await t.commit()
-            } catch (error) {
-                await t.rollback()
-                logger.simpleError(Error(`An error occured while fetching servers: ${error}`))
-            }
-        }, 1000 * 60 * 10)
-    }
-
-    public async addUserFromMessage(message: Message): Promise<void> {
-        try {
-            const user = await this.User.findByPk(message.author.id)
-
-            if (user && user.get().updatedAt > new Date(Date.now() - 60 * 60 * 24 * 1000))
-                return
-            await this.User.upsert(
-                {
-                    id: message.author.id,
-                    name: message.author.username
-                }
-            )
-        } catch (error) {
-            logger.simpleError(Error(`An error occured while adding a user from a message: ${error}`))
-        }
-    }
-
-    public async addUserFromInteraction(interaction: Interaction): Promise<void> {
-        try {
-            const user = await this.User.findByPk(interaction.user.id)
-
-            if (user && user.get().updatedAt > new Date(Date.now() - 60 * 60 * 24 * 1000))
-                return
-            await this.User.upsert(
-                {
-                    id: interaction.user.id,
-                    name: interaction.user.username
-                }
-            )
-        } catch (error: any) {
-            logger.simpleError(Error(`An error occured while adding a user from an interaction: ${error}`))
-        }
-    }
-
-    public async getGuild(guildId: string): Promise<TServer> {
-        const server = await this.Server.findByPk(guildId)
-        if (!server || !isServer(server.get()))
-            throw Error(`Server ${guildId} not found in the db.`)
-
-        return server.get()
-    }
-
-    public async getGuilds(): Promise<TServer[]> {
-        const servers = (await this.Server.findAll()).map(server => server.get())
-        if (!isServers(servers))
-            throw Error('Error when fetching servers in the db.')
-
-        return servers
-    }
-
-    public get database(): Sequelize {
-        return this._sequelize
-    }
-
     public async syncDatabase() {
         try {
             if (getSafeEnv(process.env.NODE_ENV, 'NODE_ENV') === 'development')
-                await this._sequelize.sync({ alter: true })
+                await this._sequelize.sync({ alter: true, force: false })
             logger.simpleLog('Successfully synced to the database.')
         } catch (error: any) {
             logger.simpleError(error)
@@ -475,5 +393,124 @@ export default class Database {
         // TwitchNotification
         this.TwitchNotification.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id' })
         this.TwitchNotification.belongsTo(this.Channel, { as: 'channel', foreignKey: 'channelId', targetKey: 'id' })
+    }
+
+    public async fetchServers(client: Client): Promise<void> {
+        const guilds: { id: string, name: string }[] = client.guilds.cache.map((guild) => ({
+            id: guild.id,
+            name: guild.name
+        }))
+        const guildIds: string[] = guilds.map((guild) => guild.id)
+        const t = await this._sequelize.transaction()
+
+        try {
+            for (const guild of guilds) {
+                await this.Server.upsert(
+                    {
+                        id: guild.id,
+                        name: guild.name
+                    },
+                    { transaction: t }
+                )
+            }
+            await this.Server.destroy({
+                where: {
+                    id: {
+                        [Op.notIn]: guildIds
+                    }
+                },
+                transaction: t
+            })
+            await t.commit()
+        } catch (error) {
+            await t.rollback()
+            logger.simpleError(Error(`An error occured while fetching servers: ${error}`))
+        }
+    }
+
+    public async addUserFromInteraction(interaction: Interaction): Promise<void> {
+        try {
+            const user = await this.User.findByPk(interaction.user.id)
+            if (user && user.get().updatedAt > new Date(Date.now() - 60 * 60 * 24 * 1000))
+                return
+
+            await this.User.upsert({
+                id: interaction.user.id,
+                name: interaction.user.username
+            })
+        } catch (error: any) {
+            logger.simpleError(Error(`An error occured while adding a user from an interaction: ${error}`))
+        }
+    }
+
+    public async addUserFromMessage(message: Message): Promise<void> {
+        try {
+            const user = await this.User.findByPk(message.author.id)
+            if (user && user.get().updatedAt > new Date(Date.now() - 60 * 60 * 24 * 1000))
+                return
+
+            await this.User.upsert({
+                id: message.author.id,
+                name: message.author.username
+            })
+        } catch (error) {
+            logger.simpleError(Error(`An error occured while adding a user from a message: ${error}`))
+        }
+    }
+
+    public async addChannelFromMessage(message: Message): Promise<void> {
+        try {
+            const channel = (await this.Channel.findByPk(message.channelId))?.get()
+            if (isChannel(channel) && channel.updatedAt > new Date(Date.now() - 60 * 60 * 24 * 1000))
+                return
+            if (!message.channel.isTextBased() || message.channel.isDMBased())
+                return
+
+            await this.Channel.upsert({
+                id: message.channelId,
+                name: message.channel.name,
+                serverId: message.channel.guildId
+            })
+        } catch (error) {
+            logger.simpleError(Error(`An error occured while adding a Channel from a message: ${error}`))
+        }
+    }
+
+    public async addServerFromMessage(message: Message): Promise<void> {
+        try {
+            if (!message.guild || !message.guildId)
+                return
+
+            const server = (await this.Server.findByPk(message.guildId))?.get()
+            if (isServer(server) && server.updatedAt > new Date(Date.now() - 60 * 60 * 24 * 1000))
+                return
+
+            await this.Server.upsert({
+                id: message.guildId,
+                name: message.guild.name
+            })
+        } catch (error) {
+            logger.simpleError(Error(`An error occured while adding a Server from a message: ${error}`))
+        }
+    }
+
+    public async getGuild(guildId: string): Promise<TServer> {
+        const server = (await this.Server.findByPk(guildId))?.get()
+        if (!isServer(server))
+            throw Error(`Server ${guildId} not found in the db.`)
+
+        return server
+    }
+
+    public async getGuilds(): Promise<TServer[]> {
+        const servers = (await this.Server.findAll()).map(server => server.get())
+        if (!isServers(servers))
+            throw Error('Error when fetching servers in the db.')
+
+        return servers
+    }
+
+    public get database(): Sequelize {
+        return this._sequelize
     }
 }
