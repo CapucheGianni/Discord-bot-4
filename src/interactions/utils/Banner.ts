@@ -33,7 +33,7 @@ import { InteractionModule } from '../../classes/ModuleImports.js'
 export default class AvatarInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<void> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
         const options = interaction.options as CommandInteractionOptionResolver
         const user = (options.getMember('utilisateur') ?? interaction.member) as GuildMember
         const isColor = options.getBoolean('couleur') ?? false
@@ -42,32 +42,23 @@ export default class AvatarInteraction extends InteractionModule {
 
         if (isColor) {
             if (!fetchedUser.hexAccentColor) {
-                interaction.reply({
+                return interaction.reply({
                     content: `${user} n'a pas de bannière.`,
                     allowedMentions: { parse: [] }
                 })
-                return
             }
             const embed = new EmbedBuilder()
                 .setDescription(`**[${fetchedUser.hexAccentColor}](https://colorhexa.com/${fetchedUser.hexAccentColor})**`)
                 .setColor(fetchedUser.hexAccentColor)
 
-            interaction.reply({
+            return interaction.reply({
                 content: `La bannière de ${user} est ${fetchedUser.hexAccentColor}.`,
                 embeds: [ embed ],
                 allowedMentions: { parse: [] }
             })
-            return
-        }
-        if (bannerUrl) {
-            interaction.reply({
-                content: `Bannière de ${user}[ : ](${bannerUrl})`,
-                allowedMentions: { parse: [] }
-            })
-            return
         }
         interaction.reply({
-            content: `${user} ne possède pas de bannière.`,
+            content: bannerUrl ? `Bannière de ${user}[ : ](${bannerUrl})` : `${user} ne possède pas de bannière.`,
             allowedMentions: { parse: [] }
         })
     }

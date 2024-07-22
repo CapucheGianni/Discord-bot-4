@@ -26,7 +26,7 @@ const logger = Logger.getInstance('')
 export default class PingInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<void> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
         const sent = await interaction.reply({
             content: 'Pinging...',
             fetchReply: true

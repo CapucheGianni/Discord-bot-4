@@ -28,18 +28,17 @@ import { InteractionModule } from '../../classes/ModuleImports.js'
 export default class AvatarInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<void> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
         const options = interaction.options as CommandInteractionOptionResolver
         const user = (options.getMember('utilisateur') ?? interaction.member) as GuildMember
         const globalAvatarURL = user.user.displayAvatarURL({ size: 4096 })
         const localAvatarURL = user.avatarURL({ size: 4096 })
 
         if (localAvatarURL) {
-            interaction.reply({
+            return interaction.reply({
                 content: `Photos de profil [locale](${localAvatarURL}) et [globale](${globalAvatarURL}) de ${user}:`,
                 allowedMentions: { parse: [] }
             })
-            return
         }
         interaction.reply({
             content: `Photo de profil [globale](${globalAvatarURL}) de ${user}:`,

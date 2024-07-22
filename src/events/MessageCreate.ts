@@ -71,7 +71,7 @@ export default class MessageCreate extends EventModule {
 
             await command.execute(client, message, args)
 
-            logger.simpleLog(`${message.author.username} executed the ${commandName} interaction in ${message.channelId}.`)
+            logger.simpleLog(`${message.author.username} executed the ${commandName} command in ${message.channelId}.`)
             logger.logDiscordEmbed(client, new EmbedBuilder()
                 .setTitle('Commande exécutée ✅')
                 .setDescription(`**Auteur:** ${message.author} (${message.author.id})\n**Salon:** ${message.channel} (${message.channel.id})\n**Serveur:** ${message.guild} (${message.guild.id})\n**commande:** ${commandName}`)

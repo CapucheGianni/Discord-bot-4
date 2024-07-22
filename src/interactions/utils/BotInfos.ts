@@ -24,12 +24,10 @@ import { isBot } from '../../utils/TypeGuards.js'
 export default class BotInfosInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<void> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
         const bot = (await client.database.Bot.findByPk(client.user!.id))?.get()
-        if (!isBot(bot) || !client.user) {
-            interaction.reply('Une erreur est survenue lors de l\'éxécution de la commande.')
-            return
-        }
+        if (!isBot(bot) || !client.user)
+            return interaction.reply('Une erreur est survenue lors de l\'éxécution de la commande.')
 
         const embed = new EmbedBuilder()
             .setTitle('Bot informations')

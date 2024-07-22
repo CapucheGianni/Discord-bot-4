@@ -42,7 +42,7 @@ export default class Help extends InteractionModule {
         )
     }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<void> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
         const options = interaction.options as CommandInteractionOptionResolver
         const interactionName = options.getString('commande')
         const embed = new EmbedBuilder()
@@ -51,11 +51,10 @@ export default class Help extends InteractionModule {
             const cmd = client.modules.interactions.find(int => int.data && int.data.name === interactionName)
 
             if (!cmd) {
-                interaction.reply({
-                    content: `La command \`${interactionName}\` n'existe pas !`,
+                return interaction.reply({
+                    content: `La commande \`${interactionName}\` n'existe pas !`,
                     ephemeral: true
                 })
-                return
             }
             embed.setTitle(`Commande \`${cmd.data.name}\` 📚`)
                 .setDescription('Voici les informations sur l\'intéraction demandée :')
