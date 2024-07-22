@@ -105,7 +105,7 @@ export default class MessageCreate extends EventModule {
     private _hasPermissions(user: GuildMember, command: CommandModule): boolean {
         if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID') || !command.permissions.length)
             return true
-        if (command.category === "owner")
+        if (command.category === 'owner')
             return false
         for (const permission of command.permissions) {
             if (!user.permissions.has(permission))
@@ -184,7 +184,7 @@ export default class MessageCreate extends EventModule {
         if (!isUser(user?.get()) || !isChannel(channel?.get()) || !isServer(server?.get()))
             return
 
-        const messageAsArray = message.content.replace(/[.,\/#!?$%\^&\*;:{}=_`~()]/g, ' ').split(" ")
+        const messageAsArray = message.content.replace(/[.,\/#!?$%\^&\*;:{}=_`~()]/g, ' ').split(' ')
         const lastWord = messageAsArray.reverse().find((word) => /[a-zA-Z0-9]/.test(word))
 
         if (!lastWord)

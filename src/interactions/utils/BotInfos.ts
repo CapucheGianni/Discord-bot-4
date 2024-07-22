@@ -28,10 +28,10 @@ export default class BotInfosInteraction extends InteractionModule {
         const embed = new EmbedBuilder()
             .setTitle('Bot informations')
             .addFields(
-                { name: 'Uptime', value: `The bot has been started <t:${new Date(bot.startedAt).getTime().toString().slice(0, 10)}:R>`, inline: true },
-                { name: 'Start date', value: `<t:${new Date(bot.startedAt).getTime().toString().slice(0, 10)}>`, inline: true },
-                { name: 'Creation date', value: `<t:${new Date(client.user.createdAt).getTime().toString().slice(0, 10)}:R>`, inline: true},
-                { name: 'Ram usage', value: `L'utilisation de la RAM est actuellement de ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100}MB.` },
+                { name: 'Uptime', value: `The bot has been started <t:${Math.floor((Date.now() - client.uptime!) / 1000)}:R>`, inline: true },
+                { name: 'Start date', value: `<t:${Math.floor(client.readyTimestamp! / 1000)}>`, inline: true },
+                { name: 'Creation date', value: `<t:${Math.floor(client.user.createdTimestamp / 1000)}:R>`, inline: true},
+                { name: 'Ram usage', value: `L'utilisation de la RAM est actuellement de ${client.getRamUsage}MB.` },
                 { name: 'Total servers', value: `${client.guilds.cache.size}`, inline: true },
                 { name: 'Total users', value: `${client.users.cache.size}`, inline: true},
                 { name: 'Ping', value: `${client.ws.ping}ms`, inline: true },

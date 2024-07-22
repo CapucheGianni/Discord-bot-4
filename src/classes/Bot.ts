@@ -18,7 +18,6 @@ export type ExecutedCommand = {
 }
 
 export class Bot extends Client {
-    public startedAt: Date
     public cooldowns: Collection<string, Collection<string, number>>
     public set: Set<ExecutedCommand>
     public version: string
@@ -27,7 +26,6 @@ export class Bot extends Client {
 
     constructor(client: Client, database: Database, modules: ModuleImports) {
         super(client.options)
-        this.startedAt = new Date()
         this._database = database
         this.cooldowns = new Collection()
         this.set = new Set()
@@ -75,17 +73,5 @@ export class Bot extends Client {
         } catch (error) {
             logger.simpleError(Error(`An error occured while refreshing application (/) commands: ${error}`))
         }
-    }
-
-    public async initBotInDb(): Promise<void> {
-        if (!isTruthy(this.user))
-            return
-
-        await this._database.Bot.upsert(
-            {
-                id: this.user.id,
-                startedAt: new Date()
-            }
-        )
     }
 }

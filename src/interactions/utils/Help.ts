@@ -104,7 +104,7 @@ export default class Help extends InteractionModule {
         if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID'))
             return interactions
 
-        const filteredInteractions = new Collection<string, InteractionModule>();
+        const filteredInteractions = new Collection<string, InteractionModule>()
         interactions.forEach((interaction, key) => {
             if (!interaction.data.default_member_permissions)
                 return

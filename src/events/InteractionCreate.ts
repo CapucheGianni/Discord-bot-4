@@ -119,7 +119,7 @@ export default class InteractionCreate extends EventModule {
     private _hasPermissions(user: GuildMember, interaction: InteractionModule): boolean {
         if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID') || !interaction.data.default_member_permissions)
             return true
-        if (interaction.category === "owner")
+        if (interaction.category === 'owner')
             return false
         if (!user.permissions.has(BigInt(interaction.data.default_member_permissions)))
             return false

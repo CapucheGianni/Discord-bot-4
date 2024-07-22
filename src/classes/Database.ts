@@ -354,10 +354,6 @@ export default class Database {
                 primaryKey: true,
                 allowNull: false
             },
-            startedAt: {
-                type: DataTypes.DATE,
-                allowNull: false
-            },
             maintenance: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false
