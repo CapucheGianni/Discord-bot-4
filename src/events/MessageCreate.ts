@@ -1,8 +1,21 @@
-import { Message, User, EmbedBuilder, GuildMember, Collection } from 'discord.js'
+import {
+    Message,
+    User,
+    EmbedBuilder,
+    GuildMember,
+    Collection
+} from 'discord.js'
 import { Bot } from '../classes/Bot.js'
 import { EventDecorator } from '../utils/Decorators.js'
 import { CommandModule, EventModule } from '../classes/ModuleImports.js'
-import { getSafeEnv, isBot, isChannel, isServer, isTruthy, isUser } from '../utils/TypeGuards.js'
+import {
+    getSafeEnv,
+    isBot,
+    isChannel,
+    isServer,
+    isTruthy,
+    isUser
+} from '../utils/TypeGuards.js'
 import { Logger } from '../classes/Logger.js'
 
 const logger = Logger.getInstance('')

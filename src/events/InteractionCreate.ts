@@ -1,4 +1,11 @@
-import { EmbedBuilder, Interaction, ChatInputCommandInteraction, AutocompleteInteraction, GuildMember, Collection, PermissionResolvable } from 'discord.js'
+import {
+    EmbedBuilder,
+    Interaction,
+    ChatInputCommandInteraction,
+    AutocompleteInteraction,
+    GuildMember,
+    Collection
+} from 'discord.js'
 import { Bot } from '../classes/Bot.js'
 import { EventModule, InteractionModule } from '../classes/ModuleImports.js'
 import { EventDecorator } from '../utils/Decorators.js'

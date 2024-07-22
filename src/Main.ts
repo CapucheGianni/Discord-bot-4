@@ -1,5 +1,10 @@
 import 'reflect-metadata'
-import { IntentsBitField, Partials, Client, EmbedBuilder } from 'discord.js'
+import {
+    IntentsBitField,
+    Partials,
+    Client,
+    EmbedBuilder
+} from 'discord.js'
 import Database from './classes/Database.js'
 import { Bot } from './classes/Bot.js'
 import { config } from 'dotenv'

@@ -1,6 +1,11 @@
 import 'reflect-metadata'
 import { glob } from 'glob'
-import { Collection, PermissionsString, SlashCommandBuilder, AutocompleteInteraction } from 'discord.js'
+import {
+    Collection,
+    PermissionsString,
+    SlashCommandBuilder,
+    AutocompleteInteraction
+} from 'discord.js'
 import path from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { Bot } from './Bot.js'

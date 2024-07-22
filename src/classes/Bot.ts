@@ -1,8 +1,13 @@
-import { Collection, Client, REST, Routes } from 'discord.js'
+import {
+    Collection,
+    Client,
+    REST,
+    Routes
+} from 'discord.js'
 import Database from './Database.js'
 import { ModuleImports } from './ModuleImports.js'
 import { config } from 'dotenv'
-import { getSafeEnv, isTruthy } from '../utils/TypeGuards.js'
+import { getSafeEnv } from '../utils/TypeGuards.js'
 import { Logger } from './Logger.js'
 
 import settings from '../../package.json' assert { type: 'json' }

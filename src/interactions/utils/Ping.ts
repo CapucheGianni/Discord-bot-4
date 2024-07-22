@@ -1,4 +1,10 @@
-import { CommandInteraction, SlashCommandBuilder, EmbedBuilder, AutocompleteInteraction, PermissionsBitField } from 'discord.js'
+import {
+    CommandInteraction,
+    SlashCommandBuilder,
+    EmbedBuilder,
+    AutocompleteInteraction,
+    PermissionsBitField
+} from 'discord.js'
 import { Bot } from '../../classes/Bot.js'
 import { InteractionDecorator } from '../../utils/Decorators.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'

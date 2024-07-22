@@ -1,9 +1,25 @@
-import { EmbedBuilder, Message, Interaction, Client } from 'discord.js'
+import {
+    EmbedBuilder,
+    Message,
+    Interaction,
+    Client
+} from 'discord.js'
 import { config } from 'dotenv'
 import { TServer } from '../types/Server'
-import { getSafeEnv, isChannel, isServer, isServers } from '../utils/TypeGuards.js'
+import {
+    getSafeEnv,
+    isChannel,
+    isServer,
+    isServers
+} from '../utils/TypeGuards.js'
 import { Logger } from './Logger.js'
-import { DataTypes, Model, ModelStatic, Op, Sequelize } from 'sequelize'
+import {
+    DataTypes,
+    Model,
+    ModelStatic,
+    Op,
+    Sequelize
+} from 'sequelize'
 import { TAnnouncementChannel, TChannel } from '../types/Channel'
 import { TUser } from '../types/User'
 import { TAnnouncementEmbed, TEmbedField } from '../types/Embed'
