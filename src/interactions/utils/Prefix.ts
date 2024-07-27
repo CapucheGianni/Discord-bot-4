@@ -38,12 +38,8 @@ export default class PrefixInteraction extends InteractionModule {
         const prefix = (await client.database.getGuild(interaction.guildId!)).prefix
 
         if (newPrefix) {
-            if (!(interaction.member as GuildMember).permissions.has('ManageGuild')) {
-                return interaction.reply({
-                    content: 'Vous n\'avez pas les permissions nécessaires pour modifier le préfixe du serveur',
-                    ephemeral: true
-                })
-            }
+            if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
+                return
             client.database.Server.update(
                 { prefix: newPrefix },
                 { where: { id: interaction.guildId! } }

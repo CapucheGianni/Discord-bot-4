@@ -4,7 +4,11 @@ import {
     Collection,
     PermissionsString,
     SlashCommandBuilder,
-    AutocompleteInteraction
+    AutocompleteInteraction,
+    GuildMember,
+    PermissionResolvable,
+    CommandInteraction,
+    Message
 } from 'discord.js'
 import path from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
@@ -19,7 +23,20 @@ const logger = Logger.getInstance('')
 
 export abstract class Module {
     public abstract name: string
-    public abstract execute(client: Bot, ...args: any[]): Promise<void>
+    public abstract execute(client: Bot, ...args: any[]): Promise<any>
+
+    public async checkPermissions(command: CommandInteraction | Message, member: GuildMember, permissions: PermissionResolvable[]): Promise<boolean> {
+        for (const permission of permissions) {
+            if (!member.permissions.has(permission)) {
+                command.reply({
+                    content: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action.',
+                    ephemeral: true
+                })
+                return false
+            }
+        }
+        return true
+    }
 }
 
 export abstract class CommandModule extends Module {
