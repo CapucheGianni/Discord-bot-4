@@ -35,7 +35,7 @@ export default class PingInteraction extends InteractionModule {
             .setTitle('Pinged Successfully 🏓')
             .setDescription(`**Client Latency:** ${client.ws.ping}ms\n**API latency:** ${sent.createdTimestamp - interaction.createdTimestamp}ms`)
             .setFooter({
-                text: `Commande effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
+                text: `Intéraction effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
                 iconURL: interaction.user.displayAvatarURL()
             })
             .setTimestamp()

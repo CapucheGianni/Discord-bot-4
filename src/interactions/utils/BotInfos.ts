@@ -43,12 +43,12 @@ export default class BotInfosInteraction extends InteractionModule {
                 { name: 'Node.js version', value: process.version, inline: true}
             )
             .setImage(client.user.displayAvatarURL())
-            .setColor('#ffc800')
             .setFooter({
-                text: `Commande effectuée par ${interaction.user.username} | ${client.user.username} ${client.version}`,
-                iconURL: client.user.displayAvatarURL()
+                text: `Intéraction effectuée par ${interaction.user.username} | ${client.user.username} V${client.version}`,
+                iconURL: interaction.user.displayAvatarURL()
             })
             .setTimestamp()
+            .setColor(`#ffc800`)
 
         interaction.reply({ embeds: [embed] })
     }

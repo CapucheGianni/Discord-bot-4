@@ -46,6 +46,12 @@ export default class Help extends InteractionModule {
         const options = interaction.options as CommandInteractionOptionResolver
         const interactionName = options.getString('commande')
         const embed = new EmbedBuilder()
+            .setFooter({
+                text: `Intéraction effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
+                iconURL: interaction.user.displayAvatarURL()
+            })
+            .setTimestamp()
+            .setColor(`#ffc800`)
 
         if (interactionName) {
             const cmd = client.modules.interactions.find(int => int.data && int.data.name === interactionName)
@@ -78,22 +84,10 @@ export default class Help extends InteractionModule {
                         value: cmd.data.options.length ? `>>> ${cmd.data.options.map((option) => `\`${option.toJSON().name}\`: ${option.toJSON().description} - ${option.toJSON().required ? 'requis' : 'non requis'}`).join('\n')}` : 'Aucune option disponible'
                     }
                 )
-                .setFooter({
-                    text: `Commande effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
-                    iconURL: interaction.user.displayAvatarURL()
-                })
-                .setTimestamp()
-                .setColor('#ffc800')
         } else {
             embed.setTitle('Liste des commandes 📚')
                 .setURL('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
                 .setDescription(`Voici la liste des intéractions disponibles :\n\n${this._removeInteractionWithNoAccess(interaction.member as GuildMember, client.modules.interactions).map((interactions) => `\`/${interactions.data.name}\` - ${interactions.data.description}`).join('\n')}`)
-                .setFooter({
-                    text: `Commande effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
-                    iconURL: interaction.user.displayAvatarURL()
-                })
-                .setTimestamp()
-                .setColor(`#ffc800`)
         }
         await interaction.reply({ embeds: [embed] })
     }
