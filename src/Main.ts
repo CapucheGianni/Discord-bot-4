@@ -75,6 +75,16 @@ const start = async (): Promise<void> => {
             .setTimestamp()
         )
     })
+
+    process.on('uncaughtException', (error: Error) => {
+        logger.simpleError(error)
+        logger.logDiscordEmbed(client, new EmbedBuilder()
+            .setTitle('Uncaught Exception')
+            .setDescription(`\`\`\`js\n${error}\n\`\`\``)
+            .setColor('#ff0000')
+            .setTimestamp()
+        )
+    })
 }
 
 void start()

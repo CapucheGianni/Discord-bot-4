@@ -1,5 +1,5 @@
 import { TDiscordEvents, TEventType } from '../types/DiscordEvents.js'
-import { PermissionsString, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js'
+import { PermissionsString, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
 import { CommandModule } from '../classes/ModuleImports.js'
 import { TCategory } from '../types/Command.js'
 
@@ -24,7 +24,7 @@ interface interaction {
     cooldown: number
     category: TCategory
     usage: string
-    data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder
+    data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder
 }
 
 const addMetadata = (metadataKey: string, metadataValue: any) => {

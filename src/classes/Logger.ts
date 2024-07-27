@@ -20,7 +20,7 @@ export class Logger {
 
     public log(
         client: Bot | Client,
-        message: string,
+        error: any,
         type: 'info' | 'warn' | 'error',
         isLoggable: boolean = true,
         isThrowable: boolean = false,
@@ -30,24 +30,24 @@ export class Logger {
         if (isLoggable && !this._hideLogs) {
             switch (type) {
                 case 'info':
-                    console.log(`[${timestamp.toISOString().slice(0, 10)} ${timestamp.toTimeString().slice(0, 8)}][INFO]: ${message}`)
+                    console.log(`[${timestamp.toISOString().slice(0, 10)} ${timestamp.toTimeString().slice(0, 8)}][INFO]: ${error}`)
                     if (sendAsEmbed)
-                        this._logAsEmbed(client, Error(message), 'Info', 'LightGrey')
+                        this._logAsEmbed(client, error, 'Info', 'LightGrey')
                     break
                 case 'warn':
-                    console.warn(`[${timestamp.toISOString().slice(0, 10)} ${timestamp.toTimeString().slice(0, 8)}][WARN]: ${message}`)
+                    console.warn(`[${timestamp.toISOString().slice(0, 10)} ${timestamp.toTimeString().slice(0, 8)}][WARN]: ${error}`)
                     if (sendAsEmbed)
-                        this._logAsEmbed(client, Error(message), 'Warning', 'Orange')
+                        this._logAsEmbed(client, error, 'Warning', 'Orange')
                     break
                 case 'error':
-                    console.error(`[${timestamp.toISOString().slice(0, 10)} ${timestamp.toTimeString().slice(0, 8)}][ERROR]: ${message}`)
+                    console.error(`[${timestamp.toISOString().slice(0, 10)} ${timestamp.toTimeString().slice(0, 8)}][ERROR]: ${error}`)
                     if (sendAsEmbed)
-                        this._logAsEmbed(client, Error(message), 'Error', 'Red')
+                        this._logAsEmbed(client, error, 'Error', 'Red')
                     break
             }
         }
         if (isThrowable)
-            throw Error(message)
+            throw error
     }
 
     public simpleError(error: Error, isLoggable: boolean = true): void {
@@ -77,7 +77,7 @@ export class Logger {
             .setTimestamp()
         const channel = client.channels.cache.get(this._logChannelId)
 
-        if (!isChannel(channel) || !channel.isTextBased())
+        if (!channel || !channel.isTextBased())
             return
         channel.send({ embeds: [embed] })
     }
