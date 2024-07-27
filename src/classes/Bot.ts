@@ -15,16 +15,9 @@ import settings from '../../package.json' assert { type: 'json' }
 config()
 const logger = Logger.getInstance('')
 
-export type ExecutedCommand = {
-    command: string,
-    userId: string,
-    guildId: string,
-    type: 'command' | 'interaction'
-}
-
 export class Bot extends Client {
     public cooldowns: Collection<string, Collection<string, number>>
-    public set: Set<ExecutedCommand>
+    public set: Set<string>
     public version: string
     private _modules: ModuleImports
     private _database: Database
