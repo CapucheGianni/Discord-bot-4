@@ -27,6 +27,7 @@ import { TInteraction } from '../types/Interaction'
 import { TCommand } from '../types/Command'
 import { TTwitch } from '../types/Twitch'
 import { TBot } from '../types/Bot'
+import { TPun } from '../types/Pun'
 
 config()
 const logger: Logger = Logger.getInstance(
@@ -47,6 +48,7 @@ export default class Database {
     public Command!: ModelStatic<Model<TCommand, any>>
     public TwitchNotification!: ModelStatic<Model<TTwitch, any>>
     public Bot!: ModelStatic<Model<TBot, any>>
+    public Pun!: ModelStatic<Model<TPun, any>>
 
     constructor() {
         this._sequelize = new Sequelize(
@@ -73,7 +75,7 @@ export default class Database {
             logger.simpleLog('Connected to the database!')
             logger.logDiscordEmbed(client, new EmbedBuilder()
                 .setTitle('Successfully connected to the database.')
-                .setColor(`#5FC1F9`)
+                .setColor(`#ffc800`)
                 .setTimestamp()
             )
         } catch (error) {
@@ -375,6 +377,38 @@ export default class Database {
                 defaultValue: false
             }
         })
+
+        this.Pun = this._sequelize.define('Pun', {
+            id: {
+                type: DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true,
+                allowNull: false
+            },
+            idInServer: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
+            toFind: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                validate: {
+                    isSingleWord(value: string) {
+                        const trimmedValue = value.trim()
+                        if (trimmedValue.includes(' ') || trimmedValue.includes('\t'))
+                          throw new Error('\'toFind\' doit être un seul et unique mot sans espace.');
+                      }
+                }
+            },
+            toAnswer: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            type: {
+                type: DataTypes.STRING,
+                allowNull: false
+            }
+        })
     }
 
     public setAssociations() {
@@ -383,6 +417,7 @@ export default class Database {
         this.Server.hasOne(this.Channel, { as: 'leaveChannel', foreignKey: 'leaveChannelId' })
         this.Server.hasMany(this.Channel, { as: 'channels', foreignKey: 'serverId' })
         this.Server.hasOne(this.TwitchNotification, { as: 'twitchNotificationChannel', foreignKey: 'serverId' })
+        this.Server.hasMany(this.Pun, { as: 'puns', foreignKey: 'serverId' })
 
         // Channel associations
         this.Channel.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId' })
@@ -405,6 +440,9 @@ export default class Database {
         // TwitchNotification
         this.TwitchNotification.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id' })
         this.TwitchNotification.belongsTo(this.Channel, { as: 'channel', foreignKey: 'channelId', targetKey: 'id' })
+
+        // Puns
+        this.Pun.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id' })
     }
 
     public async fetchServers(client: Client): Promise<void> {

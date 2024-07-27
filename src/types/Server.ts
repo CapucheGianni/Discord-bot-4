@@ -1,4 +1,5 @@
 import { TAnnouncementChannel, TChannel } from './Channel'
+import { TPun } from './Pun'
 import { TTwitch } from './Twitch'
 
 export type TServer = {
@@ -12,6 +13,7 @@ export type TServer = {
     leaveChannelId?: string
     welcomeChannel?: TAnnouncementChannel
     leaveChannel?: TAnnouncementChannel
-    channels?: TChannel[]
+    channels: TChannel[]
     twitchNotificationChannel?: TTwitch
+    puns: TPun[]
 }

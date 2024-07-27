@@ -3,6 +3,7 @@ import { TChannel, TAnnouncementChannel } from '../types/Channel'
 import { TCommand } from '../types/Command'
 import { TAnnouncementEmbed, TEmbedField } from '../types/Embed'
 import { TInteraction } from '../types/Interaction'
+import { TPun } from '../types/Pun'
 import { TServer } from '../types/Server'
 import { TTwitch } from '../types/Twitch'
 import { TUser } from '../types/User'
@@ -153,4 +154,17 @@ export function isBot(value: unknown): value is TBot {
     return value !== null && typeof value === 'object' &&
         typeof (value as TBot).id === 'string' &&
         typeof (value as TBot).maintenance === 'boolean'
+}
+
+export function isPun(value: unknown): value is TPun {
+    return value !== null && typeof value === 'object' &&
+        typeof (value as TPun).id === 'number' &&
+        typeof (value as TPun).toFind === 'string' &&
+        typeof (value as TPun).toAnswer === 'string' &&
+        typeof (value as TPun).type === 'string' &&
+        typeof (value as TPun).serverId === 'string'
+}
+
+export function isPuns(values: unknown): values is TPun[] {
+    return Array.isArray(values) && values.every(value => isPun(value))
 }
