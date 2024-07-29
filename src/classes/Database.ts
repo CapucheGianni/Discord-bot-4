@@ -154,14 +154,6 @@ export default class Database {
             jokes: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: true
-            },
-            welcomeChannelId: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
-            leaveChannelId: {
-                type: DataTypes.STRING,
-                allowNull: true
             }
         })
 
@@ -207,6 +199,10 @@ export default class Database {
             imageUrl: {
                 type: DataTypes.STRING,
                 allowNull: true
+            },
+            type: {
+                type: DataTypes.STRING,
+                allowNull: false
             }
         }, {
             timestamps: false
@@ -413,21 +409,19 @@ export default class Database {
 
     public setAssociations() {
         // Server associations
-        this.Server.hasOne(this.Channel, { as: 'welcomeChannel', foreignKey: 'welcomeChannelId' })
-        this.Server.hasOne(this.Channel, { as: 'leaveChannel', foreignKey: 'leaveChannelId' })
         this.Server.hasMany(this.Channel, { as: 'channels', foreignKey: 'serverId' })
+        this.Server.hasMany(this.AnnouncementChannel, { as: 'announcementChannels', foreignKey: 'serverId' })
         this.Server.hasOne(this.TwitchNotification, { as: 'twitchNotificationChannel', foreignKey: 'serverId' })
         this.Server.hasMany(this.Pun, { as: 'puns', foreignKey: 'serverId' })
 
         // Channel associations
         this.Channel.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId' })
-        this.Channel.belongsTo(this.Server, { as: 'welcomeChannel', foreignKey: 'welcomeChannelId', targetKey: 'id' })
-        this.Channel.belongsTo(this.Server, { as: 'leaveChannel', foreignKey: 'leaveChannelId', targetKey: 'id' })
         this.Channel.hasMany(this.AnnouncementChannel, { as: 'announcementChannel', foreignKey: 'channelId' })
         this.Channel.hasOne(this.TwitchNotification, { as: 'twitchNotification', foreignKey: 'channelId' })
 
         // AnnouncementChannel associations
         this.AnnouncementChannel.belongsTo(this.Channel, { as: 'channel', foreignKey: 'channelId', targetKey: 'id' })
+        this.AnnouncementChannel.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id' })
         this.AnnouncementChannel.hasOne(this.AnnouncementEmbed, { as: 'embed', foreignKey: 'announcementChannelId' })
 
         // AnnouncementEmbed

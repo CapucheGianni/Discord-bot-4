@@ -23,7 +23,7 @@ export type TAnnouncementEmbed = {
     displayThumbnail: boolean
     thumbnailUrl?: string
     displayTimestamp: boolean
-    fields: TEmbedField[]
     announcementChannelId: number
+    fields: TEmbedField[]
     announcementChannel: TAnnouncementChannel
 }

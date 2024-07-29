@@ -10,8 +10,11 @@ export type TAnnouncementChannel = {
     embedEnabled: boolean
     imageUrl: string | null
     channelId: string
-    channel: TChannel
+    type: 'welcome' | 'leave' | 'ban'
+    serverId: string
     embed: TAnnouncementEmbed | null
+    channel: TChannel
+    server: TServer
 }
 
 export type TChannel = {
@@ -21,11 +24,7 @@ export type TChannel = {
     createdAt: Date
     updatedAt: Date
     serverId: string
-    welcomeChannelId: string | null
-    leaveChannelId: string | null
     server: TServer
-    welcomeChannel: TAnnouncementChannel | null
-    leaveChannel: TAnnouncementChannel | null
-    announcementChannel: TAnnouncementChannel[]
+    announcements: TAnnouncementChannel[]
     twitchNotification: TTwitch | null
 }

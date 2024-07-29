@@ -9,10 +9,7 @@ export type TServer = {
     jokes: boolean
     createdAt: Date
     updatedAt: Date
-    welcomeChannelId: string | null
-    leaveChannelId: string | null
-    welcomeChannel: TAnnouncementChannel | null
-    leaveChannel: TAnnouncementChannel | null
+    announcementChannels: TAnnouncementChannel[]
     channels: TChannel[]
     twitchNotificationChannel: TTwitch | null
     puns: TPun[]
