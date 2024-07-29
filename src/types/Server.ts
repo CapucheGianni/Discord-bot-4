@@ -9,11 +9,11 @@ export type TServer = {
     jokes: boolean
     createdAt: Date
     updatedAt: Date
-    welcomeChannelId?: string
-    leaveChannelId?: string
-    welcomeChannel?: TAnnouncementChannel
-    leaveChannel?: TAnnouncementChannel
+    welcomeChannelId: string | null
+    leaveChannelId: string | null
+    welcomeChannel: TAnnouncementChannel | null
+    leaveChannel: TAnnouncementChannel | null
     channels: TChannel[]
-    twitchNotificationChannel?: TTwitch
+    twitchNotificationChannel: TTwitch | null
     puns: TPun[]
 }

@@ -13,17 +13,17 @@ export type TAnnouncementEmbed = {
     id: number
     color: string
     displayTitle: boolean
-    title?: string
+    title: string | null
     displayBody: boolean
-    body?: string
+    body: string | null
     displayImage: boolean
-    imageUrl?: string
+    imageUrl: string | null
     displayFooter: boolean
-    footer?: string
+    footer: string | null
     displayThumbnail: boolean
     thumbnailUrl?: string
     displayTimestamp: boolean
-    fields?: TEmbedField[]
+    fields: TEmbedField[]
     announcementChannelId: number
     announcementChannel: TAnnouncementChannel
 }

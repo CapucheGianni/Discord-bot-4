@@ -4,14 +4,14 @@ import { TTwitch } from './Twitch'
 
 export type TAnnouncementChannel = {
     id: number
-    message?: string
+    message: string | null
     dm: boolean
     isActivated: boolean
     embedEnabled: boolean
-    imageUrl?: string
+    imageUrl: string | null
     channelId: string
     channel: TChannel
-    embed?: TAnnouncementEmbed
+    embed: TAnnouncementEmbed | null
 }
 
 export type TChannel = {
@@ -21,11 +21,11 @@ export type TChannel = {
     createdAt: Date
     updatedAt: Date
     serverId: string
-    welcomeChannelId?: string
-    leaveChannelId?: string
+    welcomeChannelId: string | null
+    leaveChannelId: string | null
     server: TServer
-    welcomeChannel?: TAnnouncementChannel
-    leaveChannel?: TAnnouncementChannel
-    announcementChannel?: TAnnouncementChannel[]
-    twitchNotification?: TTwitch
+    welcomeChannel: TAnnouncementChannel | null
+    leaveChannel: TAnnouncementChannel | null
+    announcementChannel: TAnnouncementChannel[]
+    twitchNotification: TTwitch | null
 }

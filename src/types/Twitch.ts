@@ -5,12 +5,12 @@ export type TTwitch = {
     serverId: string
     streamer: string
     channelId: string
-    roleId?: string
-    message?: string
-    updateMessage?: string
+    roleId: string | null
+    message: string | null
+    updateMessage: string | null
     isStreaming: boolean
-    title?: string
-    game?: string
+    title: string | null
+    game: string | null
     enabled: boolean
     server: TServer
     channel: TChannel

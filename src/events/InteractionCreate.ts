@@ -90,7 +90,10 @@ export default class InteractionCreate extends EventModule {
                 .setColor('#ff0000')
                 .setTimestamp()
             )
-            interaction.reply({ content: 'Une erreur est survenue lors de l\'exécution de l\'intéraction.' })
+            interaction.reply({
+                content: 'Une erreur est survenue lors de l\'exécution de l\'intéraction.',
+                ephemeral: true
+            })
         }
     }
 
