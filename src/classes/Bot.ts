@@ -4,13 +4,14 @@ import {
     REST,
     Routes
 } from 'discord.js'
-import Database from './Database.js'
-import { ModuleImports } from './ModuleImports.js'
 import { config } from 'dotenv'
-import { getSafeEnv } from '../utils/TypeGuards.js'
-import { Logger } from './Logger.js'
 
-import settings from '../../package.json' assert { type: 'json' }
+import Database from './Database.js'
+import { Logger } from './Logger.js'
+import { ModuleImports } from './ModuleImports.js'
+import { getSafeEnv } from '../utils/TypeGuards.js'
+
+import settings from '../../package.json' with { 'type': 'json' }
 
 config()
 const logger = Logger.getInstance('')

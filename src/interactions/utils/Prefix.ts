@@ -1,4 +1,3 @@
-import { Bot } from '../../classes/Bot.js'
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
@@ -7,11 +6,10 @@ import {
     CommandInteractionOptionResolver,
     GuildMember
 } from 'discord.js'
-import { InteractionDecorator } from '../../utils/Decorators.js'
-import { InteractionModule } from '../../classes/ModuleImports.js'
-import { Logger } from '../../classes/Logger.js'
 
-const logger = Logger.getInstance('')
+import { Bot } from '../../classes/Bot.js'
+import { InteractionModule } from '../../classes/ModuleImports.js'
+import { InteractionDecorator } from '../../utils/Decorators.js'
 
 @InteractionDecorator({
     name: 'prefix',

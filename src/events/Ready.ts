@@ -1,11 +1,9 @@
 import { EmbedBuilder } from 'discord.js'
-import { Bot } from '../classes/Bot.js'
-import { EventDecorator } from '../utils/Decorators.js'
-import { EventModule } from '../classes/ModuleImports.js'
-import { getSafeEnv } from '../utils/TypeGuards.js'
-import { Logger } from '../classes/Logger.js'
 
-const logger = Logger.getInstance('')
+import { Bot } from '../classes/Bot.js'
+import { EventModule } from '../classes/ModuleImports.js'
+import { EventDecorator } from '../utils/Decorators.js'
+import { getSafeEnv } from '../utils/TypeGuards.js'
 
 @EventDecorator({
     name: 'ready',

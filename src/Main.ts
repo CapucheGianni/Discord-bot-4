@@ -1,16 +1,17 @@
-import 'reflect-metadata'
 import {
     IntentsBitField,
     Partials,
     Client,
     EmbedBuilder
 } from 'discord.js'
-import Database from './classes/Database.js'
-import { Bot } from './classes/Bot.js'
 import { config } from 'dotenv'
+import 'reflect-metadata'
+
+import { Bot } from './classes/Bot.js'
+import Database from './classes/Database.js'
+import { Logger } from './classes/Logger.js'
 import { ModuleImports } from './classes/ModuleImports.js'
 import { getSafeEnv } from './utils/TypeGuards.js'
-import { Logger } from './classes/Logger.js'
 
 config()
 

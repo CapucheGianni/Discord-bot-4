@@ -1,4 +1,3 @@
-import { Bot } from '../../classes/Bot.js'
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
@@ -22,11 +21,13 @@ import {
     RoleSelectMenuInteraction,
     ChannelSelectMenuInteraction
 } from 'discord.js'
-import { InteractionDecorator } from '../../utils/Decorators.js'
-import { InteractionModule } from '../../classes/ModuleImports.js'
-import { Logger } from '../../classes/Logger.js'
-import { TTwitch } from '../../types/Twitch.js'
 import { Model, Transaction } from 'sequelize'
+
+import { Bot } from '../../classes/Bot.js'
+import { Logger } from '../../classes/Logger.js'
+import { InteractionModule } from '../../classes/ModuleImports.js'
+import { TTwitch } from '../../types/Twitch.js'
+import { InteractionDecorator } from '../../utils/Decorators.js'
 
 const logger = Logger.getInstance('')
 

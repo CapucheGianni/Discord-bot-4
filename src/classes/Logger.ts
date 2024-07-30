@@ -1,6 +1,6 @@
 import { Client, ColorResolvable, EmbedBuilder } from 'discord.js'
+
 import { Bot } from './Bot.js'
-import { isChannel } from '../utils/TypeGuards.js'
 
 export class Logger {
     private static _instance: Logger

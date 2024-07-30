@@ -1,4 +1,3 @@
-import { Bot } from '../../classes/Bot.js'
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
@@ -8,8 +7,10 @@ import {
     GuildMember,
     EmbedBuilder
 } from 'discord.js'
-import { InteractionDecorator } from '../../utils/Decorators.js'
+
+import { Bot } from '../../classes/Bot.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
+import { InteractionDecorator } from '../../utils/Decorators.js'
 
 @InteractionDecorator({
     name: 'banner',

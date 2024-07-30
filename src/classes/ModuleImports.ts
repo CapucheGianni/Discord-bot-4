@@ -1,5 +1,7 @@
 import 'reflect-metadata'
-import { glob } from 'glob'
+import path from 'path'
+import { fileURLToPath, pathToFileURL } from 'url'
+
 import {
     Collection,
     PermissionsString,
@@ -10,14 +12,15 @@ import {
     CommandInteraction,
     Message
 } from 'discord.js'
-import path from 'path'
-import { fileURLToPath, pathToFileURL } from 'url'
-import { Bot } from './Bot.js'
+import { glob } from 'glob'
+
+import { TCategory } from '../types/Command.js'
 import { TDiscordEvents, TEventType } from '../types/DiscordEvents.js'
 import { getMetadata } from '../utils/Decorators.js'
-import { TCategory } from '../types/Command.js'
-import { Logger } from './Logger.js'
+
+import { Bot } from './Bot.js'
 import Database from './Database.js'
+import { Logger } from './Logger.js'
 
 const logger = Logger.getInstance('')
 

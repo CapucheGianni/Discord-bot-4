@@ -1,4 +1,3 @@
-import { Bot } from '../../classes/Bot.js'
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
@@ -6,13 +5,12 @@ import {
     PermissionsBitField,
     CommandInteractionOptionResolver
 } from 'discord.js'
-import { InteractionDecorator } from '../../utils/Decorators.js'
+
+import { Bot } from '../../classes/Bot.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
-import { Logger } from '../../classes/Logger.js'
+import { InteractionDecorator } from '../../utils/Decorators.js'
 
-import settings from '../../../settings.json' assert { type: 'json' }
-
-const logger = Logger.getInstance('')
+import settings from '../../../settings.json' with { 'type': 'json' }
 
 @InteractionDecorator({
     name: 'urlshorten',

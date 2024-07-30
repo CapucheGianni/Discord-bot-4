@@ -5,9 +5,11 @@ import {
     GuildMember,
     Collection
 } from 'discord.js'
+
 import { Bot } from '../classes/Bot.js'
-import { EventDecorator } from '../utils/Decorators.js'
+import { Logger } from '../classes/Logger.js'
 import { CommandModule, EventModule } from '../classes/ModuleImports.js'
+import { EventDecorator } from '../utils/Decorators.js'
 import {
     getSafeEnv,
     isBot,
@@ -16,7 +18,6 @@ import {
     isTruthy,
     isUser
 } from '../utils/TypeGuards.js'
-import { Logger } from '../classes/Logger.js'
 
 const logger = Logger.getInstance('')
 

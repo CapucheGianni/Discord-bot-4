@@ -1,7 +1,13 @@
-import { TDiscordEvents, TEventType } from '../types/DiscordEvents.js'
-import { PermissionsString, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
+import {
+    PermissionsString,
+    SlashCommandBuilder,
+    SlashCommandOptionsOnlyBuilder,
+    SlashCommandSubcommandsOnlyBuilder
+} from 'discord.js'
+
 import { CommandModule } from '../classes/ModuleImports.js'
 import { TCategory } from '../types/Command.js'
+import { TDiscordEvents, TEventType } from '../types/DiscordEvents.js'
 
 interface event {
     name: TDiscordEvents

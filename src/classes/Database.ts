@@ -5,14 +5,6 @@ import {
     Client
 } from 'discord.js'
 import { config } from 'dotenv'
-import { TServer } from '../types/Server'
-import {
-    getSafeEnv,
-    isChannel,
-    isServer,
-    isServers
-} from '../utils/TypeGuards.js'
-import { Logger } from './Logger.js'
 import {
     DataTypes,
     Model,
@@ -20,14 +12,24 @@ import {
     Op,
     Sequelize
 } from 'sequelize'
-import { TAnnouncementChannel, TChannel } from '../types/Channel'
-import { TUser } from '../types/User'
-import { TAnnouncementEmbed, TEmbedField } from '../types/Embed'
-import { TInteraction } from '../types/Interaction'
-import { TCommand } from '../types/Command'
-import { TTwitch } from '../types/Twitch'
+
 import { TBot } from '../types/Bot'
+import { TAnnouncementChannel, TChannel } from '../types/Channel'
+import { TCommand } from '../types/Command'
+import { TAnnouncementEmbed, TEmbedField } from '../types/Embed'
+import { TServer } from '../types/Server'
+import { TInteraction } from '../types/Interaction'
 import { TPun } from '../types/Pun'
+import { TTwitch } from '../types/Twitch'
+import { TUser } from '../types/User'
+import {
+    getSafeEnv,
+    isChannel,
+    isServer,
+    isServers
+} from '../utils/TypeGuards.js'
+
+import { Logger } from './Logger.js'
 
 config()
 const logger: Logger = Logger.getInstance(

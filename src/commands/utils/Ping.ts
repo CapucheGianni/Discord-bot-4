@@ -1,10 +1,8 @@
 import { Message, EmbedBuilder } from 'discord.js'
-import { Bot } from '../../classes/Bot.js'
-import { CommandDecorator } from '../../utils/Decorators.js'
-import { CommandModule } from '../../classes/ModuleImports.js'
-import { Logger } from '../../classes/Logger.js'
 
-const logger = Logger.getInstance('')
+import { Bot } from '../../classes/Bot.js'
+import { CommandModule } from '../../classes/ModuleImports.js'
+import { CommandDecorator } from '../../utils/Decorators.js'
 
 @CommandDecorator({
     name: 'ping',
