@@ -4,7 +4,8 @@ import {
     CommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
-    GuildMember
+    GuildMember,
+    InteractionResponse
 } from 'discord.js'
 
 import { Bot } from '../../classes/Bot.js'
@@ -30,7 +31,7 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
 export default class PrefixInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
         const newPrefix = options.getString('prefix')
         const prefix = (await client.database.getGuild(interaction.guildId!)).prefix
@@ -38,12 +39,12 @@ export default class PrefixInteraction extends InteractionModule {
         if (newPrefix) {
             if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
                 return
-            client.database.Server.update(
+            await client.database.Server.update(
                 { prefix: newPrefix },
                 { where: { id: interaction.guildId! } }
             )
             return interaction.reply(`Le prefix de ${client.user!.username} est désormais \`${newPrefix}\`.`)
         }
-        interaction.reply(`Le préfixe de ${client.user!.username} est : \`${prefix}\``)
+        return interaction.reply(`Le préfixe de ${client.user!.username} est : \`${prefix}\``)
     }
 }

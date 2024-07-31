@@ -4,7 +4,8 @@ import {
     CommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
-    GuildMember
+    GuildMember,
+    InteractionResponse
 } from 'discord.js'
 
 import { Bot } from '../../classes/Bot.js'
@@ -29,7 +30,7 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
 export default class AvatarInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
         const user = (options.getMember('utilisateur') ?? interaction.member) as GuildMember
         const globalAvatarURL = user.user.displayAvatarURL({ size: 4096 })
@@ -41,7 +42,7 @@ export default class AvatarInteraction extends InteractionModule {
                 allowedMentions: { parse: [] }
             })
         }
-        interaction.reply({
+        return interaction.reply({
             content: `Photo de profil [globale](${globalAvatarURL}) de ${user}:`,
             allowedMentions: { parse: [] }
         })

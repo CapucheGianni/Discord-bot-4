@@ -3,7 +3,8 @@ import {
     EmbedBuilder,
     CommandInteraction,
     AutocompleteInteraction,
-    PermissionsBitField
+    PermissionsBitField,
+    InteractionResponse
 } from 'discord.js'
 
 import { Bot } from '../../classes/Bot.js'
@@ -25,7 +26,7 @@ import { isBot } from '../../utils/TypeGuards.js'
 export default class BotInfosInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
         const bot = (await client.database.Bot.findByPk(client.user!.id))?.get()
         if (!isBot(bot) || !client.user)
             return interaction.reply('Une erreur est survenue lors de l\'éxécution de la commande.')
@@ -51,6 +52,6 @@ export default class BotInfosInteraction extends InteractionModule {
             .setTimestamp()
             .setColor(`#ffc800`)
 
-        interaction.reply({ embeds: [embed] })
+        return interaction.reply({ embeds: [embed] })
     }
 }

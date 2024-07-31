@@ -3,7 +3,8 @@ import {
     SlashCommandBuilder,
     EmbedBuilder,
     AutocompleteInteraction,
-    PermissionsBitField
+    PermissionsBitField,
+    Message
 } from 'discord.js'
 
 import { Bot } from '../../classes/Bot.js'
@@ -24,7 +25,7 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
 export default class PingInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<Message> {
         const sent = await interaction.reply({
             content: 'Pinging...',
             fetchReply: true
@@ -39,7 +40,7 @@ export default class PingInteraction extends InteractionModule {
             .setTimestamp()
             .setColor(`#ffc800`)
 
-        interaction.editReply({
+        return interaction.editReply({
             content: 'Pinged successfully !',
             embeds: [embed]
         })

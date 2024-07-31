@@ -10,7 +10,8 @@ import {
     GuildMember,
     PermissionResolvable,
     CommandInteraction,
-    Message
+    Message,
+    InteractionResponse
 } from 'discord.js'
 import { glob } from 'glob'
 
@@ -26,7 +27,7 @@ const logger = Logger.getInstance('')
 
 export abstract class Module {
     public abstract name: string
-    public abstract execute(client: Bot, ...args: any[]): Promise<any>
+    public abstract execute(client: Bot, ...args: any[]): Promise<void | InteractionResponse | Message>
 
     public async checkPermissions(command: CommandInteraction | Message, member: GuildMember, permissions: PermissionResolvable[]): Promise<boolean> {
         for (const permission of permissions) {

@@ -6,7 +6,8 @@ import {
     AutocompleteInteraction,
     PermissionsBitField,
     Collection,
-    GuildMember
+    GuildMember,
+    InteractionResponse
 } from 'discord.js'
 
 import { Bot } from '../../classes/Bot.js'
@@ -35,7 +36,7 @@ export default class Help extends InteractionModule {
         const options = interaction.options as CommandInteractionOptionResolver
         const focusedValue = options.getFocused()
         const interactionNames = this._removeInteractionWithNoAccess(interaction.member as GuildMember, client.modules.interactions).filter(interaction => {
-            return interaction.name.startsWith(focusedValue)
+            return interaction.name.includes(focusedValue)
         })
 
         await interaction.respond(
@@ -43,7 +44,7 @@ export default class Help extends InteractionModule {
         )
     }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
         const interactionName = options.getString('commande')
         const embed = new EmbedBuilder()
@@ -90,7 +91,7 @@ export default class Help extends InteractionModule {
                 .setURL('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
                 .setDescription(`Voici la liste des intéractions disponibles :\n\n${this._removeInteractionWithNoAccess(interaction.member as GuildMember, client.modules.interactions).map((interactions) => `\`/${interactions.data.name}\` - ${interactions.data.description}`).join('\n')}`)
         }
-        await interaction.reply({ embeds: [embed] })
+        return interaction.reply({ embeds: [embed] })
     }
 
     private _formatPermission(permissionValue: string | null | undefined): string {

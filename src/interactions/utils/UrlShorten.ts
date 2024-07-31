@@ -3,7 +3,8 @@ import {
     SlashCommandBuilder,
     CommandInteraction,
     PermissionsBitField,
-    CommandInteractionOptionResolver
+    CommandInteractionOptionResolver,
+    InteractionResponse
 } from 'discord.js'
 
 import { Bot } from '../../classes/Bot.js'
@@ -31,7 +32,7 @@ import settings from '../../../settings.json' with { 'type': 'json' }
 export default class UrlShortenInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
         const urlToShorten = options.getString('url')
         const rebrandlyUrl = 'https://api.rebrandly.com/v1/links'
@@ -46,7 +47,7 @@ export default class UrlShortenInteraction extends InteractionModule {
         })
 
         if (!response.ok)
-            return interaction.reply(`Merci de fournir un url valide`)
+            return interaction.reply(`Merci de fournir un url valide.`)
 
         const jsonResponse = await response.json()
 

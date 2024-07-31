@@ -11,7 +11,8 @@ import {
     ButtonStyle,
     ActionRowBuilder,
     ComponentType,
-    GuildMember
+    GuildMember,
+    InteractionResponse
 } from 'discord.js'
 
 import { Bot } from '../../classes/Bot.js'
@@ -152,38 +153,35 @@ const logger = Logger.getInstance('')
 export default class PunsInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
 
         switch (options.getSubcommandGroup()) {
             case 'configure':
-                this._configureServer(client, interaction, options)
-                this._configureChannel(client, interaction, options)
-                this._configureUser(client, interaction, options)
-                break
+                await this._configureServer(client, interaction, options)
+                await this._configureChannel(client, interaction, options)
+                await this._configureUser(client, interaction, options)
+                return
             case 'find':
-                this._findById(client, interaction, options)
-                this._findByName(client, interaction, options)
-                break
+                await this._findById(client, interaction, options)
+                await this._findByName(client, interaction, options)
+                return
             case 'remove':
-                this._removeById(client, interaction, options)
-                this._removeByName(client, interaction, options)
-                break
+                await this._removeById(client, interaction, options)
+                await this._removeByName(client, interaction, options)
+                return
         }
         switch (options.getSubcommand()) {
             case 'add':
-                this._add(client, interaction, options)
-                break
+                return this._add(client, interaction, options)
             case 'list':
-                this._list(client, interaction, options)
-                break
+                return this._list(client, interaction, options)
             case 'infos':
-                this._infos(client, interaction, options)
-                break
+                return this._infos(client, interaction, options)
         }
     }
 
-    private async _configureServer(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _configureServer(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'server'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -191,21 +189,21 @@ export default class PunsInteraction extends InteractionModule {
         try {
             const toEnable = options.getBoolean('enable', true)
 
-            client.database.Server.update(
+            await client.database.Server.update(
                 { jokes: toEnable },
                 { where: { id: interaction.guildId! } }
             )
-            interaction.reply(`Les jeux de mots ont été ${toEnable ? 'activés' : 'désactivés'} sur le serveur avec succès!`)
+            return interaction.reply(`Les jeux de mots ont été ${toEnable ? 'activés' : 'désactivés'} sur le serveur avec succès!`)
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
         }
     }
 
-    private async _configureChannel(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _configureChannel(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'channel'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -214,21 +212,21 @@ export default class PunsInteraction extends InteractionModule {
             const channel = options.getChannel('channel') || interaction.channel!
             const toEnable = options.getBoolean('enable', true)
 
-        await client.database.Channel.update(
+            await client.database.Channel.update(
                 { jokes: toEnable },
                 { where: { id: channel.id } }
             )
-            interaction.reply(`Les jeux de mots ont été ${toEnable ? 'activés' : 'désactivés'} dans le salon ${channel} avec succès!`)
+            return interaction.reply(`Les jeux de mots ont été ${toEnable ? 'activés' : 'désactivés'} dans le salon ${channel} avec succès!`)
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
         }
     }
 
-    private async _configureUser(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _configureUser(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'user'))
             return
         try {
@@ -238,17 +236,17 @@ export default class PunsInteraction extends InteractionModule {
                 { jokes: toEnable },
                 { where: { id: interaction.user.id } }
             )
-            interaction.reply(`Le bot ${toEnable ? 'peut désormais' : 'ne peut plus'} vous répondre!`)
+            return interaction.reply(`Le bot ${toEnable ? 'peut désormais' : 'ne peut plus'} vous répondre!`)
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
         }
     }
 
-    private async _findById(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _findById(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'byid'))
             return
         try {
@@ -276,19 +274,19 @@ export default class PunsInteraction extends InteractionModule {
                 .setTimestamp()
                 .setColor(`#ffc800`)
 
-            interaction.reply({
+            return interaction.reply({
                 embeds: [embed]
             })
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
         }
     }
 
-    private async _findByName(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _findByName(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'byname'))
             return
         try {
@@ -316,19 +314,19 @@ export default class PunsInteraction extends InteractionModule {
                 .setTimestamp()
                 .setColor(`#ffc800`)
 
-            interaction.reply({
+            return interaction.reply({
                 embeds: [embed]
             })
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
         }
     }
 
-    private async _removeById(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _removeById(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'byid'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -344,17 +342,17 @@ export default class PunsInteraction extends InteractionModule {
             if (!result)
                 return interaction.reply(`L'id \`${id}\` n'est associé à aucun jeu de mots.`)
 
-            interaction.reply(`Le jeu de mot ${id} a été supprimé correctement.`)
+            return interaction.reply(`Le jeu de mot ${id} a été supprimé correctement.`)
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
         }
     }
 
-    private async _removeByName(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _removeByName(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'byname'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -370,17 +368,17 @@ export default class PunsInteraction extends InteractionModule {
             if (!result)
                 return interaction.reply(`Le nom \`${name}\` n'est associé à aucun jeu de mots.`)
 
-            interaction.reply(`${result} jeux de mots réagissant à \`${name}\` ont été supprimés.`)
+            return interaction.reply(`${result} jeux de mots réagissant à \`${name}\` ont été supprimés.`)
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
         }
     }
 
-    private async _add(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _add(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'add'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -397,24 +395,24 @@ export default class PunsInteraction extends InteractionModule {
             })
             const newIdInServer = highestIdInServer ? highestIdInServer.get().idInServer + 1 : 1
 
-            client.database.Pun.create({
+            await client.database.Pun.create({
                 toFind: toFind,
                 toAnswer: toAnswer,
                 type: type,
                 serverId: interaction.guildId!,
                 idInServer: newIdInServer
             })
-            interaction.reply(`Le jeu de mot a correctement été enregistré avec l'id ${newIdInServer}.`)
+            return interaction.reply(`Le jeu de mot a correctement été enregistré avec l'id ${newIdInServer}.`)
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
         }
     }
 
-    private async _list(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _list(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'list'))
             return
         try {
@@ -456,7 +454,7 @@ export default class PunsInteraction extends InteractionModule {
                     time: 1000 * 60 * 5
                 })
 
-                collector.on('collect', (collectedInteraction) => {
+                collector.on('collect', async collectedInteraction => {
                     collectedInteraction.deferUpdate()
 
                     if (collectedInteraction.customId === 'left')
@@ -472,7 +470,7 @@ export default class PunsInteraction extends InteractionModule {
                         return `${pun.get().idInServer} - ${types[pun.get().type]} \`${pun.get().toFind}\` => \`${pun.get().toAnswer}\``
                     }).join('\n'))
 
-                    interaction.editReply({
+                    await interaction.editReply({
                         embeds: [embed],
                         components: [row]
                     })
@@ -481,21 +479,20 @@ export default class PunsInteraction extends InteractionModule {
                 embed.setDescription(rows.map(pun => {
                     return `${pun.get().idInServer} - ${types[pun.get().type]} \`${pun.get().toFind}\` => \`${pun.get().toAnswer}\``
                 }).join('\n'))
-
-                interaction.reply({
+                return interaction.reply({
                     embeds: [embed]
                 })
             }
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
         }
     }
 
-    private async _infos(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<any> {
+    private async _infos(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'infos'))
             return
         try {
@@ -516,9 +513,10 @@ export default class PunsInteraction extends InteractionModule {
                 .setTimestamp()
                 .setColor(`#ffc800`)
 
-            interaction.reply({ embeds: [embed] })
+            return interaction.reply({ embeds: [embed] })
         } catch (error: any) {
-            interaction.reply({
+            logger.log(client, error , 'error')
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
