@@ -32,10 +32,7 @@ import {
 import { Logger } from './Logger.js'
 
 config()
-const logger: Logger = Logger.getInstance(
-    getSafeEnv(process.env.LOG_CHANNEL_ID, 'LOG_CHANNEL_ID'),
-    getSafeEnv(process.env.HIDE_LOGS, 'HIDE_LOGS') === 'true'
-)
+const logger: Logger = Logger.getInstance('')
 
 export default class Database {
     private _sequelize: Sequelize

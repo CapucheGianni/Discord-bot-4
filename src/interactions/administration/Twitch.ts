@@ -187,14 +187,14 @@ export default class TwitchInteraction extends InteractionModule {
     private async _configureNotification(client: Bot, interaction: CommandInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[], response: InteractionResponse): Promise<void> {
         const collector = response.createMessageComponentCollector({
             filter: i => i.user.id === interaction.user.id,
-            time: 1000 * 60 * 10,
-            idle: 1000 * 60 * 2
+            time: 1000 * 60 * 15,
+            idle: 1000 * 60 * 5
         })
         let currentRowId = 0
 
         collector.on('collect', async (collectedInteraction: ButtonInteraction | RoleSelectMenuInteraction | ChannelSelectMenuInteraction) => {
             if (collectedInteraction.customId !== 'inputs')
-                collectedInteraction.deferUpdate()
+                await collectedInteraction.deferUpdate()
             switch (collectedInteraction.customId) {
                 case 'continue':
                     currentRowId++
@@ -210,7 +210,7 @@ export default class TwitchInteraction extends InteractionModule {
                     return response.edit({ components: [rows[currentRowId], rows[3]] })
                 case 'cancel':
                     collector.stop()
-                    return await collectedInteraction.channel?.send('Vous avez annulé l\'opération')
+                    return collectedInteraction.channel?.send('Vous avez annulé l\'opération')
                 case 'register':
                     try {
                         if (notification.get().channelId !== interaction.channelId) {
@@ -275,7 +275,7 @@ export default class TwitchInteraction extends InteractionModule {
             case 'inputs':
                 const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal')
                 const streamerModal = new TextInputBuilder().setCustomId('streamer').setLabel('Nom du streamer').setMinLength(4).setMaxLength(25).setStyle(TextInputStyle.Short).setValue(notification.get().streamer).setRequired(true)
-                const newMessageModal = new TextInputBuilder().setCustomId('baseMessage').setLabel('Nouveau message (tags: {streamer}, {game})').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().message || '').setRequired(false)
+                const newMessageModal = new TextInputBuilder().setCustomId('baseMessage').setLabel('Nouveau message | Tags: ({streamer}, {game})').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().message || '').setRequired(false)
                 const updateMessageModal = new TextInputBuilder().setCustomId('updateMessage').setLabel('Message d\'update (tags: {streamer}, {game})').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().updateMessage || '').setRequired(false)
                 const streamerRow = new ActionRowBuilder<TextInputBuilder>().addComponents(streamerModal)
                 const newMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(newMessageModal)
@@ -287,8 +287,8 @@ export default class TwitchInteraction extends InteractionModule {
                 try {
                     const collector = await interaction.awaitModalSubmit({
                         filter: i => i.user.id === interaction.user.id,
-                        time: 1000 * 60 * 5,
-                        idle: 1000 * 60
+                        time: 1000 * 60 * 10,
+                        idle: 1000 * 60 * 5
                     })
                     const streamer = collector.fields.getTextInputValue('streamer')
                     const newMessage = collector.fields.getTextInputValue('baseMessage')
@@ -306,25 +306,17 @@ export default class TwitchInteraction extends InteractionModule {
                 } catch { }
                 return
             case 'mention':
-                try {
-                    if (!collectedInteraction.isRoleSelectMenu())
-                        return
-                    const roles = collectedInteraction.values
-                    const roleSelectMenu = rows[2].components[0] as RoleSelectMenuBuilder
+                if (!collectedInteraction.isRoleSelectMenu())
+                    return
+                const roles = collectedInteraction.values
+                const roleSelectMenu = rows[2].components[0] as RoleSelectMenuBuilder
 
-                    roleSelectMenu.setDefaultRoles(roles)
-                    notification.set({ roleId: roles.length > 0 ? roles[0] : null })
-                    return collectedInteraction.followUp({
-                        content: 'La mention a été mise à jour localement avec succès.',
-                        ephemeral: true
-                    })
-                } catch (error: any) {
-                    logger.simpleError(error)
-                    return collectedInteraction.followUp({
-                        content: 'Une erreur est survenue lors de la mise à jour de la mention.',
-                        ephemeral: true
-                    })
-                }
+                roleSelectMenu.setDefaultRoles(roles)
+                notification.set({ roleId: roles.length > 0 ? roles[0] : null })
+                return collectedInteraction.followUp({
+                    content: 'La mention a été mise à jour localement avec succès.',
+                    ephemeral: true
+                })
             case 'channel':
                 if (!collectedInteraction.isChannelSelectMenu())
                     return

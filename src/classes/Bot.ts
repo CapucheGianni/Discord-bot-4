@@ -14,7 +14,10 @@ import { getSafeEnv } from '../utils/TypeGuards.js'
 import settings from '../../package.json' with { 'type': 'json' }
 
 config()
-const logger = Logger.getInstance('')
+const logger: Logger = Logger.getInstance(
+    getSafeEnv(process.env.LOG_CHANNEL_ID, 'LOG_CHANNEL_ID'),
+    getSafeEnv(process.env.HIDE_LOGS, 'HIDE_LOGS') === 'true'
+)
 
 export class Bot extends Client {
     public cooldowns: Collection<string, Collection<string, number>>

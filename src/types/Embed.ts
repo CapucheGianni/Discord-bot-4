@@ -21,7 +21,7 @@ export type TAnnouncementEmbed = {
     displayFooter: boolean
     footer: string | null
     displayThumbnail: boolean
-    thumbnailUrl?: string
+    thumbnailUrl: string | null
     displayTimestamp: boolean
     announcementChannelId: number
     fields: TEmbedField[]
