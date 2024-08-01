@@ -16,10 +16,11 @@ import {
     ChannelType,
     InteractionResponse,
     Message,
-    Collection,
-    Snowflake,
     RoleSelectMenuInteraction,
-    ChannelSelectMenuInteraction
+    ChannelSelectMenuInteraction,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle
 } from 'discord.js'
 import { Model, Transaction } from 'sequelize'
 
@@ -62,12 +63,12 @@ const logger = Logger.getInstance('')
 export default class TwitchInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
+    public async execute(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
         if (!await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild']))
             return
         if (client.set.has(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))) {
             return interaction.reply({
-                content: 'Cette commande est déjà en court d\'éxécution sur ce serveur.',
+                content: 'Cette intéraction est déjà en court d\'éxécution sur ce serveur.',
                 ephemeral: true
             })
         }
@@ -76,18 +77,15 @@ export default class TwitchInteraction extends InteractionModule {
 
         switch (options.getSubcommand()) {
             case 'set':
-                this._setTwitchNotification(client, interaction)
-                break
+                return this._setTwitchNotification(client, interaction)
             case 'remove':
-                this._removeTwitchNotification(client, interaction)
-                break
+                return this._removeTwitchNotification(client, interaction)
             case 'enable':
-                this._enableTwitchNotification(client, interaction)
-                break
+                return this._enableTwitchNotification(client, interaction)
         }
     }
 
-    private async _setTwitchNotification(client: Bot, interaction: CommandInteraction): Promise<any> {
+    private async _setTwitchNotification(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
         client.set.add(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
 
         try {
@@ -103,17 +101,16 @@ export default class TwitchInteraction extends InteractionModule {
             })
 
             if (isCreated)
-                await this._askForCreation(client, interaction, notification)
+                return this._askForCreation(client, interaction, notification)
             else
-                await this._setEmbedResponse(client, interaction, notification)
-
+                return this._setEmbedResponse(client, interaction, notification)
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
-            client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
         }
     }
 
@@ -145,11 +142,11 @@ export default class TwitchInteraction extends InteractionModule {
                 })
             }
             if (button.length && button[0].customId === 'continue')
-                await this._setEmbedResponse(client, interaction, notification, response)
+                return this._setEmbedResponse(client, interaction, notification, response)
         })
     }
 
-    private async _setEmbedResponse(client: Bot, interaction: CommandInteraction, notification: Model<TTwitch, any>, response?: InteractionResponse): Promise<any> {
+    private async _setEmbedResponse(client: Bot, interaction: CommandInteraction, notification: Model<TTwitch, any>, response?: InteractionResponse): Promise<void> {
         const rows = this._createButtons(notification.get().channelId, notification.get().roleId)
         const embed = new EmbedBuilder()
             .setTitle(`Configuration de ${client.user?.username} en stream!`)
@@ -173,20 +170,21 @@ export default class TwitchInteraction extends InteractionModule {
                 components: [rows[0], rows[3]],
                 embeds: [embed]
             })
-            await this._configureNotification(client, interaction, notification, rows, response)
+            return this._configureNotification(client, interaction, notification, rows, response)
         } else {
-            const message = notification.get().message?.replace('{streamer}', notification.get().streamer)
+            const message = notification.get().message?.replaceAll('{streamer}', notification.get().streamer).replaceAll('{game}', 'gameName')
             const messageWithMention = notification.get().roleId ? `||<@&${notification.get().roleId}>||\n\n${message}` : message
             const response = await interaction.reply({
                 content: messageWithMention,
                 components: [rows[0], rows[3]],
                 embeds: [embed]
             })
-            await this._configureNotification(client, interaction, notification, rows, response)
+
+            return this._configureNotification(client, interaction, notification, rows, response)
         }
     }
 
-    private async _configureNotification(client: Bot, interaction: CommandInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[], response: InteractionResponse): Promise<any> {
+    private async _configureNotification(client: Bot, interaction: CommandInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[], response: InteractionResponse): Promise<void> {
         const collector = response.createMessageComponentCollector({
             filter: i => i.user.id === interaction.user.id,
             time: 1000 * 60 * 10,
@@ -195,29 +193,24 @@ export default class TwitchInteraction extends InteractionModule {
         let currentRowId = 0
 
         collector.on('collect', async (collectedInteraction: ButtonInteraction | RoleSelectMenuInteraction | ChannelSelectMenuInteraction) => {
-            collectedInteraction.deferUpdate()
+            if (collectedInteraction.customId !== 'inputs')
+                collectedInteraction.deferUpdate()
             switch (collectedInteraction.customId) {
                 case 'continue':
                     currentRowId++
                     rows[3].components[0].setDisabled(false)
                     if (currentRowId === 2)
                         rows[3].components[1].setDisabled(true)
-                    response.edit({ components: [rows[currentRowId], rows[3]] })
-                    break
+                    return response.edit({ components: [rows[currentRowId], rows[3]] })
                 case 'back':
                     currentRowId--
                     rows[3].components[1].setDisabled(false)
                     if (!currentRowId)
                         rows[3].components[0].setDisabled(true)
-                    response.edit({ components: [rows[currentRowId], rows[3]] })
-                    break
+                    return response.edit({ components: [rows[currentRowId], rows[3]] })
                 case 'cancel':
                     collector.stop()
-                    interaction.followUp({
-                        content: 'Vous avez annulé l\'opération',
-                        components: []
-                    })
-                    break
+                    return await collectedInteraction.channel?.send('Vous avez annulé l\'opération')
                 case 'register':
                     try {
                         if (notification.get().channelId !== interaction.channelId) {
@@ -231,21 +224,19 @@ export default class TwitchInteraction extends InteractionModule {
                             }
                         }
                         await notification.save()
-                        collectedInteraction.channel?.send('Tous vos changements ont été enregistrés avec succès.')
+                        await collectedInteraction.channel?.send('Tous vos changements ont été enregistrés avec succès.')
                     } catch (error: any) {
                         logger.log(client, error, 'error')
-                        interaction.followUp({
+                        await interaction.followUp({
                             content: 'Une erreur est survenue lors de la création de la notification, si l\'erreur se répète veuillez contacter le développeur.',
                             ephemeral: true
                         })
-                        response.edit({
-                            components: []
-                        })
+                        await response.edit({ components: [] })
                     }
-                    collector.stop()
-                    break
+                    return collector.stop()
                 default:
-                    await response.edit({ components: [] })
+                    if (collectedInteraction.customId !== 'inputs')
+                        await response.edit({ components: [] })
                     await this._handleRowInteractions(interaction, collectedInteraction, notification, rows)
 
                     const embed = new EmbedBuilder()
@@ -263,94 +254,80 @@ export default class TwitchInteraction extends InteractionModule {
                             iconURL: client.user?.displayAvatarURL()
                         })
                         .setTimestamp()
-                    const message = notification.get().message?.replace('{streamer}', notification.get().streamer)
+                    const message = notification.get().message?.replaceAll('{streamer}', notification.get().streamer).replaceAll('{game}', 'gameName')
                     const messageWithMention = notification.get().roleId ? `||<@&${notification.get().roleId}>||\n\n${message}` : message
 
-                    await response.edit({
+                    return response.edit({
                         content: messageWithMention,
                         embeds: [embed],
                         components: [rows[currentRowId], rows[3]]
                     })
-                    break
             }
         })
         collector.on('end', async () => {
             client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
-            response.edit({ components: [] })
+            await response.edit({ components: [] })
         })
     }
 
-    private async _handleRowInteractions(interaction: CommandInteraction, collectedInteraction: ButtonInteraction | RoleSelectMenuInteraction | ChannelSelectMenuInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[]): Promise<any> {
+    private async _handleRowInteractions(interaction: CommandInteraction, collectedInteraction: ButtonInteraction | RoleSelectMenuInteraction | ChannelSelectMenuInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[]): Promise<void | Message | InteractionResponse> {
         switch (collectedInteraction.customId) {
-            case 'newMessage':
-                try {
-                    const newMessageSent = await collectedInteraction.channel?.send('Veuillez entrer le message de notification que vous souhaitez voir apparaître lorsque le streamer est en live:\nTags disponibles:\n> - \`{streamer}\` - Affiche le nom du streamer')
-                    const newMessage = (await this._readMessage(interaction)).first()
+            case 'inputs':
+                const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal')
+                const streamerModal = new TextInputBuilder().setCustomId('streamer').setLabel('Nom du streamer').setMinLength(4).setMaxLength(25).setStyle(TextInputStyle.Short).setValue(notification.get().streamer).setRequired(true)
+                const newMessageModal = new TextInputBuilder().setCustomId('baseMessage').setLabel('Nouveau message (tags: {streamer}, {game})').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().message || '').setRequired(false)
+                const updateMessageModal = new TextInputBuilder().setCustomId('updateMessage').setLabel('Message d\'update (tags: {streamer}, {game})').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().updateMessage || '').setRequired(false)
+                const streamerRow = new ActionRowBuilder<TextInputBuilder>().addComponents(streamerModal)
+                const newMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(newMessageModal)
+                const updateMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(updateMessageModal)
 
-                    notification.set({ message: newMessage?.content })
-                    await newMessageSent?.delete()
-                    await newMessage?.delete()
-                    break
-                } catch {
-                    await interaction.followUp({
-                        content: 'Vous avez dépassé le temps requis pour répondre, veuillez réessayer.',
+                modal.addComponents(streamerRow, newMessageRow, updateMessageRow)
+                await collectedInteraction.showModal(modal)
+
+                try {
+                    const collector = await interaction.awaitModalSubmit({
+                        filter: i => i.user.id === interaction.user.id,
+                        time: 1000 * 60 * 5,
+                        idle: 1000 * 60
+                    })
+                    const streamer = collector.fields.getTextInputValue('streamer')
+                    const newMessage = collector.fields.getTextInputValue('baseMessage')
+                    const updateMessage = collector.fields.getTextInputValue('updateMessage')
+
+                    notification.set({
+                        streamer: streamer,
+                        message: newMessage,
+                        updateMessage: updateMessage
+                    })
+                    return collector.reply({
+                        content: 'Les données ont été enregistrées localement avec succès.',
                         ephemeral: true
                     })
-                }
-            case 'updateMessage':
-                try {
-                    const updateMessageSent = await collectedInteraction.channel?.send("Veuillez entrer le message de notification que vous souhaitez voir apparaître lorsque le streamer a changé son titre:\nTags disponibles:\n> - \`{streamer}\` - Affiche le nom du streamer")
-                    const updateMessage = (await this._readMessage(interaction)).first()
-
-                    notification.set({ updateMessage: updateMessage?.content })
-                    await updateMessageSent?.delete()
-                    await updateMessage?.delete()
-                    break
-                } catch {
-                    await interaction.followUp({
-                        content: 'Vous avez dépassé le temps requis pour répondre, veuillez réessayer.',
-                        ephemeral: true
-                    })
-                }
-            case 'streamer':
-                try {
-                    const streamerSent = await collectedInteraction.channel?.send("Veuillez entrer le nom du streamer dont vous voulez voir les lives:")
-                    const streamer = (await this._readMessage(interaction)).first()
-
-                    notification.set({ streamer: streamer?.content })
-                    await streamerSent?.delete()
-                    await streamer?.delete()
-                    break
-                } catch {
-                    await interaction.followUp({
-                        content: 'Vous avez dépassé le temps requis pour répondre, veuillez réessayer.',
-                        ephemeral: true
-                    })
-                }
+                } catch { }
+                return
             case 'mention':
                 try {
                     if (!collectedInteraction.isRoleSelectMenu())
-                        break
+                        return
                     const roles = collectedInteraction.values
                     const roleSelectMenu = rows[2].components[0] as RoleSelectMenuBuilder
 
                     roleSelectMenu.setDefaultRoles(roles)
                     notification.set({ roleId: roles.length > 0 ? roles[0] : null })
-                    await collectedInteraction.followUp({
-                        content: 'La mention a été mise à jour correctement.',
+                    return collectedInteraction.followUp({
+                        content: 'La mention a été mise à jour localement avec succès.',
                         ephemeral: true
                     })
-                    break
                 } catch (error: any) {
                     logger.simpleError(error)
-                    return await collectedInteraction.followUp({
+                    return collectedInteraction.followUp({
                         content: 'Une erreur est survenue lors de la mise à jour de la mention.',
                         ephemeral: true
                     })
                 }
             case 'channel':
                 if (!collectedInteraction.isChannelSelectMenu())
-                    break
+                    return
                 const channels = collectedInteraction.values
                 const channelSelectMenu = rows[1].components[0] as ChannelSelectMenuBuilder
 
@@ -362,28 +339,16 @@ export default class TwitchInteraction extends InteractionModule {
                 }
                 channelSelectMenu.setDefaultChannels(channels)
                 notification.set({ channelId: channels[0] })
-                collectedInteraction.followUp({
-                    content: 'Le salon a été mis à jour correctement.',
+                return collectedInteraction.followUp({
+                    content: 'Le salon a été mis à jour localement avec succès.',
                     ephemeral: true
                 })
-                break
         }
     }
 
-    private _readMessage(interaction: CommandInteraction): Promise<Collection<Snowflake, Message>> {
-        return interaction.channel!.awaitMessages({
-            filter: m => m.author.id === interaction.user.id,
-            time: 1000 * 60 * 2,
-            max: 1,
-            errors: ['time']
-        })
-    }
-
     private _createButtons(channelId: string, roleId: string | null): ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[] {
-        const streamerButton = new ButtonBuilder().setCustomId('streamer').setLabel('Streamer').setStyle(ButtonStyle.Secondary)
+        const textInputsButton = new ButtonBuilder().setCustomId('inputs').setLabel('Streamer / Message / Message d\'update').setStyle(ButtonStyle.Secondary)
         const channelSelector = new ChannelSelectMenuBuilder().setCustomId('channel').setPlaceholder('Salon').setDefaultChannels(channelId).setMaxValues(1).setMinValues(1).setChannelTypes(ChannelType.GuildText)
-        const newMessageButton = new ButtonBuilder().setCustomId('newMessage').setLabel('Message').setStyle(ButtonStyle.Secondary)
-        const updateMessageButton = new ButtonBuilder().setCustomId('updateMessage').setLabel('Update').setStyle(ButtonStyle.Secondary)
         const mentionSelector = new RoleSelectMenuBuilder().setCustomId('mention').setPlaceholder('Mention').setMinValues(0).setMaxValues(1)
         const continueButton = new ButtonBuilder().setCustomId('continue').setEmoji('➡️').setStyle(ButtonStyle.Primary)
         const backButton = new ButtonBuilder().setCustomId('back').setEmoji('⬅️').setStyle(ButtonStyle.Primary).setDisabled(true)
@@ -394,14 +359,14 @@ export default class TwitchInteraction extends InteractionModule {
             mentionSelector.setDefaultRoles(roleId)
 
         return [
-            new ActionRowBuilder<ButtonBuilder>().addComponents(streamerButton, newMessageButton, updateMessageButton),
+            new ActionRowBuilder<ButtonBuilder>().addComponents(textInputsButton),
             new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(channelSelector),
             new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(mentionSelector),
             new ActionRowBuilder<ButtonBuilder>().addComponents(backButton, continueButton, cancelButton, registerButton)
         ]
     }
 
-    private async _removeTwitchNotification(client: Bot, interaction: CommandInteraction): Promise<any> {
+    private async _removeTwitchNotification(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
         client.set.add(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
 
         const t = await client.database.database.transaction()
@@ -415,8 +380,8 @@ export default class TwitchInteraction extends InteractionModule {
             }
 
             const deleteButton = new ButtonBuilder().setCustomId('delete').setLabel('Supprimer').setStyle(ButtonStyle.Danger)
-            const goBackButton = new ButtonBuilder().setCustomId('goback').setLabel('Annuler').setStyle(ButtonStyle.Secondary)
-            const row = new ActionRowBuilder<ButtonBuilder>().addComponents(goBackButton, deleteButton)
+            const cancelButton = new ButtonBuilder().setCustomId('cancel').setLabel('Annuler').setStyle(ButtonStyle.Secondary)
+            const row = new ActionRowBuilder<ButtonBuilder>().addComponents(cancelButton, deleteButton)
             const response = await interaction.reply({
                 content: 'Êtes vous sûr de vouloir supprimer la notification twitch ? Cette action est irréversible.',
                 components: [row]
@@ -434,7 +399,7 @@ export default class TwitchInteraction extends InteractionModule {
                 button.push(collectedInteraction)
             })
             collector.on('end', async () => {
-                if (!button.length || button[0].customId === 'goback') {
+                if (!button.length || button[0].customId === 'cancel') {
                     client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
                     await t.commit()
                     return response.edit({
@@ -444,7 +409,7 @@ export default class TwitchInteraction extends InteractionModule {
                 }
                 if (button.length && button[0].customId === 'delete') {
                     await notification.destroy({ transaction: t })
-                    response.edit({
+                    await response.edit({
                         content: 'Vous ne recevrez plus de notifications sur ce serveur.',
                         components: []
                     })
@@ -455,15 +420,15 @@ export default class TwitchInteraction extends InteractionModule {
         } catch (error: any) {
             await t.rollback()
             logger.log(client, error, 'error')
-            interaction.reply({
+            client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
-            client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
         }
     }
 
-    private async _enableTwitchNotification(client: Bot, interaction: CommandInteraction): Promise<any> {
+    private async _enableTwitchNotification(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
 
         try {
@@ -480,10 +445,10 @@ export default class TwitchInteraction extends InteractionModule {
             const toEnable = options.getBoolean('toenable', true)
 
             await model.update({ enabled: toEnable })
-            interaction.reply(`Les notifications twitch ont été ${toEnable ? 'activées' : 'désactivées'} avec succès.`)
+            return interaction.reply(`Les notifications twitch ont été ${toEnable ? 'activées' : 'désactivées'} avec succès.`)
         } catch (error: any) {
             logger.log(client, error, 'error')
-            interaction.reply({
+            return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
                 ephemeral: true
             })
