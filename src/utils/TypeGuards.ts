@@ -99,7 +99,6 @@ export function isEmbed(value: unknown): value is TAnnouncementEmbed {
     return value !== null && typeof value === 'object' &&
         typeof (value as TAnnouncementEmbed).id === 'number' &&
         typeof (value as TAnnouncementEmbed).color === 'string' &&
-        typeof (value as TAnnouncementEmbed).displayTitle === 'boolean' &&
         typeof (value as TAnnouncementEmbed).displayBody === 'boolean' &&
         typeof (value as TAnnouncementEmbed).displayImage === 'boolean' &&
         typeof (value as TAnnouncementEmbed).displayFooter === 'boolean' &&

@@ -15,13 +15,13 @@ import {
     TextInputBuilder,
     ModalBuilder,
     TextInputStyle,
-    StringSelectMenuBuilder,
-    StringSelectMenuOptionBuilder,
     ChannelType,
     ChannelSelectMenuInteraction,
     StringSelectMenuInteraction,
     EmbedBuilder,
-    Message
+    Message,
+    ColorResolvable,
+    resolveColor
 } from 'discord.js'
 
 import { Bot } from '../../classes/Bot.js'
@@ -31,6 +31,7 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
 import { Model } from 'sequelize'
 import { TAnnouncementChannel } from '../../types/Channel.js'
 import { isTruthy } from '../../utils/TypeGuards.js'
+import { TAnnouncementEmbed, TEmbedField } from '../../types/Embed.js'
 
 const logger = Logger.getInstance('')
 const responseByType = {
@@ -64,7 +65,7 @@ type AnnouncementType = 'welcome' | 'leave' | 'ban'
         )
         .addSubcommandGroup(subCommandGroup => subCommandGroup
             .setName('leave')
-            .setDescription('Configure the leave announcement.')
+            .setDescription('Configurez les annonces de départs.')
             .addSubcommand(subCommand => subCommand
                 .setName('configure')
                 .setDescription('Configuration des annonces de départs.')
@@ -76,7 +77,7 @@ type AnnouncementType = 'welcome' | 'leave' | 'ban'
         )
         .addSubcommandGroup(subCommandGroup => subCommandGroup
             .setName('ban')
-            .setDescription('Configure the ban announcement.')
+            .setDescription('Configurez les annonces de bans.')
             .addSubcommand(subCommand => subCommand
                 .setName('configure')
                 .setDescription('Configuration des annonces de bans.')
@@ -109,8 +110,10 @@ export default class AnnouncementsInteraction extends InteractionModule {
             return this._removeAnnouncement(client, interaction, options.getSubcommandGroup(true) as AnnouncementType)
     }
 
-    private async _configureAnnouncement(client: Bot, interaction: CommandInteraction, type: AnnouncementType): Promise<InteractionResponse | void> {
+    private async _configureAnnouncement(client: Bot, interaction: CommandInteraction, type: AnnouncementType): Promise<Message | void> {
         // client.set.add(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
+
+        await interaction.deferReply()
 
         try {
             const [channel, isCreated] = await client.database.AnnouncementChannel.findOrCreate({
@@ -140,9 +143,8 @@ export default class AnnouncementsInteraction extends InteractionModule {
         } catch (error: any) {
             logger.log(client, error, 'error')
             client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
-            return interaction.reply({
+            return interaction.editReply({
                 content: 'Une erreur est survenue lors de l\'éxécution de l\'intéraction.',
-                ephemeral: true
             })
         }
     }
@@ -151,7 +153,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         const continueButton = new ButtonBuilder().setCustomId('continue').setLabel('Continuer').setStyle(ButtonStyle.Secondary).setEmoji('✅')
         const stopButton = new ButtonBuilder().setCustomId('stop').setLabel('Annuler').setStyle(ButtonStyle.Secondary).setEmoji('❌')
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(continueButton, stopButton)
-        const response = await interaction.reply({
+        const response = await interaction.editReply({
             content: `Aucun message ${responseByType[channel.get().type]} n'est configuré sur ce serveur. Voulez-vous continuer ?`,
             components: [row]
         })
@@ -184,21 +186,21 @@ export default class AnnouncementsInteraction extends InteractionModule {
         })
     }
 
-    private async _setResponse(client: Bot, interaction: CommandInteraction, channel: Model<TAnnouncementChannel, any>, type: AnnouncementType, response?: InteractionResponse): Promise<void> {
+    private async _setResponse(client: Bot, interaction: CommandInteraction, channel: Model<TAnnouncementChannel, any>, type: AnnouncementType, response?: Message): Promise<void> {
         const rows = this._createButtons(channel.get(), type)
-        const embed = this._buildEmbed(channel.get())
+        const embed = await this._buildEmbed(client, channel.get())
         const imageUrl = channel.get().imageUrl
 
         if (response) {
             await response.edit({
-                content: `C\'est votre message ${responseByType[type]}!`,
+                content: 'No message set',
                 embeds: embed,
                 components: [rows[0], rows[1], rows[6]],
                 files: []
             })
             return this._handleUserActions(client, interaction, channel, rows, response)
         } else {
-            const response = await interaction.reply({
+            const response = await interaction.editReply({
                 content: channel.get().message || 'No message set',
                 embeds: embed,
                 components: [rows[0], rows[1], rows[6]],
@@ -208,38 +210,51 @@ export default class AnnouncementsInteraction extends InteractionModule {
         }
     }
 
-    private _buildEmbed(channel: TAnnouncementChannel): EmbedBuilder[] | [] {
+    private async _buildEmbed(client: Bot, channel: TAnnouncementChannel): Promise<EmbedBuilder[]> {
         if (!channel.embedEnabled)
             return []
 
         const embed = new EmbedBuilder()
-        const storedEmbed = channel.embed
+        const storedEmbed: TAnnouncementEmbed = channel.embed ? channel.embed : {
+            id: 0,
+            title: 'Welcome user !',
+            color: 'Red',
+            displayBody: false,
+            body: null,
+            displayImage: false,
+            imageUrl: null,
+            displayFooter: false,
+            footer: null,
+            displayThumbnail: false,
+            thumbnailUrl: null,
+            displayTimestamp: false,
+            announcementChannelId: channel.id,
+            fields: [],
+            announcementChannel: channel
+        }
 
-        if (!isTruthy(storedEmbed))
-            return []
-        const fields = storedEmbed.fields
-
-        if (storedEmbed.displayTitle)
-            embed.setTitle(storedEmbed.title)
-        if (storedEmbed.displayBody)
+        channel.embed = storedEmbed
+        embed.setTitle(storedEmbed.title)
+        embed.setColor(storedEmbed.color)
+        if (storedEmbed.displayBody && storedEmbed.body)
             embed.setDescription(storedEmbed.body)
-        if (storedEmbed.displayImage)
+        if (storedEmbed.displayImage && storedEmbed.imageUrl)
             embed.setImage(storedEmbed.imageUrl)
-        if (storedEmbed.displayFooter)
-            embed.setImage(storedEmbed.footer)
-        if (storedEmbed.displayThumbnail)
+        if (storedEmbed.displayFooter && storedEmbed.footer)
+            embed.setFooter({ text: storedEmbed.footer })
+        if (storedEmbed.displayThumbnail && storedEmbed.thumbnailUrl)
             embed.setThumbnail(storedEmbed.thumbnailUrl)
         if (storedEmbed.displayTimestamp)
             embed.setTimestamp()
-        if (fields.length) {
-            for (const field of fields) {
+        if (storedEmbed.fields) {
+            for (const field of storedEmbed.fields) {
                 embed.addFields({ name: field.title, value: field.value, inline: field.inline })
             }
         }
         return [embed]
     }
 
-    private async _handleUserActions(client: Bot, interaction: CommandInteraction, channel: Model<TAnnouncementChannel, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | StringSelectMenuBuilder>[], response: InteractionResponse): Promise<void> {
+    private async _handleUserActions(client: Bot, interaction: CommandInteraction, channel: Model<TAnnouncementChannel, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder>[], response: Message): Promise<void> {
         const collector = response.createMessageComponentCollector({
             filter: i => i.user.id === interaction.user.id,
             time: 1000 * 60 * 15,
@@ -279,6 +294,12 @@ export default class AnnouncementsInteraction extends InteractionModule {
                             }
                         }
                         await channel.save()
+                        if (channel.get().embed)
+                            await (channel.get().embed as unknown as Model<TAnnouncementEmbed, any>).save()
+                        if (channel.get().embed && channel.get().embed?.fields.length) {
+                            for (const field of ((channel.get().embed as unknown as Model<TAnnouncementEmbed, any>).get().fields as unknown as Model<TEmbedField, any>[]))
+                                field.save()
+                        }
                         await collectedInteraction.channel?.send('Tous vos changements ont été enregistrés avec succès.')
                     } catch (error: any) {
                         logger.log(client, error, 'error')
@@ -292,17 +313,23 @@ export default class AnnouncementsInteraction extends InteractionModule {
                 default:
                     if (collectedInteraction.customId !== 'msgimg' && collectedInteraction.customId !== 'embedinfos' && collectedInteraction.customId !== 'addembedfield')
                         await response.edit({ components: [] })
-                    await this._updateAnnouncement(interaction, collectedInteraction, channel, rows)
 
-                    const embed = this._buildEmbed(channel.get())
-                    const imageUrl = channel.get().imageUrl
+                    try {
+                        await this._updateAnnouncement(interaction, collectedInteraction, channel, rows)
 
-                    return response.edit({
-                        content: channel.get().message || 'No message set',
-                        embeds: embed,
-                        components: [rows[currentRowId], rows[currentRowId + 1], rows[6]],
-                        files: imageUrl && imageUrl !== '' ? [imageUrl] : []
-                    })
+                        const embed = await this._buildEmbed(client, channel.get())
+                        const imageUrl = channel.get().imageUrl
+
+                        return response.edit({
+                            content: channel.get().message || 'No message set',
+                            embeds: embed,
+                            components: [rows[currentRowId], rows[currentRowId + 1], rows[6]],
+                            files: imageUrl && imageUrl !== '' ? [imageUrl] : []
+                        })
+                    } catch (error) {
+                        logger.log(client, error, 'error')
+                    }
+
             }
         })
         collector.on('end', async () => {
@@ -311,9 +338,9 @@ export default class AnnouncementsInteraction extends InteractionModule {
         })
     }
 
-    private async _updateAnnouncement(interaction: CommandInteraction, collectedInteraction: ButtonInteraction | ChannelSelectMenuInteraction | StringSelectMenuInteraction, channel: Model<TAnnouncementChannel, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | StringSelectMenuBuilder>[]): Promise<void | Message | InteractionResponse> {
-        switch (collectedInteraction.customId) {
-            case 'isactivated':
+    private async _updateAnnouncement(interaction: CommandInteraction, collectedInteraction: ButtonInteraction | ChannelSelectMenuInteraction | StringSelectMenuInteraction, channel: Model<TAnnouncementChannel, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder>[]): Promise<void | Message | InteractionResponse> {
+        const handlers: { [key: string]: () => Promise<void | Message | InteractionResponse> } = {
+            'isactivated': async () => {
                 const activatedButton = rows[0].components[0] as ButtonBuilder
                 const continueButton = rows[6].components[1] as ButtonBuilder
 
@@ -321,10 +348,11 @@ export default class AnnouncementsInteraction extends InteractionModule {
                 activatedButton.setLabel(channel.get().isActivated ? 'Activé' : 'Désactivé').setStyle(channel.get().isActivated ? ButtonStyle.Success : ButtonStyle.Danger)
                 continueButton.setDisabled(!channel.get().isActivated)
                 return collectedInteraction.followUp({
-                    content: 'Les changements ont été sauvegardés localement avec succès.',
+                    content: '✅',
                     ephemeral: true
                 })
-            case 'msgimg':
+            },
+            'msgimg': async () => {
                 const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal')
                 const messageModal = new TextInputBuilder().setCustomId('message').setLabel('Message | Tags: ({user}, {username})').setMaxLength(1950).setStyle(TextInputStyle.Paragraph).setValue(channel.get().message || '').setRequired(false)
                 const imageUrlModal = new TextInputBuilder().setCustomId('imageurl').setLabel('Image URL (ex: https://imgur.com/5wukV1P)').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(channel.get().imageUrl || '').setRequired(false)
@@ -348,20 +376,22 @@ export default class AnnouncementsInteraction extends InteractionModule {
                         imageUrl: imageUrl
                     })
                     return collector.reply({
-                        content: 'Les changements ont été sauvegardés localement avec succès.',
+                        content: '✅',
                         ephemeral: true
                     })
                 } catch { }
-            case 'isdms':
+            },
+            'isdms': async () => {
                 const dmButton = rows[0].components[2] as ButtonBuilder
 
                 channel.set({ dm: !channel.get().dm })
                 dmButton.setLabel(channel.get().dm ? 'En dms' : 'Sur le serveur')
                 return collectedInteraction.followUp({
-                    content: 'Les changements ont été sauvegardés localement avec succès.',
+                    content: '✅',
                     ephemeral: true
                 })
-            case 'channel':
+            },
+            'channel': async () => {
                 if (!collectedInteraction.isChannelSelectMenu())
                     return
                 const channels = collectedInteraction.values
@@ -369,44 +399,184 @@ export default class AnnouncementsInteraction extends InteractionModule {
 
                 if (!channels.length) {
                     return collectedInteraction.followUp({
-                        content: 'Veuillez spécifier un salon où envoyer les notifications twitch.',
+                        content: `Veuillez spécifier un salon où envoyer les messages ${responseByType[channel.get().type]}.`,
                         ephemeral: true
                     })
                 }
                 channelSelectMenu.setDefaultChannels(channels)
                 channel.set({ channelId: channels[0] })
                 return collectedInteraction.followUp({
-                    content: 'Le salon a été mis à jour localement avec succès.',
+                    content: '✅',
                     ephemeral: true
                 })
+            },
+            'embedenabled': async () => {
+                const embedEnabledButton = rows[2].components[0] as ButtonBuilder
+                const continueEmbedButton = rows[6].components[1] as ButtonBuilder
+
+                channel.set({ embedEnabled: !channel.get().embedEnabled })
+                embedEnabledButton.setLabel(channel.get().embedEnabled ? 'Embed activé' : 'Embed désactivé').setStyle(channel.get().embedEnabled ? ButtonStyle.Success : ButtonStyle.Danger)
+                continueEmbedButton.setDisabled(!channel.get().embedEnabled)
+                for (let i = 1; i < 3; i++)
+                    rows[2].components[i].setDisabled(!channel.get().embedEnabled)
+                for (let i = 0; i < 3; i++)
+                    rows[3].components[i].setDisabled(!channel.get().embedEnabled)
+                return collectedInteraction.followUp({
+                    content: '✅',
+                    ephemeral: true
+                })
+            },
+            'hasbody': async () => {
+                const hasBodyButton = rows[2].components[1] as ButtonBuilder
+                const embed = channel.get().embed
+
+                if (!isTruthy(embed))
+                    return
+                embed.displayBody = !embed.displayBody
+                channel.set({ embed })
+                hasBodyButton.setLabel(embed.displayBody ? 'Avec description' : 'Sans description').setStyle(embed.displayBody ? ButtonStyle.Success : ButtonStyle.Danger)
+                return collectedInteraction.followUp({
+                    content: '✅',
+                    ephemeral: true
+                })
+            },
+            'hasimage': async () => {
+                const hasImageButton = rows[2].components[2] as ButtonBuilder
+                const embed = channel.get().embed
+
+                if (!isTruthy(embed))
+                    return
+                embed.displayImage = !embed.displayImage
+                channel.set({ embed })
+                hasImageButton.setLabel(embed.displayImage ? 'Avec image' : 'Sans image').setStyle(embed.displayImage ? ButtonStyle.Success : ButtonStyle.Danger)
+                return collectedInteraction.followUp({
+                    content: '✅',
+                    ephemeral: true
+                })
+            },
+            'hasthumbnail': async () => {
+                const hasThumbnailButton = rows[3].components[0] as ButtonBuilder
+                const embed = channel.get().embed
+
+                if (!isTruthy(embed))
+                    return
+                embed.displayThumbnail = !embed.displayThumbnail
+                channel.set({ embed })
+                hasThumbnailButton.setLabel(embed.displayThumbnail ? 'Avec thumbnail' : 'Sans thumbnail').setStyle(embed.displayThumbnail ? ButtonStyle.Success : ButtonStyle.Danger)
+                return collectedInteraction.followUp({
+                    content: '✅',
+                    ephemeral: true
+                })
+            },
+            'hasfooter': async () => {
+                const hasFooterButton = rows[3].components[1] as ButtonBuilder
+                const embed = channel.get().embed
+
+                if (!isTruthy(embed))
+                    return
+                embed.displayFooter = !embed.displayFooter
+                channel.set({ embed })
+                hasFooterButton.setLabel(embed.displayFooter ? 'Avec footer' : 'Sans footer').setStyle(embed.displayFooter ? ButtonStyle.Success : ButtonStyle.Danger)
+                return collectedInteraction.followUp({
+                    content: '✅',
+                    ephemeral: true
+                })
+            },
+            'hastimestamp': async () => {
+                const hasTimestampButton = rows[3].components[2] as ButtonBuilder
+                const embed = channel.get().embed
+
+                if (!isTruthy(embed))
+                    return
+                embed.displayTimestamp = !embed.displayTimestamp
+                channel.set({ embed })
+                hasTimestampButton.setLabel(embed.displayTimestamp ? 'Avec timestamp' : 'Sans timestamp').setStyle(embed.displayTimestamp ? ButtonStyle.Success : ButtonStyle.Danger)
+                return collectedInteraction.followUp({
+                    content: '✅',
+                    ephemeral: true
+                })
+            },
+            'embedinfos': async () => {
+                const embed = channel.get().embed as unknown as Model<TAnnouncementEmbed, any>
+                const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal')
+                const titleModal = new TextInputBuilder().setCustomId('title').setLabel('Titre').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.get().title).setRequired(true)
+                const bodyModal = new TextInputBuilder().setCustomId('body').setLabel('Description').setMaxLength(2048).setStyle(TextInputStyle.Paragraph).setValue(embed.get().body || '').setRequired(false)
+                const colorModal = new TextInputBuilder().setCustomId('color').setLabel('Couleur').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.get().color as string).setRequired(true)
+                const footerModal = new TextInputBuilder().setCustomId('footer').setLabel('Footer').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.get().footer || '').setRequired(false)
+                const imageUrlModal = new TextInputBuilder().setCustomId('imageurl').setLabel('Image URL').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.get().imageUrl || '').setRequired(false)
+                const titleRow = new ActionRowBuilder<TextInputBuilder>().addComponents(titleModal)
+                const bodyRow = new ActionRowBuilder<TextInputBuilder>().addComponents(bodyModal)
+                const colorRow = new ActionRowBuilder<TextInputBuilder>().addComponents(colorModal)
+                const footerRow = new ActionRowBuilder<TextInputBuilder>().addComponents(footerModal)
+                const imageUrlRow = new ActionRowBuilder<TextInputBuilder>().addComponents(imageUrlModal)
+
+                modal.addComponents(titleRow, bodyRow, colorRow, footerRow, imageUrlRow)
+                await collectedInteraction.showModal(modal)
+
+                try {
+                    const collector = await interaction.awaitModalSubmit({
+                        filter: i => i.user.id === interaction.user.id,
+                        time: 1000 * 60 * 10,
+                        idle: 1000 * 60 * 5
+                    })
+                    const title = collector.fields.getTextInputValue('title')
+                    const body = collector.fields.getTextInputValue('body')
+                    const color = collector.fields.getTextInputValue('color') as ColorResolvable
+                    const footer = collector.fields.getTextInputValue('footer')
+                    const imageUrl = collector.fields.getTextInputValue('imageurl')
+
+                    try {
+                        resolveColor(color)
+                        embed.set({
+                            title,
+                            body,
+                            footer,
+                            color,
+                            imageUrl
+                        })
+                        return collector.reply({
+                            content: '✅',
+                            ephemeral: true
+                        })
+                    } catch {
+                        embed.set({
+                            title,
+                            body,
+                            footer,
+                            imageUrl
+                        })
+                        return collector.reply({
+                            content: 'Couleur non valide.',
+                            ephemeral: true
+                        })
+                    }
+                } catch { }
+            }
         }
+        return handlers[collectedInteraction.customId]()
     }
 
-    private _createButtons(channel: TAnnouncementChannel, type: AnnouncementType): ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | StringSelectMenuBuilder>[] {
-        const rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | StringSelectMenuBuilder>[] = []
+    private _createButtons(channel: TAnnouncementChannel, type: AnnouncementType): ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder>[] {
+        const rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder>[] = []
 
         const isActivatedButton = new ButtonBuilder().setCustomId('isactivated').setLabel(channel.isActivated ? 'Activé' : 'Désactivé').setStyle(channel.isActivated ? ButtonStyle.Success : ButtonStyle.Danger)
         const messageAndImageModalButton = new ButtonBuilder().setCustomId('msgimg').setLabel('Message & Image').setStyle(ButtonStyle.Secondary).setDisabled(!channel.isActivated)
-        const isDmsButton = new ButtonBuilder().setCustomId('isdms').setLabel(channel.dm ? 'En dms' : 'Sur le serveur').setStyle(ButtonStyle.Secondary).setDisabled(type === 'welcome' && !channel.isActivated)
+        const isDmsButton = new ButtonBuilder().setCustomId('isdms').setLabel(channel.dm ? 'En dms' : 'Sur le serveur').setStyle(ButtonStyle.Secondary).setDisabled(type !== 'welcome' || !channel.isActivated)
         rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(isActivatedButton, messageAndImageModalButton, isDmsButton))
         const channelSelectMenu = new ChannelSelectMenuBuilder().setCustomId('channel').setMinValues(1).setMaxValues(1).setDefaultChannels(channel.channelId).setChannelTypes(ChannelType.GuildText).setDisabled(!channel.isActivated)
         rows.push(new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(channelSelectMenu))
 
         const embedEnabledButton = new ButtonBuilder().setCustomId('embedenabled').setLabel(channel.embedEnabled ? 'Embed activé' : 'Embed désactivé').setStyle(channel.embedEnabled ? ButtonStyle.Success : ButtonStyle.Danger)
-        const hasTitleButton = new ButtonBuilder().setCustomId('hastitle').setLabel(channel.embed?.displayTitle ? 'Avec titre' : 'Sans titre').setStyle(channel.embed?.displayTitle ? ButtonStyle.Success : ButtonStyle.Danger).setDisabled(!channel.embedEnabled)
         const hasBodyButton = new ButtonBuilder().setCustomId('hasbody').setLabel(channel.embed?.displayBody ? 'Avec description' : 'Sans description').setStyle(channel.embed?.displayBody ? ButtonStyle.Success : ButtonStyle.Danger).setDisabled(!channel.embedEnabled)
         const hasImageButton = new ButtonBuilder().setCustomId('hasimage').setLabel(channel.embed?.displayImage ? 'Avec image' : 'Sans image').setStyle(channel.embed?.displayImage ? ButtonStyle.Success : ButtonStyle.Danger).setDisabled(!channel.embedEnabled)
-        rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(embedEnabledButton, hasTitleButton, hasBodyButton, hasImageButton))
-        const hasThumbnailButton = new ButtonBuilder().setCustomId('hasthumbnail').setLabel(channel.embed?.displayThumbnail ? 'Avec thumbnail' : 'Sans thumbnail').setStyle(channel.embed?.displayBody ? ButtonStyle.Success : ButtonStyle.Danger).setDisabled(!channel.embedEnabled)
+        rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(embedEnabledButton, hasBodyButton, hasImageButton))
+        const hasThumbnailButton = new ButtonBuilder().setCustomId('hasthumbnail').setLabel(channel.embed?.displayThumbnail ? 'Avec thumbnail' : 'Sans thumbnail').setStyle(channel.embed?.displayThumbnail ? ButtonStyle.Success : ButtonStyle.Danger).setDisabled(!channel.embedEnabled)
         const hasFooterButton = new ButtonBuilder().setCustomId('hasfooter').setLabel(channel.embed?.displayFooter ? 'Avec footer' : 'Sans footer').setStyle(channel.embed?.displayFooter ? ButtonStyle.Success : ButtonStyle.Danger).setDisabled(!channel.embedEnabled)
-        const hasTimestampsButton = new ButtonBuilder().setCustomId('hastimestamps').setLabel(channel.embed?.displayTimestamp ? 'Avec timestamp' : 'Sans timestamp').setStyle(channel.embed?.displayTimestamp ? ButtonStyle.Success : ButtonStyle.Danger).setDisabled(!channel.embedEnabled)
+        const hasTimestampsButton = new ButtonBuilder().setCustomId('hastimestamp').setLabel(channel.embed?.displayTimestamp ? 'Avec timestamp' : 'Sans timestamp').setStyle(channel.embed?.displayTimestamp ? ButtonStyle.Success : ButtonStyle.Danger).setDisabled(!channel.embedEnabled)
         rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(hasThumbnailButton, hasFooterButton, hasTimestampsButton))
 
         const embedInfosModalButton = new ButtonBuilder().setCustomId('embedinfos').setLabel('Embed').setStyle(ButtonStyle.Secondary).setDisabled(!channel.embedEnabled)
-        const addEmbedFieldModalButton = new ButtonBuilder().setCustomId('addembedfield').setLabel('Ajouter un field').setStyle(ButtonStyle.Secondary).setDisabled(!channel.embedEnabled)
-        rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(embedInfosModalButton, addEmbedFieldModalButton))
-        const removeEmbedFieldMenu = new StringSelectMenuBuilder().setCustomId('removeembedfield').setMaxValues(1).setOptions(channel.embed ? channel.embed.fields.map(field => new StringSelectMenuOptionBuilder().setLabel(field.title).setValue(`${field.id}`)) : [new StringSelectMenuOptionBuilder().setLabel('Aucune option').setValue('nooption').setDefault(true)]).setDisabled(!channel.embedEnabled && !channel.embed?.fields.length)
-        rows.push(new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(removeEmbedFieldMenu))
+        rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(embedInfosModalButton))
 
         const backButton = new ButtonBuilder().setCustomId('back').setEmoji('⬅️').setStyle(ButtonStyle.Primary).setDisabled(true)
         const continueButton = new ButtonBuilder().setCustomId('continue').setEmoji('➡️').setStyle(ButtonStyle.Primary).setDisabled(!channel.isActivated)

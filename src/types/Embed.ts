@@ -1,3 +1,4 @@
+import { ColorResolvable } from 'discord.js'
 import { TAnnouncementChannel } from './Channel'
 
 export type TEmbedField = {
@@ -11,9 +12,8 @@ export type TEmbedField = {
 
 export type TAnnouncementEmbed = {
     id: number
-    color: string
-    displayTitle: boolean
-    title: string | null
+    color: ColorResolvable
+    title: string
     displayBody: boolean
     body: string | null
     displayImage: boolean
