@@ -19,6 +19,7 @@ export default class Ready extends EventModule {
         await client.modules.upsertInteractionsIntoDb(client.database)
         await client.modules.upsertCommandsIntoDb(client.database)
         await client.database.fetchServers(client)
+        await client.database.initBotInDb(client.user!.id)
 
         const embed = new EmbedBuilder()
             .setTitle('Bot is online!')

@@ -2,7 +2,9 @@ import {
     EmbedBuilder,
     Message,
     Interaction,
-    Client
+    Client,
+    resolveColor,
+    ColorResolvable
 } from 'discord.js'
 import { config } from 'dotenv'
 import {
@@ -216,15 +218,20 @@ export default class Database {
             },
             color: {
                 type: DataTypes.STRING,
-                defaultValue: 'red'
-            },
-            displayTitle: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: '#FFFFFF',
+                validate: {
+                    isColorResolvable(value: string) {
+                        try {
+                            resolveColor(value as ColorResolvable)
+                        } catch (error) {
+                            throw Error('Invalid color.')
+                        }
+                    }
+                }
             },
             title: {
                 type: DataTypes.STRING(256),
-                allowNull: true
+                allowNull: false
             },
             displayBody: {
                 type: DataTypes.BOOLEAN,
@@ -391,7 +398,7 @@ export default class Database {
                     isSingleWord(value: string) {
                         const trimmedValue = value.trim()
                         if (trimmedValue.includes(' ') || trimmedValue.includes('\t'))
-                          throw new Error('\'toFind\' doit être un seul et unique mot sans espace.');
+                          throw Error('\'toFind\' doit être un seul et unique mot sans espace.');
                       }
                 }
             },
@@ -593,5 +600,19 @@ export default class Database {
 
     public get database(): Sequelize {
         return this._sequelize
+    }
+
+    public async initBotInDb(id: string): Promise<boolean> {
+        const [bot, isCreated] = await this.Bot.findOrCreate({
+            where: {
+                id
+            },
+            defaults: {
+                id,
+                maintenance: false
+            }
+        })
+
+        return isCreated
     }
 }
