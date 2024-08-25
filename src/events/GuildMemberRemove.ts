@@ -9,15 +9,15 @@ import { isString, isTruthy } from '../utils/TypeGuards.js'
 config()
 
 @EventDecorator({
-    name: 'guildMemberAdd',
+    name: 'guildMemberRemove',
     eventType: 'on'
 })
-export default class GuildMemberAddEvent extends EventModule {
+export default class GuildMemberRemoveEvent extends EventModule {
     public async execute(client: Bot, member: GuildMember): Promise<void | InteractionResponse | Message> {
         const welcomeChannel = await client.database.AnnouncementChannel.findOne({
             where: {
                 serverId: member.guild.id,
-                type: 'welcome'
+                type: 'leave'
             },
             include: {
                 model: client.database.AnnouncementEmbed,
@@ -54,19 +54,11 @@ export default class GuildMemberAddEvent extends EventModule {
 
         if (!welcomeChannel.get().message && !embed.data.title)
             return
-        if (welcomeChannel.get().dm) {
-            return member.send({
-                content: this._replaceTags(welcomeChannel.get().message!, member),
-                embeds: embed.data.title ? this._replaceTags([embed], member) : [],
-                files: imageUrl && imageUrl !== '' ? [imageUrl] : []
-            })
-        } else {
-            return channel.send({
-                content: this._replaceTags(welcomeChannel.get().message!, member),
-                embeds: embed.data.title ? this._replaceTags([embed], member) : [],
-                files: imageUrl && imageUrl !== '' ? [imageUrl] : []
-            })
-        }
+        return channel.send({
+            content: this._replaceTags(welcomeChannel.get().message!, member),
+            embeds: embed.data.title ? this._replaceTags([embed], member) : [],
+            files: imageUrl && imageUrl !== '' ? [imageUrl] : []
+        })
     }
 
     private _replaceTags<T>(param: T, member: GuildMember): T {
