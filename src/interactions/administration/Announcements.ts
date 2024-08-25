@@ -21,17 +21,17 @@ import {
     EmbedBuilder,
     Message,
     ColorResolvable,
-    resolveColor
+    resolveColor,
 } from 'discord.js'
+import { Model } from 'sequelize'
 
 import { Bot } from '../../classes/Bot.js'
 import { Logger } from '../../classes/Logger.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
-import { InteractionDecorator } from '../../utils/Decorators.js'
-import { Model } from 'sequelize'
 import { TAnnouncementChannel } from '../../types/Channel.js'
-import { isTruthy } from '../../utils/TypeGuards.js'
-import { TAnnouncementEmbed, TEmbedField } from '../../types/Embed.js'
+import { TAnnouncementEmbed } from '../../types/Embed.js'
+import { InteractionDecorator } from '../../utils/Decorators.js'
+import { isString, isTruthy } from '../../utils/TypeGuards.js'
 
 const logger = Logger.getInstance('')
 const responseByType = {
@@ -62,6 +62,10 @@ type AnnouncementType = 'welcome' | 'leave' | 'ban'
                 .setName('remove')
                 .setDescription('Supprimer les annonces d\'arrivées.')
             )
+            .addSubcommand(subCommand => subCommand
+                .setName('test')
+                .setDescription('Testez facilement votre message d\'arrivée.')
+            )
         )
         .addSubcommandGroup(subCommandGroup => subCommandGroup
             .setName('leave')
@@ -74,6 +78,10 @@ type AnnouncementType = 'welcome' | 'leave' | 'ban'
                 .setName('remove')
                 .setDescription('Supprimer les annonces de départ.')
             )
+            .addSubcommand(subCommand => subCommand
+                .setName('test')
+                .setDescription('Testez facilement votre message de départ.')
+            )
         )
         .addSubcommandGroup(subCommandGroup => subCommandGroup
             .setName('ban')
@@ -85,6 +93,10 @@ type AnnouncementType = 'welcome' | 'leave' | 'ban'
             .addSubcommand(subCommand => subCommand
                 .setName('remove')
                 .setDescription('Supprimer les annonces de bans.')
+            )
+            .addSubcommand(subCommand => subCommand
+                .setName('test')
+                .setDescription('Testez facilement votre message de ban.')
             )
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
@@ -108,6 +120,8 @@ export default class AnnouncementsInteraction extends InteractionModule {
             return this._configureAnnouncement(client, interaction, options.getSubcommandGroup(true) as AnnouncementType)
         if (options.getSubcommand() === 'remove')
             return this._removeAnnouncement(client, interaction, options.getSubcommandGroup(true) as AnnouncementType)
+        if (options.getSubcommand() === 'test')
+            return this._testAnnouncement(client, interaction, options.getSubcommandGroup(true) as AnnouncementType)
     }
 
     private async _configureAnnouncement(client: Bot, interaction: CommandInteraction, type: AnnouncementType): Promise<Message | void> {
@@ -129,10 +143,6 @@ export default class AnnouncementsInteraction extends InteractionModule {
                 include: [{
                     model: client.database.AnnouncementEmbed,
                     as: 'embed',
-                    include: [{
-                        model: client.database.EmbedField,
-                        as: 'fields'
-                    }]
                 }]
             })
 
@@ -188,36 +198,36 @@ export default class AnnouncementsInteraction extends InteractionModule {
 
     private async _setResponse(client: Bot, interaction: CommandInteraction, channel: Model<TAnnouncementChannel, any>, type: AnnouncementType, response?: Message): Promise<void> {
         const rows = this._createButtons(channel.get(), type)
-        const embed = await this._buildEmbed(client, channel.get())
+        const embed = await this._buildEmbed(client, channel.get(), interaction.member as GuildMember)
         const imageUrl = channel.get().imageUrl
 
         if (response) {
             await response.edit({
                 content: 'No message set',
                 embeds: embed,
-                components: [rows[0], rows[1], rows[6]],
+                components: [rows[0], rows[1], rows[5]],
                 files: []
             })
             return this._handleUserActions(client, interaction, channel, rows, response)
         } else {
             const response = await interaction.editReply({
-                content: channel.get().message || 'No message set',
-                embeds: embed,
-                components: [rows[0], rows[1], rows[6]],
+                content: this._replaceTags(channel.get().message || 'No message set', interaction.member as GuildMember),
+                embeds: this._replaceTags(embed, interaction.member as GuildMember),
+                components: [rows[0], rows[1], rows[5]],
                 files: imageUrl && imageUrl !== '' ? [imageUrl] : []
             })
             return this._handleUserActions(client, interaction, channel, rows, response)
         }
     }
 
-    private async _buildEmbed(client: Bot, channel: TAnnouncementChannel): Promise<EmbedBuilder[]> {
+    private async _buildEmbed(client: Bot, channel: TAnnouncementChannel, member: GuildMember): Promise<EmbedBuilder[]> {
         if (!channel.embedEnabled)
             return []
 
         const embed = new EmbedBuilder()
         const storedEmbed: TAnnouncementEmbed = channel.embed ? channel.embed : {
             id: 0,
-            title: 'Welcome user !',
+            title: 'Announcement',
             color: 'Red',
             displayBody: false,
             body: null,
@@ -242,15 +252,10 @@ export default class AnnouncementsInteraction extends InteractionModule {
             embed.setImage(storedEmbed.imageUrl)
         if (storedEmbed.displayFooter && storedEmbed.footer)
             embed.setFooter({ text: storedEmbed.footer })
-        if (storedEmbed.displayThumbnail && storedEmbed.thumbnailUrl)
-            embed.setThumbnail(storedEmbed.thumbnailUrl)
+        if (storedEmbed.displayThumbnail)
+            embed.setThumbnail(member.user.displayAvatarURL())
         if (storedEmbed.displayTimestamp)
             embed.setTimestamp()
-        if (storedEmbed.fields) {
-            for (const field of storedEmbed.fields) {
-                embed.addFields({ name: field.title, value: field.value, inline: field.inline })
-            }
-        }
         return [embed]
     }
 
@@ -268,16 +273,18 @@ export default class AnnouncementsInteraction extends InteractionModule {
             switch (collectedInteraction.customId) {
                 case 'continue':
                     currentRowId += 2
-                    rows[6].components[0].setDisabled(false)
-                    if (currentRowId === 4)
-                        rows[6].components[1].setDisabled(true)
-                    return response.edit({ components: [rows[currentRowId], rows[currentRowId + 1], rows[6]] })
+                    rows[5].components[0].setDisabled(false)
+                    if (currentRowId === 4) {
+                        rows[5].components[1].setDisabled(true)
+                        return response.edit({ components: [rows[currentRowId], rows[5]] })
+                    }
+                    return response.edit({ components: [rows[currentRowId], rows[currentRowId + 1], rows[5]] })
                 case 'back':
                     currentRowId -= 2
-                    rows[6].components[1].setDisabled(false)
+                    rows[5].components[1].setDisabled(false)
                     if (!currentRowId)
-                        rows[6].components[0].setDisabled(true)
-                    return response.edit({ components: [rows[currentRowId], rows[currentRowId + 1], rows[6]] })
+                        rows[5].components[0].setDisabled(true)
+                    return response.edit({ components: [rows[currentRowId], rows[currentRowId + 1], rows[5]] })
                 case 'cancel':
                     collector.stop()
                     return await collectedInteraction.channel?.send('Vous avez annulé l\'opération')
@@ -294,11 +301,39 @@ export default class AnnouncementsInteraction extends InteractionModule {
                             }
                         }
                         await channel.save()
-                        if (channel.get().embed)
-                            await (channel.get().embed as unknown as Model<TAnnouncementEmbed, any>).save()
-                        if (channel.get().embed && channel.get().embed?.fields.length) {
-                            for (const field of ((channel.get().embed as unknown as Model<TAnnouncementEmbed, any>).get().fields as unknown as Model<TEmbedField, any>[]))
-                                field.save()
+                        if (channel.get().embedEnabled && channel.get().embed) {
+                            const [embed, isCreated] = await client.database.AnnouncementEmbed.findOrCreate({
+                                where: {
+                                    announcementChannelId: channel.get().id
+                                },
+                                defaults: {
+                                    color: channel.get().embed?.color,
+                                    title: channel.get().embed?.title,
+                                    displayBody: channel.get().embed?.displayBody,
+                                    body: channel.get().embed?.body,
+                                    displayImage: channel.get().embed?.displayImage,
+                                    imageUrl: channel.get().embed?.imageUrl,
+                                    displayFooter: channel.get().embed?.displayFooter,
+                                    footer: channel.get().embed?.footer,
+                                    displayThumbnail: channel.get().embed?.displayThumbnail,
+                                    displayTimestamp: channel.get().embed?.displayTimestamp
+                                }
+                            })
+
+                            if (!isCreated) {
+                                embed.update({
+                                    color: channel.get().embed?.color,
+                                    title: channel.get().embed?.title,
+                                    displayBody: channel.get().embed?.displayBody,
+                                    body: channel.get().embed?.body,
+                                    displayImage: channel.get().embed?.displayImage,
+                                    imageUrl: channel.get().embed?.imageUrl,
+                                    displayFooter: channel.get().embed?.displayFooter,
+                                    footer: channel.get().embed?.footer,
+                                    displayThumbnail: channel.get().embed?.displayThumbnail,
+                                    displayTimestamp: channel.get().embed?.displayTimestamp
+                                })
+                            }
                         }
                         await collectedInteraction.channel?.send('Tous vos changements ont été enregistrés avec succès.')
                     } catch (error: any) {
@@ -317,13 +352,13 @@ export default class AnnouncementsInteraction extends InteractionModule {
                     try {
                         await this._updateAnnouncement(interaction, collectedInteraction, channel, rows)
 
-                        const embed = await this._buildEmbed(client, channel.get())
+                        const embed = await this._buildEmbed(client, channel.get(), interaction.member as GuildMember)
                         const imageUrl = channel.get().imageUrl
 
                         return response.edit({
-                            content: channel.get().message || 'No message set',
-                            embeds: embed,
-                            components: [rows[currentRowId], rows[currentRowId + 1], rows[6]],
+                            content: this._replaceTags(channel.get().message || 'No message set', interaction.member as GuildMember),
+                            embeds: this._replaceTags(embed, interaction.member as GuildMember),
+                            components: currentRowId !== 4 ? [rows[currentRowId], rows[currentRowId + 1], rows[5]] : [rows[currentRowId], rows[5]],
                             files: imageUrl && imageUrl !== '' ? [imageUrl] : []
                         })
                     } catch (error) {
@@ -342,7 +377,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         const handlers: { [key: string]: () => Promise<void | Message | InteractionResponse> } = {
             'isactivated': async () => {
                 const activatedButton = rows[0].components[0] as ButtonBuilder
-                const continueButton = rows[6].components[1] as ButtonBuilder
+                const continueButton = rows[5].components[1] as ButtonBuilder
 
                 channel.set({ isActivated: !channel.get().isActivated })
                 activatedButton.setLabel(channel.get().isActivated ? 'Activé' : 'Désactivé').setStyle(channel.get().isActivated ? ButtonStyle.Success : ButtonStyle.Danger)
@@ -354,8 +389,8 @@ export default class AnnouncementsInteraction extends InteractionModule {
             },
             'msgimg': async () => {
                 const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal')
-                const messageModal = new TextInputBuilder().setCustomId('message').setLabel('Message | Tags: ({user}, {username})').setMaxLength(1950).setStyle(TextInputStyle.Paragraph).setValue(channel.get().message || '').setRequired(false)
-                const imageUrlModal = new TextInputBuilder().setCustomId('imageurl').setLabel('Image URL (ex: https://imgur.com/5wukV1P)').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(channel.get().imageUrl || '').setRequired(false)
+                const messageModal = new TextInputBuilder().setCustomId('message').setLabel('Message').setMaxLength(1950).setStyle(TextInputStyle.Paragraph).setValue(channel.get().message || '').setRequired(false)
+                const imageUrlModal = new TextInputBuilder().setCustomId('imageurl').setLabel('Image: https://i.imgur.com/5wukV1P.jpeg').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(channel.get().imageUrl || '').setRequired(false)
                 const messageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(messageModal)
                 const imageUrlRow = new ActionRowBuilder<TextInputBuilder>().addComponents(imageUrlModal)
 
@@ -383,9 +418,11 @@ export default class AnnouncementsInteraction extends InteractionModule {
             },
             'isdms': async () => {
                 const dmButton = rows[0].components[2] as ButtonBuilder
+                const channelSelector = rows[1].components[0] as ChannelSelectMenuBuilder
 
                 channel.set({ dm: !channel.get().dm })
                 dmButton.setLabel(channel.get().dm ? 'En dms' : 'Sur le serveur')
+                channelSelector.setDisabled(channel.get().dm)
                 return collectedInteraction.followUp({
                     content: '✅',
                     ephemeral: true
@@ -412,15 +449,14 @@ export default class AnnouncementsInteraction extends InteractionModule {
             },
             'embedenabled': async () => {
                 const embedEnabledButton = rows[2].components[0] as ButtonBuilder
-                const continueEmbedButton = rows[6].components[1] as ButtonBuilder
 
                 channel.set({ embedEnabled: !channel.get().embedEnabled })
                 embedEnabledButton.setLabel(channel.get().embedEnabled ? 'Embed activé' : 'Embed désactivé').setStyle(channel.get().embedEnabled ? ButtonStyle.Success : ButtonStyle.Danger)
-                continueEmbedButton.setDisabled(!channel.get().embedEnabled)
                 for (let i = 1; i < 3; i++)
                     rows[2].components[i].setDisabled(!channel.get().embedEnabled)
                 for (let i = 0; i < 3; i++)
                     rows[3].components[i].setDisabled(!channel.get().embedEnabled)
+                rows[4].components[0].setDisabled(!channel.get().embedEnabled)
                 return collectedInteraction.followUp({
                     content: '✅',
                     ephemeral: true
@@ -497,13 +533,16 @@ export default class AnnouncementsInteraction extends InteractionModule {
                 })
             },
             'embedinfos': async () => {
-                const embed = channel.get().embed as unknown as Model<TAnnouncementEmbed, any>
+                const embed = channel.get().embed
+                if (!isTruthy(embed))
+                    return
+
                 const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal')
-                const titleModal = new TextInputBuilder().setCustomId('title').setLabel('Titre').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.get().title).setRequired(true)
-                const bodyModal = new TextInputBuilder().setCustomId('body').setLabel('Description').setMaxLength(2048).setStyle(TextInputStyle.Paragraph).setValue(embed.get().body || '').setRequired(false)
-                const colorModal = new TextInputBuilder().setCustomId('color').setLabel('Couleur').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.get().color as string).setRequired(true)
-                const footerModal = new TextInputBuilder().setCustomId('footer').setLabel('Footer').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.get().footer || '').setRequired(false)
-                const imageUrlModal = new TextInputBuilder().setCustomId('imageurl').setLabel('Image URL').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.get().imageUrl || '').setRequired(false)
+                const titleModal = new TextInputBuilder().setCustomId('title').setLabel('Titre').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.title).setRequired(true)
+                const bodyModal = new TextInputBuilder().setCustomId('body').setLabel('Description').setMaxLength(2048).setStyle(TextInputStyle.Paragraph).setValue(embed.body || '').setRequired(false)
+                const colorModal = new TextInputBuilder().setCustomId('color').setLabel('Couleur').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.color as string).setRequired(true)
+                const footerModal = new TextInputBuilder().setCustomId('footer').setLabel('Footer').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.footer || '').setRequired(false)
+                const imageUrlModal = new TextInputBuilder().setCustomId('imageurl').setLabel('Image URL').setMaxLength(255).setStyle(TextInputStyle.Short).setValue(embed.imageUrl || '').setRequired(false)
                 const titleRow = new ActionRowBuilder<TextInputBuilder>().addComponents(titleModal)
                 const bodyRow = new ActionRowBuilder<TextInputBuilder>().addComponents(bodyModal)
                 const colorRow = new ActionRowBuilder<TextInputBuilder>().addComponents(colorModal)
@@ -527,30 +566,32 @@ export default class AnnouncementsInteraction extends InteractionModule {
 
                     try {
                         resolveColor(color)
-                        embed.set({
-                            title,
-                            body,
-                            footer,
-                            color,
-                            imageUrl
-                        })
+                        embed.title = title
+                        embed.body = body
+                        embed.footer = footer
+                        embed.color = color
+                        embed.imageUrl = imageUrl
                         return collector.reply({
                             content: '✅',
                             ephemeral: true
                         })
                     } catch {
-                        embed.set({
-                            title,
-                            body,
-                            footer,
-                            imageUrl
-                        })
+                        embed.title = title
+                        embed.body = body
+                        embed.footer = footer
+                        embed.imageUrl = imageUrl
                         return collector.reply({
                             content: 'Couleur non valide.',
                             ephemeral: true
                         })
                     }
                 } catch { }
+            },
+            'tagsinfos': async () => {
+                return collectedInteraction.followUp({
+                    content: '**Liste des tags disponibles:**\n>>> `-` {user}\n`-` {username}\n`-` {server}\n`-` {membercount}',
+                    ephemeral: true
+                })
             }
         }
         return handlers[collectedInteraction.customId]()
@@ -563,7 +604,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         const messageAndImageModalButton = new ButtonBuilder().setCustomId('msgimg').setLabel('Message & Image').setStyle(ButtonStyle.Secondary).setDisabled(!channel.isActivated)
         const isDmsButton = new ButtonBuilder().setCustomId('isdms').setLabel(channel.dm ? 'En dms' : 'Sur le serveur').setStyle(ButtonStyle.Secondary).setDisabled(type !== 'welcome' || !channel.isActivated)
         rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(isActivatedButton, messageAndImageModalButton, isDmsButton))
-        const channelSelectMenu = new ChannelSelectMenuBuilder().setCustomId('channel').setMinValues(1).setMaxValues(1).setDefaultChannels(channel.channelId).setChannelTypes(ChannelType.GuildText).setDisabled(!channel.isActivated)
+        const channelSelectMenu = new ChannelSelectMenuBuilder().setCustomId('channel').setMinValues(1).setMaxValues(1).setDefaultChannels(channel.channelId).setChannelTypes(ChannelType.GuildText).setDisabled(!channel.isActivated || channel.dm)
         rows.push(new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(channelSelectMenu))
 
         const embedEnabledButton = new ButtonBuilder().setCustomId('embedenabled').setLabel(channel.embedEnabled ? 'Embed activé' : 'Embed désactivé').setStyle(channel.embedEnabled ? ButtonStyle.Success : ButtonStyle.Danger)
@@ -576,7 +617,8 @@ export default class AnnouncementsInteraction extends InteractionModule {
         rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(hasThumbnailButton, hasFooterButton, hasTimestampsButton))
 
         const embedInfosModalButton = new ButtonBuilder().setCustomId('embedinfos').setLabel('Embed').setStyle(ButtonStyle.Secondary).setDisabled(!channel.embedEnabled)
-        rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(embedInfosModalButton))
+        const tagsInfosButton = new ButtonBuilder().setCustomId('tagsinfos').setLabel('Tags').setStyle(ButtonStyle.Primary)
+        rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(embedInfosModalButton, tagsInfosButton))
 
         const backButton = new ButtonBuilder().setCustomId('back').setEmoji('⬅️').setStyle(ButtonStyle.Primary).setDisabled(true)
         const continueButton = new ButtonBuilder().setCustomId('continue').setEmoji('➡️').setStyle(ButtonStyle.Primary).setDisabled(!channel.isActivated)
@@ -585,6 +627,33 @@ export default class AnnouncementsInteraction extends InteractionModule {
         rows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(backButton, continueButton, cancelButton, registerButton))
 
         return rows
+    }
+
+    private _replaceTags<T>(param: string | EmbedBuilder[], member: GuildMember): T {
+        const tagsWithReplacements: { name: string, value: string }[] = [
+            { name: '{user}', value: `${member.user}` },
+            { name: '{username}', value: `${member.user.username}` },
+            { name: '{server}', value: `${member.guild.name}` },
+            { name: '{membercount}', value: `${member.guild.memberCount}` },
+        ]
+
+        if (isString(param)) {
+            let result = param as string
+            for (const {name, value} of tagsWithReplacements) {
+                result = result.replaceAll(name, value)
+            }
+            return result as T
+        }
+
+        if (!param.length)
+            return param as T
+        for (const {name, value} of tagsWithReplacements) {
+            param[0].data.title = param[0].data.title?.replaceAll(name, value)
+            param[0].data.description = param[0].data.description?.replaceAll(name, value)
+            if (param[0].data.footer)
+                param[0].data.footer.text = param[0].data.footer.text.replaceAll(name, value)
+        }
+        return param as T
     }
 
     private async _removeAnnouncement(client: Bot, interaction: CommandInteraction, type: AnnouncementType): Promise<void | InteractionResponse> {
@@ -653,5 +722,19 @@ export default class AnnouncementsInteraction extends InteractionModule {
                 ephemeral: true
             })
         }
+    }
+
+    private async _testAnnouncement(client: Bot, interaction: CommandInteraction, type: AnnouncementType): Promise<InteractionResponse> {
+        if (type === 'ban')
+            client.emit('guildBanAdd', interaction.member as GuildMember)
+        if (type === 'leave')
+            client.emit('guildMemberRemove', interaction.member as GuildMember)
+        if (type === 'welcome')
+            client.emit('guildMemberAdd', interaction.member as GuildMember)
+
+        return interaction.reply({
+            content: '✅',
+            ephemeral: true
+        })
     }
 }
