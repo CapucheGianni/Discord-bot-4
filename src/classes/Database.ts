@@ -398,7 +398,7 @@ export default class Database {
                     isSingleWord(value: string) {
                         const trimmedValue = value.trim()
                         if (trimmedValue.includes(' ') || trimmedValue.includes('\t'))
-                          throw Error('\'toFind\' doit être un seul et unique mot sans espace.');
+                          throw Error('\'toFind\' doit être un seul et unique mot sans espace.')
                       }
                 }
             },

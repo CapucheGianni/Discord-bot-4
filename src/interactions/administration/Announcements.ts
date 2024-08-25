@@ -125,7 +125,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
     }
 
     private async _configureAnnouncement(client: Bot, interaction: CommandInteraction, type: AnnouncementType): Promise<Message | void> {
-        // client.set.add(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
+        client.set.add(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
 
         await interaction.deferReply()
 
@@ -147,9 +147,8 @@ export default class AnnouncementsInteraction extends InteractionModule {
             })
 
             if (isCreated)
-                return this._askForCreation(client, interaction, channel, type)
-            else
-                return this._setResponse(client, interaction, channel, type)
+                return await this._askForCreation(client, interaction, channel, type)
+            return await this._setResponse(client, interaction, channel, type)
         } catch (error: any) {
             logger.log(client, error, 'error')
             client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
@@ -186,6 +185,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
                 try { await channel.destroy() }
                 catch (error: any) { logger.log(client, error, 'warn') }
 
+                client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
                 return response.edit({
                     content: 'Vous avez annulé l\'opération.',
                     components: []
@@ -198,7 +198,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
 
     private async _setResponse(client: Bot, interaction: CommandInteraction, channel: Model<TAnnouncementChannel, any>, type: AnnouncementType, response?: Message): Promise<void> {
         const rows = this._createButtons(channel.get(), type)
-        const embed = await this._buildEmbed(client, channel.get(), interaction.member as GuildMember)
+        const embed = await this._buildEmbed(channel.get(), interaction.member as GuildMember)
         const imageUrl = channel.get().imageUrl
 
         if (response) {
@@ -220,7 +220,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         }
     }
 
-    private async _buildEmbed(client: Bot, channel: TAnnouncementChannel, member: GuildMember): Promise<EmbedBuilder[]> {
+    private async _buildEmbed(channel: TAnnouncementChannel, member: GuildMember): Promise<EmbedBuilder[]> {
         if (!channel.embedEnabled)
             return []
 
@@ -352,7 +352,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
                     try {
                         await this._updateAnnouncement(interaction, collectedInteraction, channel, rows)
 
-                        const embed = await this._buildEmbed(client, channel.get(), interaction.member as GuildMember)
+                        const embed = await this._buildEmbed(channel.get(), interaction.member as GuildMember)
                         const imageUrl = channel.get().imageUrl
 
                         return response.edit({
