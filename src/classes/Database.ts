@@ -416,33 +416,33 @@ export default class Database {
     public setAssociations() {
         // Server associations
         this.Server.hasMany(this.Channel, { as: 'channels', foreignKey: 'serverId' })
-        this.Server.hasMany(this.AnnouncementChannel, { as: 'announcementChannels', foreignKey: 'serverId' })
-        this.Server.hasOne(this.TwitchNotification, { as: 'twitchNotificationChannel', foreignKey: 'serverId' })
-        this.Server.hasMany(this.Pun, { as: 'puns', foreignKey: 'serverId' })
+        this.Server.hasMany(this.AnnouncementChannel, { as: 'announcementChannels', foreignKey: 'serverId', onDelete: 'CASCADE' })
+        this.Server.hasOne(this.TwitchNotification, { as: 'twitchNotificationChannel', foreignKey: 'serverId', onDelete: 'CASCADE' })
+        this.Server.hasMany(this.Pun, { as: 'puns', foreignKey: 'serverId', onDelete: 'CASCADE' })
 
         // Channel associations
         this.Channel.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId' })
-        this.Channel.hasMany(this.AnnouncementChannel, { as: 'announcementChannel', foreignKey: 'channelId' })
-        this.Channel.hasOne(this.TwitchNotification, { as: 'twitchNotification', foreignKey: 'channelId' })
+        this.Channel.hasMany(this.AnnouncementChannel, { as: 'announcementChannel', foreignKey: 'channelId', onDelete: 'CASCADE' })
+        this.Channel.hasOne(this.TwitchNotification, { as: 'twitchNotification', foreignKey: 'channelId', onDelete: 'CASCADE' })
 
         // AnnouncementChannel associations
-        this.AnnouncementChannel.belongsTo(this.Channel, { as: 'channel', foreignKey: 'channelId', targetKey: 'id' })
-        this.AnnouncementChannel.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id' })
-        this.AnnouncementChannel.hasOne(this.AnnouncementEmbed, { as: 'embed', foreignKey: 'announcementChannelId' })
+        this.AnnouncementChannel.belongsTo(this.Channel, { as: 'channel', foreignKey: 'channelId', targetKey: 'id', onDelete: 'CASCADE' })
+        this.AnnouncementChannel.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id', onDelete: 'CASCADE' })
+        this.AnnouncementChannel.hasOne(this.AnnouncementEmbed, { as: 'embed', foreignKey: 'announcementChannelId', onDelete: 'CASCADE' })
 
         // AnnouncementEmbed
-        this.AnnouncementEmbed.belongsTo(this.AnnouncementChannel, { as: 'announcementChannel', foreignKey: 'announcementChannelId', targetKey: 'id' })
-        this.AnnouncementEmbed.hasMany(this.EmbedField, { as: 'fields', foreignKey: 'embedId' })
+        this.AnnouncementEmbed.belongsTo(this.AnnouncementChannel, { as: 'announcementChannel', foreignKey: 'announcementChannelId', targetKey: 'id', onDelete: 'CASCADE' })
+        this.AnnouncementEmbed.hasMany(this.EmbedField, { as: 'fields', foreignKey: 'embedId', onDelete: 'CASCADE' })
 
         // EmbedField
-        this.EmbedField.belongsTo(this.AnnouncementEmbed, { as: 'embed', foreignKey: 'embedId', targetKey: 'id' })
+        this.EmbedField.belongsTo(this.AnnouncementEmbed, { as: 'embed', foreignKey: 'embedId', targetKey: 'id', onDelete: 'CASCADE' })
 
         // TwitchNotification
-        this.TwitchNotification.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id' })
-        this.TwitchNotification.belongsTo(this.Channel, { as: 'channel', foreignKey: 'channelId', targetKey: 'id' })
+        this.TwitchNotification.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id', onDelete: 'CASCADE' })
+        this.TwitchNotification.belongsTo(this.Channel, { as: 'channel', foreignKey: 'channelId', targetKey: 'id', onDelete: 'CASCADE' })
 
         // Puns
-        this.Pun.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id' })
+        this.Pun.belongsTo(this.Server, { as: 'server', foreignKey: 'serverId', targetKey: 'id', onDelete: 'CASCADE' })
     }
 
     public async fetchServers(client: Client): Promise<void> {
@@ -450,7 +450,6 @@ export default class Database {
             id: guild.id,
             name: guild.name
         }))
-        const guildIds: string[] = guilds.map((guild) => guild.id)
         const t = await this._sequelize.transaction()
 
         try {
@@ -463,14 +462,6 @@ export default class Database {
                     { transaction: t }
                 )
             }
-            await this.Server.destroy({
-                where: {
-                    id: {
-                        [Op.notIn]: guildIds
-                    }
-                },
-                transaction: t
-            })
             await t.commit()
         } catch (error) {
             await t.rollback()
