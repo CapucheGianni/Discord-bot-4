@@ -2,6 +2,7 @@ import { EmbedBuilder } from 'discord.js'
 
 import { Bot } from '../classes/Bot.js'
 import { EventModule } from '../classes/ModuleImports.js'
+import Twitch from '../classes/Twitch.js'
 import { EventDecorator } from '../utils/Decorators.js'
 import { getSafeEnv } from '../utils/TypeGuards.js'
 
@@ -20,6 +21,9 @@ export default class Ready extends EventModule {
         await client.modules.upsertCommandsIntoDb(client.database)
         await client.database.fetchServers(client)
         await client.database.initBotInDb(client.user!.id)
+
+        await new Twitch().getTwitchStreams(client)
+
 
         const embed = new EmbedBuilder()
             .setTitle('Bot is online!')
