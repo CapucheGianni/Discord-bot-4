@@ -335,13 +335,20 @@ export default class TwitchInteraction extends InteractionModule {
                     content: 'Le salon a été mis à jour localement avec succès.',
                     ephemeral: true
                 })
+            case 'tags':
+                collectedInteraction.followUp({
+                    content: '**Liste des tags disponibles:**\n>>> `-` {streamer}\n`-` {game}',
+                    ephemeral: true
+                })
         }
     }
 
     private _createButtons(channelId: string, roleId: string | null): ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[] {
-        const textInputsButton = new ButtonBuilder().setCustomId('inputs').setLabel('Streamer / Message / Message d\'update').setStyle(ButtonStyle.Secondary)
+        const textInputsButton = new ButtonBuilder().setCustomId('inputs').setLabel('Infos').setStyle(ButtonStyle.Secondary)
+        const tagsButton = new ButtonBuilder().setCustomId('tags').setLabel('Tags').setStyle(ButtonStyle.Primary)
         const channelSelector = new ChannelSelectMenuBuilder().setCustomId('channel').setPlaceholder('Salon').setDefaultChannels(channelId).setMaxValues(1).setMinValues(1).setChannelTypes(ChannelType.GuildText)
         const mentionSelector = new RoleSelectMenuBuilder().setCustomId('mention').setPlaceholder('Mention').setMinValues(0).setMaxValues(1)
+
         const continueButton = new ButtonBuilder().setCustomId('continue').setEmoji('➡️').setStyle(ButtonStyle.Primary)
         const backButton = new ButtonBuilder().setCustomId('back').setEmoji('⬅️').setStyle(ButtonStyle.Primary).setDisabled(true)
         const registerButton = new ButtonBuilder().setCustomId('register').setLabel('Enregistrer').setStyle(ButtonStyle.Success)
@@ -351,7 +358,7 @@ export default class TwitchInteraction extends InteractionModule {
             mentionSelector.setDefaultRoles(roleId)
 
         return [
-            new ActionRowBuilder<ButtonBuilder>().addComponents(textInputsButton),
+            new ActionRowBuilder<ButtonBuilder>().addComponents(textInputsButton, tagsButton),
             new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(channelSelector),
             new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(mentionSelector),
             new ActionRowBuilder<ButtonBuilder>().addComponents(backButton, continueButton, cancelButton, registerButton)
@@ -364,7 +371,7 @@ export default class TwitchInteraction extends InteractionModule {
         const t = await client.database.database.transaction()
 
         try {
-            const notification = (await client.database.TwitchNotification.findByPk(interaction.guildId!, { transaction: t }))
+            const notification = await client.database.TwitchNotification.findByPk(interaction.guildId!, { transaction: t })
             if (!notification) {
                 client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
                 await t.rollback()
