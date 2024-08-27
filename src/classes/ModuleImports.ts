@@ -11,7 +11,9 @@ import {
     PermissionResolvable,
     CommandInteraction,
     Message,
-    InteractionResponse
+    InteractionResponse,
+    User,
+    Guild
 } from 'discord.js'
 import { glob } from 'glob'
 
@@ -58,6 +60,30 @@ export abstract class CommandModule extends Module {
             const optionKey = key as keyof typeof this
             this[optionKey] = getMetadata(optionKey, this.constructor)
         })
+    }
+
+    public async getUserFromArg(client: Bot, arg: string | undefined): Promise<User | null> {
+        if (!arg)
+            return null
+
+        const userId = arg.replace(/\D/g, '')
+        try {
+            return await client.users.fetch(userId)
+        } catch {
+            return null
+        }
+    }
+
+    public async getMemberFromArg(server: Guild | null, arg: string | undefined): Promise<GuildMember | null> {
+        if (!arg || !server)
+            return null
+
+        const userId = arg.replace(/\D/g, '')
+        try {
+            return await server.members.fetch(userId)
+        } catch {
+            return null
+        }
     }
 }
 
