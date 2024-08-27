@@ -22,8 +22,9 @@ export default class Ready extends EventModule {
         await client.database.fetchServers(client)
         await client.database.initBotInDb(client.user!.id)
 
-        await new Twitch().getTwitchStreams(client)
-
+        const twitch = new Twitch()
+        await twitch.getTwitchToken()
+        await twitch.getTwitchStreams(client)
 
         const embed = new EmbedBuilder()
             .setTitle('Bot is online!')

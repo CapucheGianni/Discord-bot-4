@@ -1,10 +1,13 @@
 import { EmbedBuilder } from "discord.js"
 import fetch from "node-fetch"
+import { Model } from "sequelize"
 
+import { Bot } from "./Bot.js"
 import { Logger } from "./Logger.js"
+import { TTwitch } from "../types/Twitch.js"
+import { isTruthy } from "../utils/TypeGuards.js"
 
 import settings from '../../settings.json' with { 'type': 'json' }
-import { Bot } from "./Bot.js"
 
 const logger = Logger.getInstance('')
 
@@ -33,14 +36,10 @@ type TwitchStreamResponse = {
 }
 
 export default class Twitch {
-    private _token: string
-    private _tokenExpiration: number
+    private _token: string = ''
+    private _tokenExpiration: number = 0
 
-    constructor() {
-        this._token = ''
-        this._tokenExpiration = 0
-        this.getTwitchToken()
-    }
+    constructor() { }
 
     public async getTwitchToken(): Promise<void> {
         try {
@@ -100,13 +99,82 @@ export default class Twitch {
                         return
 
                     const data = jsonRes[0]
-                    if (!this._isTwitchStreamResponse(data))
-                        return
+                    if (!this._isTwitchStreamResponse(data)) {
+                        return twitchNotification.update({
+                            isStreaming: false,
+                            title: null,
+                            game: null
+                        })
+                    }
+                    this._sendWhenStreaming(client, data, twitchNotification)
                 } catch (error: any) {
                     logger.log(client, error, 'warn')
                 }
             })
         }, 1000 * 60 * 10)
+    }
+
+    private async _sendWhenStreaming(client: Bot, data: TwitchStreamResponse, twitchNotification: Model<TTwitch, any>): Promise<void> {
+        const embed = this._setEmbed(client, data)
+
+        if (!twitchNotification.get().isStreaming)
+            await this._sendMessage(client, twitchNotification.get(), embed, 'message')
+        else
+            if (twitchNotification.get().title !== data.title || twitchNotification.get().game !== data.game_name)
+                await this._sendMessage(client, twitchNotification.get(), embed, 'updateMessage')
+        await twitchNotification.update({
+            isStreaming: true,
+            title: data.title,
+            game: data.game_name
+        })
+    }
+
+    private async _sendMessage(client: Bot, twitchNotification: TTwitch, embed: EmbedBuilder, type: 'message' | 'updateMessage'): Promise<void> {
+        const message = twitchNotification[type]?.replace('{streamer}', twitchNotification.streamer)
+        const channel = client.channels.cache.get(twitchNotification.channelId)
+
+        if (!isTruthy(channel) || !channel.isTextBased())
+            throw Error('Could not send the message in the picked channel.')
+        await channel.send({
+            content: twitchNotification.roleId ? `||<@${twitchNotification.roleId}>||\n\n${message}` : message,
+            embeds: [embed],
+            allowedMentions: { parse: ['roles'] }
+        })
+    }
+
+    private _setEmbed(client: Bot, data: TwitchStreamResponse): EmbedBuilder {
+        const { title, viewer_count, game_name, user_login, user_name, tags } = data
+
+        return new EmbedBuilder()
+            .setTitle(title)
+            .setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${user_login}-1920x1080.jpg?cacheBypass=${Date.now()}`)
+            .addFields(
+                {
+                    name: 'Viewers',
+                    value: `${viewer_count}`,
+                    inline: true
+                },
+                {
+                    name: 'Lien',
+                    value: `https://twitch.tv/${user_login}`,
+                    inline: true
+                },
+                {
+                    name: 'Jeu',
+                    value: `${game_name}`,
+                    inline: true
+                },
+                {
+                    name: 'Tags',
+                    value: tags.join(' / ') || 'Aucun tag configuré',
+                }
+            )
+            .setFooter({
+                text: `${user_name} est en live | ${client.user!.username}`,
+                iconURL: client.user!.displayAvatarURL()
+            })
+            .setTimestamp()
+            .setColor('#6441a5')
     }
 
     private _isTwitchTokenResponse(res: unknown): res is TwitchTokenResponse {
