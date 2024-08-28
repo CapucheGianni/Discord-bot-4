@@ -1,13 +1,14 @@
 import {
     SlashCommandBuilder,
     EmbedBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     CommandInteractionOptionResolver,
     AutocompleteInteraction,
     PermissionsBitField,
     Collection,
     GuildMember,
-    InteractionResponse
+    InteractionResponse,
+    User
 } from 'discord.js'
 import Fuse from 'fuse.js'
 
@@ -36,26 +37,29 @@ export default class Help extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> {
         const options = interaction.options as CommandInteractionOptionResolver
         const focusedValue = options.getFocused()
-        const interactions = this._removeInteractionWithNoAccess(interaction.member as GuildMember, client.modules.interactions).map(interaction => ({
+        const interactions = this._removeInteractionWithNoAccess(interaction.member as GuildMember ?? interaction.user, client.modules.interactions).map(interaction => ({
             name: interaction.name,
             interaction
         }))
+
+        if (!focusedValue) {
+            return interaction.respond(
+                interactions.map(interaction => ({ name: interaction.name, value: interaction.name }))
+            )
+        }
+
         const fuse = new Fuse(interactions, {
             keys: ['name'],
             threshold: 0.2
         })
         const result = fuse.search(focusedValue)
 
-        if (!result.length)
-            return interaction.respond(
-                interactions.map(interaction => ({ name: interaction.name, value: interaction.name }))
-            )
         await interaction.respond(
             result.map(choice => ({ name: choice.item.name, value: choice.item.name }))
         )
     }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
         const interactionName = options.getString('commande')
         const embed = new EmbedBuilder()
@@ -100,7 +104,7 @@ export default class Help extends InteractionModule {
         } else {
             embed.setTitle('Liste des commandes 📚')
                 .setURL('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-                .setDescription(`Voici la liste des intéractions disponibles :\n\n${this._removeInteractionWithNoAccess(interaction.member as GuildMember, client.modules.interactions).map((interactions) => `\`/${interactions.data.name}\` - ${interactions.data.description}`).join('\n')}`)
+                .setDescription(`Voici la liste des intéractions disponibles :\n\n${this._removeInteractionWithNoAccess(interaction.member as GuildMember ?? interaction.user, client.modules.interactions).map((interactions) => `\`/${interactions.data.name}\` - ${interactions.data.description}`).join('\n')}`)
         }
         return interaction.reply({ embeds: [embed] })
     }
@@ -115,15 +119,18 @@ export default class Help extends InteractionModule {
         ) || 'Aucune permission requise'
     }
 
-    private _removeInteractionWithNoAccess(user: GuildMember, interactions: Collection<string, InteractionModule>): Collection<string, InteractionModule> {
+    private _removeInteractionWithNoAccess(user: GuildMember | User, interactions: Collection<string, InteractionModule>): Collection<string, InteractionModule> {
         if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID'))
             return interactions
 
+        const isGuildMember = (user: GuildMember | User): user is GuildMember => (user as GuildMember).permissions !== undefined
         const filteredInteractions = new Collection<string, InteractionModule>()
         interactions.forEach((interaction, key) => {
             if (!interaction.data.default_member_permissions)
                 return
-            if (user.permissions.has(BigInt(interaction.data.default_member_permissions)))
+            if (interaction.category === 'owner')
+                return
+            if (isGuildMember(user) && user.permissions.has(BigInt(interaction.data.default_member_permissions)))
                 filteredInteractions.set(key, interaction)
         })
 
