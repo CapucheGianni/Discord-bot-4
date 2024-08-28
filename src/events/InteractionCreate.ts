@@ -29,11 +29,6 @@ export default class InteractionCreate extends EventModule {
     }
 
     private async _executeInteraction(client: Bot, interaction: ChatInputCommandInteraction): Promise<void> {
-        if (!interaction.guild || !interaction.channel) {
-            interaction.reply({ content: 'Les intéractions ne sont pas disponibles en messages privés.' })
-            return
-        }
-
         await client.database.addServerFromInteraction(interaction)
         await client.database.addChannelFromInteraction(interaction)
         await client.database.addUserFromInteraction(interaction)
@@ -62,7 +57,7 @@ export default class InteractionCreate extends EventModule {
 
             if (!this._getCooldown(client.cooldowns, interaction, interactionCommand))
                 return
-            if (!interaction.member || !this._hasPermissions(interaction.member as GuildMember, interactionCommand)) {
+            if (!this._hasPermissions(interaction.member as GuildMember | null, interactionCommand)) {
                 interaction.reply(`Vous n'avez pas les permissions nécessaires pour éxécuter la commande ${interactionCommand.name}.`)
                 return
             }
@@ -127,12 +122,12 @@ export default class InteractionCreate extends EventModule {
         return (isBot(bot) && bot.maintenance)
     }
 
-    private _hasPermissions(user: GuildMember, interaction: InteractionModule): boolean {
-        if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID') || !interaction.data.default_member_permissions)
+    private _hasPermissions(member: GuildMember | null, interaction: InteractionModule): boolean {
+        if (!member || member.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID') || !interaction.data.default_member_permissions)
             return true
         if (interaction.category === 'owner')
             return false
-        if (!user.permissions.has(BigInt(interaction.data.default_member_permissions)))
+        if (!member.permissions.has(BigInt(interaction.data.default_member_permissions)))
             return false
         return true
     }

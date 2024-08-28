@@ -116,13 +116,13 @@ export default class MessageCreate extends EventModule {
         return (isBot(bot) && bot.maintenance)
     }
 
-    private _hasPermissions(user: GuildMember, command: CommandModule): boolean {
-        if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID') || !command.permissions.length)
+    private _hasPermissions(member: GuildMember, command: CommandModule): boolean {
+        if (member.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID') || !command.permissions.length)
             return true
         if (command.category === 'owner')
             return false
         for (const permission of command.permissions) {
-            if (!user.permissions.has(permission))
+            if (!member.permissions.has(permission))
                 return false
         }
         return true

@@ -18,7 +18,6 @@ import { CommandDecorator } from '../../utils/Decorators.js'
 })
 export default class BannerCommand extends CommandModule {
     public async execute(client: Bot, command: Message, args: string[]): Promise<void | Message> {
-
         if (args[0] === 'color') {
             const user = await this.getMemberFromArg(command.guild, args[1] ?? command.author.id)
             if (!user)

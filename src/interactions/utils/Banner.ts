@@ -1,7 +1,7 @@
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
     GuildMember,
@@ -35,11 +35,11 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
 export default class AvatarInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
-        const user = (options.getMember('utilisateur') ?? interaction.member) as GuildMember
+        const user = (options.getMember('utilisateur') ?? interaction.member) as GuildMember | null
         const isColor = options.getBoolean('couleur') ?? false
-        const fetchedUser = await user.user.fetch()
+        const fetchedUser = user ? await user.user.fetch() : interaction.user
         const bannerUrl = fetchedUser.bannerURL({ size: 4096 })
 
         if (isColor) {
@@ -60,7 +60,7 @@ export default class AvatarInteraction extends InteractionModule {
             })
         }
         return interaction.reply({
-            content: bannerUrl ? `Bannière de ${user}[ : ](${bannerUrl})` : `${user} ne possède pas de bannière.`,
+            content: bannerUrl ? `[Bannière](${bannerUrl}) de ${user} :` : `${user} ne possède pas de bannière.`,
             allowedMentions: { parse: [] }
         })
     }

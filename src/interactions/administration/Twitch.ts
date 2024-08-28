@@ -1,7 +1,7 @@
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
     EmbedBuilder,
@@ -59,11 +59,12 @@ const logger = Logger.getInstance('')
             )
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
+        .setDMPermission(false)
 })
 export default class TwitchInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<void | InteractionResponse> {
         if (!await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild']))
             return
         if (client.set.has(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))) {
@@ -85,7 +86,7 @@ export default class TwitchInteraction extends InteractionModule {
         }
     }
 
-    private async _setTwitchNotification(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
+    private async _setTwitchNotification(client: Bot, interaction: ChatInputCommandInteraction): Promise<void | InteractionResponse> {
         client.set.add(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
 
         try {
@@ -114,7 +115,7 @@ export default class TwitchInteraction extends InteractionModule {
         }
     }
 
-    private async _askForCreation(client: Bot, interaction: CommandInteraction, notification: Model<TTwitch, any>): Promise<void> {
+    private async _askForCreation(client: Bot, interaction: ChatInputCommandInteraction, notification: Model<TTwitch, any>): Promise<void> {
         const continueButton = new ButtonBuilder().setCustomId('continue').setLabel('Continuer').setStyle(ButtonStyle.Secondary).setEmoji('✅')
         const stopButton = new ButtonBuilder().setCustomId('stop').setLabel('Annuler').setStyle(ButtonStyle.Secondary).setEmoji('❌')
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(continueButton, stopButton)
@@ -146,7 +147,7 @@ export default class TwitchInteraction extends InteractionModule {
         })
     }
 
-    private async _setEmbedResponse(client: Bot, interaction: CommandInteraction, notification: Model<TTwitch, any>, response?: InteractionResponse): Promise<void> {
+    private async _setEmbedResponse(client: Bot, interaction: ChatInputCommandInteraction, notification: Model<TTwitch, any>, response?: InteractionResponse): Promise<void> {
         const rows = this._createButtons(notification.get().channelId, notification.get().roleId)
         const embed = new EmbedBuilder()
             .setTitle(`Configuration de ${client.user?.username} en stream!`)
@@ -184,7 +185,7 @@ export default class TwitchInteraction extends InteractionModule {
         }
     }
 
-    private async _configureNotification(client: Bot, interaction: CommandInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[], response: InteractionResponse): Promise<void> {
+    private async _configureNotification(client: Bot, interaction: ChatInputCommandInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[], response: InteractionResponse): Promise<void> {
         const collector = response.createMessageComponentCollector({
             filter: i => i.user.id === interaction.user.id,
             time: 1000 * 60 * 15,
@@ -270,7 +271,7 @@ export default class TwitchInteraction extends InteractionModule {
         })
     }
 
-    private async _handleRowInteractions(interaction: CommandInteraction, collectedInteraction: ButtonInteraction | RoleSelectMenuInteraction | ChannelSelectMenuInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[]): Promise<void | Message | InteractionResponse> {
+    private async _handleRowInteractions(interaction: ChatInputCommandInteraction, collectedInteraction: ButtonInteraction | RoleSelectMenuInteraction | ChannelSelectMenuInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[]): Promise<void | Message | InteractionResponse> {
         switch (collectedInteraction.customId) {
             case 'inputs':
                 const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal')
@@ -365,7 +366,7 @@ export default class TwitchInteraction extends InteractionModule {
         ]
     }
 
-    private async _removeTwitchNotification(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
+    private async _removeTwitchNotification(client: Bot, interaction: ChatInputCommandInteraction): Promise<void | InteractionResponse> {
         client.set.add(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
 
         const t = await client.database.database.transaction()
@@ -427,7 +428,7 @@ export default class TwitchInteraction extends InteractionModule {
         }
     }
 
-    private async _enableTwitchNotification(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
+    private async _enableTwitchNotification(client: Bot, interaction: ChatInputCommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
 
         try {

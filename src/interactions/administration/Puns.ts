@@ -1,7 +1,7 @@
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
     ChannelType,
@@ -149,11 +149,12 @@ const logger = Logger.getInstance('')
             )
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
+        .setDMPermission(false)
 })
 export default class PunsInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<void | InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
 
         switch (options.getSubcommandGroup()) {
@@ -181,7 +182,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _configureServer(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _configureServer(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'server'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -203,7 +204,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _configureChannel(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _configureChannel(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'channel'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -226,7 +227,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _configureUser(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _configureUser(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'user'))
             return
         try {
@@ -246,7 +247,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _findById(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _findById(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'byid'))
             return
         try {
@@ -286,7 +287,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _findByName(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _findByName(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'byname'))
             return
         try {
@@ -326,7 +327,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _removeById(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _removeById(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'byid'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -352,7 +353,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _removeByName(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _removeByName(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'byname'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -378,7 +379,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _add(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _add(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'add'))
             return
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
@@ -412,7 +413,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _list(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _list(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'list'))
             return
         try {
@@ -492,7 +493,7 @@ export default class PunsInteraction extends InteractionModule {
         }
     }
 
-    private async _infos(client: Bot, interaction: CommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
+    private async _infos(client: Bot, interaction: ChatInputCommandInteraction, options: CommandInteractionOptionResolver): Promise<void | InteractionResponse> {
         if (!(options.getSubcommand() === 'infos'))
             return
         try {

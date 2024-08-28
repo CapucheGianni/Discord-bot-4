@@ -1,7 +1,7 @@
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
     GuildMember,
@@ -27,17 +27,18 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
             .setMaxLength(5)
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
+        .setDMPermission(false)
 })
 export default class PrefixInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<void | InteractionResponse> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<void | InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
         const newPrefix = options.getString('prefix')
         const prefix = (await client.database.getGuild(interaction.guildId!)).prefix
 
         if (newPrefix) {
-            if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
+            if (!(await this.checkPermissions(interaction, interaction.member as GuildMember | null, ['ManageGuild'])))
                 return
             await client.database.Server.update(
                 { prefix: newPrefix },

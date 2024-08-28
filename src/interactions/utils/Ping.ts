@@ -1,5 +1,5 @@
 import {
-    CommandInteraction,
+    ChatInputCommandInteraction,
     SlashCommandBuilder,
     EmbedBuilder,
     AutocompleteInteraction,
@@ -25,7 +25,7 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
 export default class PingInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<Message> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<Message> {
         const sent = await interaction.reply({
             content: 'Pinging...',
             fetchReply: true

@@ -1,7 +1,7 @@
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
     GuildMember,
@@ -30,20 +30,20 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
 export default class AvatarInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
-        const user = (options.getMember('utilisateur') ?? interaction.member) as GuildMember
-        const globalAvatarURL = user.user.displayAvatarURL({ size: 4096 })
-        const localAvatarURL = user.avatarURL({ size: 4096 })
+        const member = (options.getMember('utilisateur') ?? interaction.member) as GuildMember | null
+        const globalAvatarURL = member ? member.user.displayAvatarURL({ size: 4096 }) : interaction.user.displayAvatarURL({ size: 4096 })
+        const localAvatarURL = member ? member.avatarURL({ size: 4096 }) : null
 
         if (localAvatarURL) {
             return interaction.reply({
-                content: `Photos de profil [locale](${localAvatarURL}) et [globale](${globalAvatarURL}) de ${user}:`,
+                content: `Photos de profil [locale](${localAvatarURL}) et [globale](${globalAvatarURL}) de ${member}:`,
                 allowedMentions: { parse: [] }
             })
         }
         return interaction.reply({
-            content: `Photo de profil [globale](${globalAvatarURL}) de ${user}:`,
+            content: `Photo de profil [globale](${globalAvatarURL}) de ${member}:`,
             allowedMentions: { parse: [] }
         })
     }

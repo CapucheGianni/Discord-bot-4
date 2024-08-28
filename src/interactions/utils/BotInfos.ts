@@ -1,7 +1,7 @@
 import {
     SlashCommandBuilder,
     EmbedBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     AutocompleteInteraction,
     PermissionsBitField,
     InteractionResponse
@@ -26,7 +26,7 @@ import { isBot } from '../../utils/TypeGuards.js'
 export default class BotInfosInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<InteractionResponse> {
         const bot = (await client.database.Bot.findByPk(client.user!.id))?.get()
         if (!isBot(bot) || !client.user)
             return interaction.reply('Une erreur est survenue lors de l\'éxécution de la commande.')

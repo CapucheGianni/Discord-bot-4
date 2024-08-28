@@ -1,7 +1,7 @@
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
     InteractionResponse
@@ -32,7 +32,7 @@ import settings from '../../../settings.json' with { 'type': 'json' }
 export default class UrlShortenInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<InteractionResponse> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
         const urlToShorten = options.getString('url')
         const rebrandlyUrl = 'https://api.rebrandly.com/v1/links'

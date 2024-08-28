@@ -1,7 +1,7 @@
 import {
     AutocompleteInteraction,
     SlashCommandBuilder,
-    CommandInteraction,
+    ChatInputCommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
     InteractionResponse,
@@ -100,11 +100,12 @@ type AnnouncementType = 'welcome' | 'leave' | 'ban'
             )
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
+        .setDMPermission(false)
 })
 export default class AnnouncementsInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
-    public async execute(client: Bot, interaction: CommandInteraction): Promise<any> {
+    public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<any> {
         if (!await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild']))
             return
         if (client.set.has(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))) {
@@ -124,7 +125,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
             return this._testAnnouncement(client, interaction, options.getSubcommandGroup(true) as AnnouncementType)
     }
 
-    private async _configureAnnouncement(client: Bot, interaction: CommandInteraction, type: AnnouncementType): Promise<Message | void> {
+    private async _configureAnnouncement(client: Bot, interaction: ChatInputCommandInteraction, type: AnnouncementType): Promise<Message | void> {
         client.set.add(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
 
         await interaction.deferReply()
@@ -158,7 +159,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         }
     }
 
-    private async _askForCreation(client: Bot, interaction: CommandInteraction, channel: Model<TAnnouncementChannel, any>, type: AnnouncementType): Promise<void> {
+    private async _askForCreation(client: Bot, interaction: ChatInputCommandInteraction, channel: Model<TAnnouncementChannel, any>, type: AnnouncementType): Promise<void> {
         const continueButton = new ButtonBuilder().setCustomId('continue').setLabel('Continuer').setStyle(ButtonStyle.Secondary).setEmoji('✅')
         const stopButton = new ButtonBuilder().setCustomId('stop').setLabel('Annuler').setStyle(ButtonStyle.Secondary).setEmoji('❌')
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(continueButton, stopButton)
@@ -196,7 +197,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         })
     }
 
-    private async _setResponse(client: Bot, interaction: CommandInteraction, channel: Model<TAnnouncementChannel, any>, type: AnnouncementType, response?: Message): Promise<void> {
+    private async _setResponse(client: Bot, interaction: ChatInputCommandInteraction, channel: Model<TAnnouncementChannel, any>, type: AnnouncementType, response?: Message): Promise<void> {
         const rows = this._createButtons(channel.get(), type)
         const embed = await this._buildEmbed(channel.get(), interaction.member as GuildMember)
         const imageUrl = channel.get().imageUrl
@@ -259,7 +260,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         return [embed]
     }
 
-    private async _handleUserActions(client: Bot, interaction: CommandInteraction, channel: Model<TAnnouncementChannel, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder>[], response: Message): Promise<void> {
+    private async _handleUserActions(client: Bot, interaction: ChatInputCommandInteraction, channel: Model<TAnnouncementChannel, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder>[], response: Message): Promise<void> {
         const collector = response.createMessageComponentCollector({
             filter: i => i.user.id === interaction.user.id,
             time: 1000 * 60 * 15,
@@ -373,7 +374,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         })
     }
 
-    private async _updateAnnouncement(interaction: CommandInteraction, collectedInteraction: ButtonInteraction | ChannelSelectMenuInteraction | StringSelectMenuInteraction, channel: Model<TAnnouncementChannel, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder>[]): Promise<void | Message | InteractionResponse> {
+    private async _updateAnnouncement(interaction: ChatInputCommandInteraction, collectedInteraction: ButtonInteraction | ChannelSelectMenuInteraction | StringSelectMenuInteraction, channel: Model<TAnnouncementChannel, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder>[]): Promise<void | Message | InteractionResponse> {
         const handlers: { [key: string]: () => Promise<void | Message | InteractionResponse> } = {
             'isactivated': async () => {
                 const activatedButton = rows[0].components[0] as ButtonBuilder
@@ -656,7 +657,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         return param as T
     }
 
-    private async _removeAnnouncement(client: Bot, interaction: CommandInteraction, type: AnnouncementType): Promise<void | InteractionResponse> {
+    private async _removeAnnouncement(client: Bot, interaction: ChatInputCommandInteraction, type: AnnouncementType): Promise<void | InteractionResponse> {
         client.set.add(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
 
         const t = await client.database.database.transaction()
@@ -724,7 +725,7 @@ export default class AnnouncementsInteraction extends InteractionModule {
         }
     }
 
-    private async _testAnnouncement(client: Bot, interaction: CommandInteraction, type: AnnouncementType): Promise<InteractionResponse> {
+    private async _testAnnouncement(client: Bot, interaction: ChatInputCommandInteraction, type: AnnouncementType): Promise<InteractionResponse> {
         if (type === 'ban')
             client.emit('guildBanAdd', interaction.member as GuildMember)
         if (type === 'leave')

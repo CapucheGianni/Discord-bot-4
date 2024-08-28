@@ -33,7 +33,9 @@ export abstract class Module {
     public abstract name: string
     public abstract execute(client: Bot, ...args: any[]): Promise<void | InteractionResponse | Message>
 
-    public async checkPermissions(command: CommandInteraction | Message, member: GuildMember, permissions: PermissionResolvable[]): Promise<boolean> {
+    public async checkPermissions(command: CommandInteraction | Message, member: GuildMember | null, permissions: PermissionResolvable[]): Promise<boolean> {
+        if (!member)
+            return true
         for (const permission of permissions) {
             if (!member.permissions.has(permission)) {
                 command.reply({
