@@ -6,7 +6,7 @@ import { CommandDecorator } from '../../utils/Decorators.js'
 
 @CommandDecorator({
     name: 'ping',
-    description: 'Display the ping of the bot',
+    description: 'Affiche le temps de latence du bot.',
     cooldown: 1,
     permissions: [],
     category: 'utils',
