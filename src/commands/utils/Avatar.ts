@@ -1,8 +1,5 @@
 import {
-    Message,
-    GuildMember,
-    Guild,
-    User,
+    Message
 } from 'discord.js'
 
 import { Bot } from '../../classes/Bot.js'
