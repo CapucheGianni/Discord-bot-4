@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 import path from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
+import Fuse from 'fuse.js'
 
 import {
     Collection,
@@ -13,7 +14,8 @@ import {
     Message,
     InteractionResponse,
     User,
-    Guild
+    Guild,
+    Role
 } from 'discord.js'
 import { glob } from 'glob'
 
@@ -68,9 +70,20 @@ export abstract class CommandModule extends Module {
 
         const userId = arg.replace(/\D/g, '')
         try {
+            if (!userId)
+                throw Error()
             return await client.users.fetch(userId)
         } catch {
-            return null
+            const users = client.users.cache.map(cachedUser => ({
+                username: cachedUser.username,
+                cachedUser
+            }))
+            const fuse = new Fuse(users, {
+                keys: ['username'],
+                threshold: 0.3
+            })
+            const result = fuse.search(arg)
+            return result.length > 0 ? result[0].item.cachedUser : null
         }
     }
 
@@ -80,9 +93,57 @@ export abstract class CommandModule extends Module {
 
         const userId = arg.replace(/\D/g, '')
         try {
+            if (!userId)
+                throw Error()
             return await server.members.fetch(userId)
         } catch {
+            const members = server.members.cache.map(cachedMember => ({
+                username: cachedMember.user.username,
+                cachedMember
+            }))
+            const fuse = new Fuse(members, {
+                keys: ['username'],
+                threshold: 0.3
+            })
+            const result = fuse.search(arg)
+            return result.length > 0 ? result[0].item.cachedMember : null
+        }
+    }
+
+    public async getServerFromArg(client: Bot, arg: string | undefined): Promise<Guild | null> {
+        if (!arg)
             return null
+
+        const serverId = arg.replace(/\D/g, '')
+        try {
+            if (!serverId)
+                throw Error()
+            return await client.guilds.fetch(serverId)
+        } catch {
+            return null
+        }
+    }
+
+    public async getRoleFromArg(server: Guild, arg: string | undefined): Promise<Role | null> {
+        if (!arg)
+            return null
+
+        const roleId = arg.replace(/\D/g, '')
+        try {
+            if (!roleId)
+                throw Error()
+            return await server.roles.fetch(roleId)
+        } catch {
+            const roles = server.roles.cache.map(cachedRoles => ({
+                username: cachedRoles.name,
+                cachedRoles
+            }))
+            const fuse = new Fuse(roles, {
+                keys: ['username'],
+                threshold: 0.3
+            })
+            const result = fuse.search(arg)
+            return result.length > 0 ? result[0].item.cachedRoles : null
         }
     }
 }
