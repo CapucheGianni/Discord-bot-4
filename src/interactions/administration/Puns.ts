@@ -269,7 +269,7 @@ export default class PunsInteraction extends InteractionModule {
                     { name: 'Type', value: pun.type }
                 )
                 .setFooter({
-                    text: `Intéraction effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
+                    text: `Intéraction effectuée par ${interaction.user.username} | ${client.user?.username} V${client.version}`,
                     iconURL: interaction.user.displayAvatarURL()
                 })
                 .setTimestamp()
@@ -309,7 +309,7 @@ export default class PunsInteraction extends InteractionModule {
                     { name: 'Type', value: puns.map(pun => `\`'${pun.get().type}'\``).join(', ') }
                 )
                 .setFooter({
-                    text: `Intéraction effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
+                    text: `Intéraction effectuée par ${interaction.user.username} | ${client.user?.username} V${client.version}`,
                     iconURL: interaction.user.displayAvatarURL()
                 })
                 .setTimestamp()
@@ -423,7 +423,7 @@ export default class PunsInteraction extends InteractionModule {
             const embed = new EmbedBuilder()
                 .setTitle(`Jeux de mots du serveur ${interaction.guild}`)
                 .setFooter({
-                    text: `Intéraction effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
+                    text: `Intéraction effectuée par ${interaction.user.username} | ${client.user?.username} V${client.version}`,
                     iconURL: interaction.user.displayAvatarURL()
                 })
                 .setTimestamp()
@@ -508,7 +508,7 @@ export default class PunsInteraction extends InteractionModule {
                     { name: `${interaction.user.username}`, value: `Jeux de mots ${userEnabled ? 'activés' : 'désactivés'}` },
                 )
                 .setFooter({
-                    text: `Intéraction effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
+                    text: `Intéraction effectuée par ${interaction.user.username} | ${client.user?.username} V${client.version}`,
                     iconURL: interaction.user.displayAvatarURL()
                 })
                 .setTimestamp()

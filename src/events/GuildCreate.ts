@@ -38,7 +38,7 @@ export default class GuildCreate extends EventModule {
             )
             .setThumbnail(server.iconURL())
             .setFooter({
-                text: `${client.user!.username} is now on ${client.getServerNumber} servers`,
+                text: `${client.user?.username} is now on ${client.getServerNumber} servers`,
                 iconURL: client.user?.displayAvatarURL()
             })
             .setTimestamp()

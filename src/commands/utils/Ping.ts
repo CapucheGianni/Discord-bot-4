@@ -22,7 +22,7 @@ export default class PingCommand extends CommandModule {
             .setTitle('Pinged Successfully 🏓')
             .setDescription(`**Client Latency:** ${client.ws.ping}ms\n**API latency:** ${sent.createdTimestamp - command.createdTimestamp}ms`)
             .setFooter({
-                text: `Commande effectuée par ${command.author.username} | ${client.user!.username} V${client.version}`,
+                text: `Commande effectuée par ${command.author.username} | ${client.user?.username} V${client.version}`,
                 iconURL: command.author.displayAvatarURL()
             })
             .setTimestamp()

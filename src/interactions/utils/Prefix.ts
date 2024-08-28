@@ -44,8 +44,8 @@ export default class PrefixInteraction extends InteractionModule {
                 { prefix: newPrefix },
                 { where: { id: interaction.guildId! } }
             )
-            return interaction.reply(`Le prefix de ${client.user!.username} est désormais \`${newPrefix}\`.`)
+            return interaction.reply(`Le prefix de ${client.user?.username} est désormais \`${newPrefix}\`.`)
         }
-        return interaction.reply(`Le préfixe de ${client.user!.username} est : \`${prefix}\``)
+        return interaction.reply(`Le préfixe de ${client.user?.username} est : \`${prefix}\``)
     }
 }

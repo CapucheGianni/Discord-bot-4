@@ -37,7 +37,7 @@ export default class GuildDelete extends EventModule {
                 }
             )
             .setFooter({
-                text: `${client.user!.username} is now on ${client.getServerNumber} servers`,
+                text: `${client.user?.username} is now on ${client.getServerNumber} servers`,
                 iconURL: client.user?.displayAvatarURL()
             })
             .setTimestamp()

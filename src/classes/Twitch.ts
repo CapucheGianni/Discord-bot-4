@@ -118,10 +118,10 @@ export default class Twitch {
         const embed = this._setEmbed(client, data)
 
         if (!twitchNotification.get().isStreaming)
-            await this._sendMessage(client, twitchNotification.get(), embed, 'message')
+            await this._sendMessage(client, twitchNotification.get(), data, embed, 'message')
         else
             if (twitchNotification.get().title !== data.title || twitchNotification.get().game !== data.game_name)
-                await this._sendMessage(client, twitchNotification.get(), embed, 'updateMessage')
+                await this._sendMessage(client, twitchNotification.get(), data, embed, 'updateMessage')
         await twitchNotification.update({
             isStreaming: true,
             title: data.title,
@@ -129,8 +129,8 @@ export default class Twitch {
         })
     }
 
-    private async _sendMessage(client: Bot, twitchNotification: TTwitch, embed: EmbedBuilder, type: 'message' | 'updateMessage'): Promise<void> {
-        const message = twitchNotification[type]?.replace('{streamer}', twitchNotification.streamer)
+    private async _sendMessage(client: Bot, twitchNotification: TTwitch, data: TwitchStreamResponse, embed: EmbedBuilder, type: 'message' | 'updateMessage'): Promise<void> {
+        const message = twitchNotification[type]?.replaceAll('{streamer}', data.user_name).replaceAll('{game}', data.game_name)
         const channel = client.channels.cache.get(twitchNotification.channelId)
 
         if (!isTruthy(channel) || !channel.isTextBased())
@@ -170,8 +170,8 @@ export default class Twitch {
                 }
             )
             .setFooter({
-                text: `${user_name} est en live | ${client.user!.username}`,
-                iconURL: client.user!.displayAvatarURL()
+                text: `${user_name} est en live | ${client.user?.username}`,
+                iconURL: client.user?.displayAvatarURL()
             })
             .setTimestamp()
             .setColor('#6441a5')

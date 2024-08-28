@@ -19,13 +19,13 @@ import { getSafeEnv, isTruthy } from '../../utils/TypeGuards.js'
 
 @InteractionDecorator({
     name: 'help',
-    description: 'Affiche les intéractions disponibles',
+    description: 'Affiche les intéractions disponibles.',
     cooldown: 3,
     category: 'utils',
     usage: 'help [interaction]',
     data: new SlashCommandBuilder()
         .setName('help')
-        .setDescription('Affiche les intéractions disponibles')
+        .setDescription('Affiche les intéractions disponibles.')
         .addStringOption((option) => option
             .setName('commande')
             .setDescription('La commande à afficher')
@@ -64,7 +64,7 @@ export default class Help extends InteractionModule {
         const interactionName = options.getString('commande')
         const embed = new EmbedBuilder()
             .setFooter({
-                text: `Intéraction effectuée par ${interaction.user.username} | ${client.user!.username} V${client.version}`,
+                text: `Intéraction effectuée par ${interaction.user.username} | ${client.user?.username} V${client.version}`,
                 iconURL: interaction.user.displayAvatarURL()
             })
             .setTimestamp()

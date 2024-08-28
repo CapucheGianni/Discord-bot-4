@@ -35,7 +35,7 @@ export default class InteractionCreate extends EventModule {
 
         try {
             if (await this._botIsInMaintenance(client)) {
-                interaction.reply(`${client.user!.username} n'est pas disponible pour le moment`)
+                interaction.reply(`${client.user?.username} n'est pas disponible pour le moment`)
                 return
             }
 
@@ -68,7 +68,7 @@ export default class InteractionCreate extends EventModule {
                 .setTitle('Intéraction exécutée ✅')
                 .setDescription(`**Auteur:** ${interaction.user} (${interaction.user.id})\n**Salon:** ${interaction.channel} (${interaction.channelId})\n**Serveur:** ${interaction.guild} (${interaction.guildId})\n**Interaction:** ${interaction.commandName}`)
                 .setFooter({
-                    text: `Interaction exécutée par ${interaction.user.username} | ${client.user!.username}`,
+                    text: `Interaction exécutée par ${interaction.user.username} | ${client.user?.username}`,
                     iconURL: interaction.user.displayAvatarURL()
                 })
                 .setTimestamp()
@@ -80,8 +80,8 @@ export default class InteractionCreate extends EventModule {
                 .setTitle(`Erreur lors de l'éxécution de l'intéraction ${interaction.commandName} ❌`)
                 .setDescription(`\`\`\`${error}\`\`\``)
                 .setFooter({
-                    text: `Intéraction exécutée par ${interaction.user.username} | ${client.user!.username}`,
-                    iconURL: client.user!.displayAvatarURL()
+                    text: `Intéraction exécutée par ${interaction.user.username} | ${client.user?.username}`,
+                    iconURL: client.user?.displayAvatarURL()
                 })
                 .setColor('#ff0000')
                 .setTimestamp()
@@ -117,7 +117,7 @@ export default class InteractionCreate extends EventModule {
     }
 
     private async _botIsInMaintenance(client: Bot): Promise<boolean> {
-        const bot = (await client.database.Bot.findByPk(client.user!.id))?.get()
+        const bot = (await client.database.Bot.findByPk(client.user?.id))?.get()
 
         return (isBot(bot) && bot.maintenance)
     }

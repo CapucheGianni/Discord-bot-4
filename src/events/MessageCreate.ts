@@ -36,7 +36,7 @@ export default class MessageCreate extends EventModule {
             await client.database.addUserFromMessage(message)
 
             if (await this._botIsInMaintenance(client)) {
-                message.reply(`${client.user!.username} n'est pas disponible pour le moment`)
+                message.reply(`${client.user?.username} n'est pas disponible pour le moment`)
                 return
             }
 
@@ -111,7 +111,7 @@ export default class MessageCreate extends EventModule {
     }
 
     private async _botIsInMaintenance(client: Bot): Promise<boolean> {
-        const bot = (await client.database.Bot.findByPk(client.user!.id))?.get()
+        const bot = (await client.database.Bot.findByPk(client.user?.id))?.get()
 
         return (isBot(bot) && bot.maintenance)
     }

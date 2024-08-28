@@ -65,14 +65,14 @@ export default class MessageDelete extends EventModule {
                     inline: true
                 })
                 .setFooter({
-                    text: `Message supprimé | ${client.user!.username}`,
+                    text: `Message supprimé | ${client.user?.username}`,
                     iconURL: message.interaction.user.displayAvatarURL()
                 })
                 .setColor(`#ff0000`)
                 .setTimestamp()
         } else {
             embed.setFooter({
-                text: `Message supprimé | ${client.user!.username}`,
+                text: `Message supprimé | ${client.user?.username}`,
                 iconURL: message.author.displayAvatarURL()
             })
             .setTimestamp()
