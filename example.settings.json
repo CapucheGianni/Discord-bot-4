@@ -1,0 +1,15 @@
+{
+    "rebrandly": {
+        "API_KEY": ""
+    },
+
+    "twitch": {
+        "TWITCH_CLIENT_ID": "",
+        "TWITCH_CLIENT_SECRET": ""
+    },
+
+    "topgg": {
+        "TOKEN": "",
+        "AUTHORIZATION": ""
+    }
+}
