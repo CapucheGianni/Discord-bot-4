@@ -9,6 +9,7 @@ import {
     GuildMember,
     InteractionResponse
 } from 'discord.js'
+import Fuse from 'fuse.js'
 
 import { Bot } from '../../classes/Bot.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
@@ -35,12 +36,22 @@ export default class Help extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> {
         const options = interaction.options as CommandInteractionOptionResolver
         const focusedValue = options.getFocused()
-        const interactionNames = this._removeInteractionWithNoAccess(interaction.member as GuildMember, client.modules.interactions).filter(interaction => {
-            return interaction.name.includes(focusedValue)
+        const interactions = this._removeInteractionWithNoAccess(interaction.member as GuildMember, client.modules.interactions).map(interaction => ({
+            name: interaction.name,
+            interaction
+        }))
+        const fuse = new Fuse(interactions, {
+            keys: ['name'],
+            threshold: 0.2
         })
+        const result = fuse.search(focusedValue)
 
+        if (!result.length)
+            return interaction.respond(
+                interactions.map(interaction => ({ name: interaction.name, value: interaction.name }))
+            )
         await interaction.respond(
-            interactionNames.map(choice => ({ name: choice.name, value: choice.name }))
+            result.map(choice => ({ name: choice.item.name, value: choice.item.name }))
         )
     }
 
