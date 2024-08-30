@@ -1,11 +1,11 @@
 ![license](https://img.shields.io/github/license/capuchegianni/KaideBot)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/capuchegianni/KaideBot)
 ![GitHub Repo stars](https://img.shields.io/github/stars/capuchegianni/KaideBot)
-![Discord](https://img.shields.io/discord/1124061621510221934)
+[![Discord](https://img.shields.io/discord/1124061621510221934)](https://discord.gg/3a6MWgp5qh)
 
 # KaideBot
 
-Kaide (prononcé kaydé) est une app Discord multifonction développé par [CapucheGianni](https://github.com/capuchegianni) depuis 2022. <br>
+Kaide (prononcé kayidé) est une app Discord multifonction développé par [CapucheGianni](https://github.com/capuchegianni) depuis 2022. <br>
 Cette app est d'abord un moyen pour moi d'améliorer mes compétences en tant que développeur et m'a permis de découvrir le Web, Javascript, NodeJS et beaucoup d'autres technologies. <br>
 ![image](https://github.com/user-attachments/assets/e9467545-8ab0-4339-a339-df64c11a748c)
 
