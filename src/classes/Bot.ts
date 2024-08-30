@@ -2,7 +2,8 @@ import {
     Collection,
     Client,
     REST,
-    Routes
+    Routes,
+    RESTPostAPIChatInputApplicationCommandsJSONBody
 } from 'discord.js'
 import { config } from 'dotenv'
 
@@ -12,6 +13,7 @@ import { ModuleImports } from './ModuleImports.js'
 import { getSafeEnv } from '../utils/TypeGuards.js'
 
 import settings from '../../package.json' with { 'type': 'json' }
+import { ApplicationIntegrationTypes, InteractionContextTypes } from '../types/DiscordEvents.js'
 
 config()
 const logger: Logger = Logger.getInstance(
@@ -65,8 +67,13 @@ export class Bot extends Client {
 
         try {
             const interactions = this._modules.interactions.map((interaction) => {
-                if (interaction.data)
-                    return interaction.data.toJSON()
+                if (interaction.data) {
+                    const data = interaction.data.toJSON() as RESTPostAPIChatInputApplicationCommandsJSONBody & { contexts?: ApplicationIntegrationTypes[]; integration_types?: InteractionContextTypes[] }
+
+                    data.contexts = interaction.contexts
+                    data.integration_types = interaction.integration_types
+                    return data
+                }
             })
 
             logger.simpleLog('Started refreshing application (/) commands.')

@@ -37,7 +37,9 @@ const logger = Logger.getInstance('')
     description: 'Configuration des notifications twitch sur votre serveur.',
     cooldown: 5,
     category: 'administration',
-    usage: '',
+    usage: 'twitch <set | remove | enable>',
+    integration_types: [0],
+    contexts: [0],
     data: new SlashCommandBuilder()
         .setName('twitch')
         .setDescription('Configuration des notifications twitch sur votre serveur.')

@@ -18,6 +18,8 @@ import { isBot } from '../../utils/TypeGuards.js'
     cooldown: 1,
     category: 'utils',
     usage: 'botinfos',
+    integration_types: [0, 1],
+    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('botinfos')
         .setDescription('Affiche des informations utiles sur le bot.')

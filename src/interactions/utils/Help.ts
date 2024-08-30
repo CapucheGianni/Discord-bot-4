@@ -6,9 +6,8 @@ import {
     AutocompleteInteraction,
     PermissionsBitField,
     Collection,
-    GuildMember,
     InteractionResponse,
-    User
+    Interaction
 } from 'discord.js'
 import Fuse from 'fuse.js'
 
@@ -23,6 +22,8 @@ import { getSafeEnv, isTruthy } from '../../utils/TypeGuards.js'
     cooldown: 3,
     category: 'utils',
     usage: 'help [interaction]',
+    integration_types: [0, 1],
+    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('help')
         .setDescription('Affiche les intéractions disponibles.')
@@ -37,7 +38,7 @@ export default class Help extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> {
         const options = interaction.options as CommandInteractionOptionResolver
         const focusedValue = options.getFocused()
-        const interactions = this._removeInteractionWithNoAccess(interaction.member as GuildMember ?? interaction.user, client.modules.interactions).map(interaction => ({
+        const interactions = this._removeInteractionWithNoAccess(interaction, client.modules.interactions).map(interaction => ({
             name: interaction.name,
             interaction
         }))
@@ -104,7 +105,7 @@ export default class Help extends InteractionModule {
         } else {
             embed.setTitle('Liste des commandes 📚')
                 .setURL('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-                .setDescription(`Voici la liste des intéractions disponibles :\n\n${this._removeInteractionWithNoAccess(interaction.member as GuildMember ?? interaction.user, client.modules.interactions).map((interactions) => `\`/${interactions.data.name}\` - ${interactions.data.description}`).join('\n')}`)
+                .setDescription(`Voici la liste des intéractions disponibles :\n\n${this._removeInteractionWithNoAccess(interaction, client.modules.interactions).map((interactions) => `\`/${interactions.data.name}\` - ${interactions.data.description}`).join('\n')}`)
         }
         return interaction.reply({ embeds: [embed] })
     }
@@ -119,19 +120,18 @@ export default class Help extends InteractionModule {
         ) || 'Aucune permission requise'
     }
 
-    private _removeInteractionWithNoAccess(user: GuildMember | User, interactions: Collection<string, InteractionModule>): Collection<string, InteractionModule> {
-        if (user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID'))
+    private _removeInteractionWithNoAccess(interaction: Interaction, interactions: Collection<string, InteractionModule>): Collection<string, InteractionModule> {
+        if (interaction.user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID'))
             return interactions
 
-        const isGuildMember = (user: GuildMember | User): user is GuildMember => (user as GuildMember).permissions !== undefined
         const filteredInteractions = new Collection<string, InteractionModule>()
-        interactions.forEach((interaction, key) => {
-            if (!interaction.data.default_member_permissions)
+        interactions.forEach((int, key) => {
+            if (!int.data.default_member_permissions)
                 return
-            if (interaction.category === 'owner')
+            if (int.category === 'owner')
                 return
-            if (isGuildMember(user) && user.permissions.has(BigInt(interaction.data.default_member_permissions)))
-                filteredInteractions.set(key, interaction)
+            if (interaction.memberPermissions?.has(BigInt(int.data.default_member_permissions)))
+                filteredInteractions.set(key, int)
         })
 
         return filteredInteractions

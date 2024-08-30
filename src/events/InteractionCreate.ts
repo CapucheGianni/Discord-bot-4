@@ -57,7 +57,7 @@ export default class InteractionCreate extends EventModule {
 
             if (!this._getCooldown(client.cooldowns, interaction, interactionCommand))
                 return
-            if (!this._hasPermissions(interaction.member as GuildMember | null, interactionCommand)) {
+            if (!this._hasPermissions(interaction, interactionCommand)) {
                 interaction.reply(`Vous n'avez pas les permissions nécessaires pour éxécuter la commande ${interactionCommand.name}.`)
                 return
             }
@@ -66,7 +66,9 @@ export default class InteractionCreate extends EventModule {
             logger.simpleLog(`${interaction.user.username} executed the ${interactionCommand.name} interaction in ${interaction.channelId}.`)
             logger.logDiscordEmbed(client, new EmbedBuilder()
                 .setTitle('Intéraction exécutée ✅')
-                .setDescription(`**Auteur:** ${interaction.user} (${interaction.user.id})\n**Salon:** ${interaction.channel} (${interaction.channelId})\n**Serveur:** ${interaction.guild} (${interaction.guildId})\n**Interaction:** ${interaction.commandName}`)
+                .setDescription(interaction.guild
+                    ? `**Auteur:** ${interaction.user} (${interaction.user.id})\n**Salon:** ${interaction.channel} (${interaction.channelId})\n**Serveur:** ${interaction.guild} (${interaction.guildId})\n**Interaction:** ${interaction.commandName}`
+                    : `**Auteur:** ${interaction.user} (${interaction.user.id})\n**Interaction:** ${interaction.commandName}`)
                 .setFooter({
                     text: `Interaction exécutée par ${interaction.user.username} | ${client.user?.username}`,
                     iconURL: interaction.user.displayAvatarURL()
@@ -122,12 +124,12 @@ export default class InteractionCreate extends EventModule {
         return (isBot(bot) && bot.maintenance)
     }
 
-    private _hasPermissions(member: GuildMember | null, interaction: InteractionModule): boolean {
-        if (!member || member.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID') || !interaction.data.default_member_permissions)
+    private _hasPermissions(interaction: ChatInputCommandInteraction, interactionModule: InteractionModule): boolean {
+        if (interaction.user.id === getSafeEnv(process.env.OWNER_ID, 'OWNER_ID') || !interactionModule.data.default_member_permissions)
             return true
-        if (interaction.category === 'owner')
+        if (interactionModule.category === 'owner')
             return false
-        if (!member.permissions.has(BigInt(interaction.data.default_member_permissions)))
+        if (!interaction.memberPermissions?.has(BigInt(interactionModule.data.default_member_permissions)))
             return false
         return true
     }

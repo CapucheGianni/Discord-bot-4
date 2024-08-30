@@ -81,3 +81,14 @@ export type TDiscordEvents =
     'guildScheduledEventUserRemove'
 
 export type TEventType = 'on' | 'once'
+
+export enum ApplicationIntegrationTypes {
+    GUILD_INSTALL = 0,
+    USER_INSTALL = 1
+}
+
+export enum InteractionContextTypes {
+    GUILD = 0,
+    BOT_DM = 1,
+    PRIVATE_CHANNEL = 2
+}

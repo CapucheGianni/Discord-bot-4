@@ -7,7 +7,12 @@ import {
 
 import { CommandModule } from '../classes/ModuleImports.js'
 import { TCategory } from '../types/Command.js'
-import { TDiscordEvents, TEventType } from '../types/DiscordEvents.js'
+import {
+    TDiscordEvents,
+    TEventType,
+    InteractionContextTypes,
+    ApplicationIntegrationTypes
+} from '../types/DiscordEvents.js'
 
 interface event {
     name: TDiscordEvents
@@ -29,7 +34,9 @@ interface interaction {
     description: string
     cooldown: number
     category: TCategory
-    usage: string
+    usage: string,
+    integration_types: ApplicationIntegrationTypes[]
+    contexts: InteractionContextTypes[]
     data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder
 }
 

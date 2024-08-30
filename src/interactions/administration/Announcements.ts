@@ -48,6 +48,8 @@ type AnnouncementType = 'welcome' | 'leave' | 'ban'
     cooldown: 5,
     category: 'administration',
     usage: 'announcements <welcome | leave | ban> <enable | configure>',
+    integration_types: [0],
+    contexts: [0],
     data: new SlashCommandBuilder()
         .setName('announcements')
         .setDescription('Configuration des annonces.')

@@ -17,6 +17,8 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
     cooldown: 1,
     category: 'utils',
     usage: 'ping',
+    integration_types: [0, 1],
+    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Display the ping of the bot')

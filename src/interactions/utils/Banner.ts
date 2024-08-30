@@ -4,7 +4,6 @@ import {
     ChatInputCommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
-    GuildMember,
     EmbedBuilder,
     InteractionResponse
 } from 'discord.js'
@@ -19,6 +18,8 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
     cooldown: 1,
     category: 'utils',
     usage: 'banner [user]',
+    integration_types: [0, 1],
+    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('banner')
         .setDescription('Affiche la bannière du membre voulu.')
@@ -37,15 +38,15 @@ export default class AvatarInteraction extends InteractionModule {
 
     public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<InteractionResponse> {
         const options = interaction.options as CommandInteractionOptionResolver
-        const user = (options.getMember('utilisateur') ?? interaction.member) as GuildMember | null
+        const user = options.getUser('utilisateur') ?? interaction.user
         const isColor = options.getBoolean('couleur') ?? false
-        const fetchedUser = user ? await user.user.fetch() : interaction.user
+        const fetchedUser = await user.fetch()
         const bannerUrl = fetchedUser.bannerURL({ size: 4096 })
 
         if (isColor) {
             if (!fetchedUser.hexAccentColor) {
                 return interaction.reply({
-                    content: `${user} n'a pas de bannière.`,
+                    content: `${fetchedUser} n'a pas de bannière.`,
                     allowedMentions: { parse: [] }
                 })
             }
@@ -54,13 +55,13 @@ export default class AvatarInteraction extends InteractionModule {
                 .setColor(fetchedUser.hexAccentColor)
 
             return interaction.reply({
-                content: `La bannière de ${user} est ${fetchedUser.hexAccentColor}.`,
+                content: `La bannière de ${fetchedUser} est ${fetchedUser.hexAccentColor}.`,
                 embeds: [ embed ],
                 allowedMentions: { parse: [] }
             })
         }
         return interaction.reply({
-            content: bannerUrl ? `[Bannière](${bannerUrl}) de ${user} :` : `${user} ne possède pas de bannière.`,
+            content: bannerUrl ? `[Bannière](${bannerUrl}) de ${fetchedUser} :` : `${fetchedUser} ne possède pas de bannière.`,
             allowedMentions: { parse: [] }
         })
     }

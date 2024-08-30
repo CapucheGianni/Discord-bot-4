@@ -20,7 +20,12 @@ import {
 import { glob } from 'glob'
 
 import { TCategory } from '../types/Command.js'
-import { TDiscordEvents, TEventType } from '../types/DiscordEvents.js'
+import {
+    TDiscordEvents,
+    TEventType,
+    InteractionContextTypes,
+    ApplicationIntegrationTypes
+} from '../types/DiscordEvents.js'
 import { getMetadata } from '../utils/Decorators.js'
 
 import { Bot } from './Bot.js'
@@ -169,6 +174,8 @@ export abstract class InteractionModule extends Module {
     public cooldown!: number
     public category!: TCategory
     public usage!: string
+    public integration_types!: InteractionContextTypes[]
+    public contexts!: ApplicationIntegrationTypes[]
     public data!: SlashCommandBuilder
 
     constructor() {
@@ -232,7 +239,7 @@ export class ModuleImports {
         const t = await db.database.transaction()
 
         try {
-            for (const [interactionName, interactionModule] of this._interactions) {
+            for (const [interactionName] of this._interactions) {
                 await db.Interaction.upsert(
                     { name: interactionName },
                     { transaction: t }
@@ -249,7 +256,7 @@ export class ModuleImports {
         const t = await db.database.transaction()
 
         try {
-            for (const [commandName, commandModule] of this._commands) {
+            for (const [commandName] of this._commands) {
                 await db.Command.upsert(
                     { name: commandName },
                     { transaction: t }

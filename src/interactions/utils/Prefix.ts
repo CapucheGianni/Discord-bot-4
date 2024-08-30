@@ -18,6 +18,8 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
     cooldown: 3,
     category: 'utils',
     usage: 'prefix [prefix]',
+    integration_types: [0],
+    contexts: [0],
     data: new SlashCommandBuilder()
         .setName('prefix')
         .setDescription('Renvoie ou modifie le préfixe du serveur.')
@@ -33,16 +35,19 @@ export default class PrefixInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
 
     public async execute(client: Bot, interaction: ChatInputCommandInteraction): Promise<void | InteractionResponse> {
+        if (!interaction.guildId)
+            return interaction.reply('Vous devez être dans un serveur pour utiliser cette intéraction.')
+
         const options = interaction.options as CommandInteractionOptionResolver
         const newPrefix = options.getString('prefix')
-        const prefix = (await client.database.getGuild(interaction.guildId!)).prefix
+        const prefix = (await client.database.getGuild(interaction.guildId)).prefix
 
         if (newPrefix) {
             if (!(await this.checkPermissions(interaction, interaction.member as GuildMember | null, ['ManageGuild'])))
                 return
             await client.database.Server.update(
                 { prefix: newPrefix },
-                { where: { id: interaction.guildId! } }
+                { where: { id: interaction.guildId } }
             )
             return interaction.reply(`Le prefix de ${client.user?.username} est désormais \`${newPrefix}\`.`)
         }

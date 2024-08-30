@@ -28,6 +28,8 @@ const logger = Logger.getInstance('')
     cooldown: 5,
     category: 'administration',
     usage: 'puns <configure <server | channel | user> | add | remove | list | find <byid | byname>',
+    integration_types: [0],
+    contexts: [0],
     data: new SlashCommandBuilder()
         .setName('puns')
         .setDescription('Configuration et liste des jeux de mots sur votre serveur.')
@@ -432,6 +434,13 @@ export default class PunsInteraction extends InteractionModule {
                 includes: 'Contient',
                 endsWith: 'Finit par',
                 startsWith: 'Commence par'
+            }
+
+            if (!count) {
+                embed.setDescription('Aucun jeu de mot créé.')
+                return interaction.reply({
+                    embeds: [embed]
+                })
             }
 
             if (count > 10) {
