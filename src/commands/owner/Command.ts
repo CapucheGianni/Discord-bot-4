@@ -36,6 +36,7 @@ export default class CommandCommand extends CommandModule {
             return command.react('✅')
         } catch (error: any) {
             logger.log(client, error, 'error')
+            return command.react('❌')
         }
     }
 }

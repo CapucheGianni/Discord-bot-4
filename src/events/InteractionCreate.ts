@@ -4,7 +4,8 @@ import {
     ChatInputCommandInteraction,
     AutocompleteInteraction,
     GuildMember,
-    Collection
+    Collection,
+    User
 } from 'discord.js'
 
 import { Bot } from '../classes/Bot.js'
@@ -34,7 +35,7 @@ export default class InteractionCreate extends EventModule {
         await client.database.addUserFromInteraction(interaction)
 
         try {
-            if (await this._botIsInMaintenance(client)) {
+            if (await this._botIsInMaintenance(client, interaction.user)) {
                 interaction.reply(`${client.user?.username} n'est pas disponible pour le moment`)
                 return
             }
@@ -118,10 +119,10 @@ export default class InteractionCreate extends EventModule {
         }
     }
 
-    private async _botIsInMaintenance(client: Bot): Promise<boolean> {
+    private async _botIsInMaintenance(client: Bot, user: User): Promise<boolean> {
         const bot = (await client.database.Bot.findByPk(client.user?.id))?.get()
 
-        return (isBot(bot) && bot.maintenance)
+        return (isBot(bot) && bot.maintenance && user.id !== getSafeEnv(process.env.OWNER_ID, 'OWNER_ID'))
     }
 
     private _hasPermissions(interaction: ChatInputCommandInteraction, interactionModule: InteractionModule): boolean {
