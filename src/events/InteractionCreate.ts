@@ -44,7 +44,7 @@ export default class InteractionCreate extends EventModule {
                 interaction.reply({ content: 'Une erreur est survenue lors de l\'exécution de la commande.' })
                 return logger.log(client, `Interaction ${interaction.commandName} not found in database.`, 'warn')
             }
-            if (!interactionInDb.enabled) {
+            if (!interactionInDb.enabled && interaction.user.id !== getSafeEnv(process.env.OWNER_ID, 'OWNER_ID')) {
                 interaction.reply({ content: 'Cette intéraction est désactivée.' })
                 return
             }

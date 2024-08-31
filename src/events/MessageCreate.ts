@@ -59,7 +59,7 @@ export default class MessageCreate extends EventModule {
                 return
 
             const commandFromDb = await client.database.Command.findByPk(command.name)
-            if (!commandFromDb || !commandFromDb.get().enabled) {
+            if ((!commandFromDb || !commandFromDb.get().enabled) && message.author.id !== getSafeEnv(process.env.OWNER_ID, 'OWNER_ID')) {
                 await message.reply('Cette commande est désactivée.')
                 return
             }
