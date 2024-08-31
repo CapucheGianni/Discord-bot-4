@@ -1,11 +1,11 @@
-import { EmbedBuilder } from "discord.js"
-import fetch from "node-fetch"
-import { Model } from "sequelize"
+import { EmbedBuilder } from 'discord.js'
+import fetch from 'node-fetch'
+import { Model } from 'sequelize'
 
-import { Bot } from "./Bot.js"
-import { Logger } from "./Logger.js"
-import { TTwitch } from "../types/Twitch.js"
-import { isTruthy } from "../utils/TypeGuards.js"
+import { Bot } from './Bot.js'
+import { Logger } from './Logger.js'
+import { TTwitch } from '../types/Twitch.js'
+import { isTruthy } from '../utils/TypeGuards.js'
 
 import settings from '../../settings.json' with { 'type': 'json' }
 

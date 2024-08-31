@@ -22,23 +22,23 @@ export default class MessageDelete extends EventModule {
             return
         if (!message.guild || !message.author || message.guildId !== '1124061621510221934')
             return
-        embed.setTitle("Message supprimé 🗑️")
+        embed.setTitle('Message supprimé 🗑️')
             .addFields({
-                name: "Date d'envoi",
+                name: 'Date d\'envoi',
                 value: `<t:${message.createdTimestamp.toString().slice(0, 10)}> (<t:${message.createdTimestamp.toString().slice(0, 10)}:R>)`
             },
             {
-                name: "Auteur",
+                name: 'Auteur',
                 value: `${message.author} (${message.author.id})`,
                 inline: true
             },
             {
-                name: "Salon",
+                name: 'Salon',
                 value: `${message.channel} (${message.channelId})`,
                 inline: true
             },
             {
-                name: "Serveur",
+                name: 'Serveur',
                 value: `${message.guild} (${message.guildId})`,
                 inline: true
             })
@@ -49,18 +49,18 @@ export default class MessageDelete extends EventModule {
             embed.setDescription(message.embeds[0].description)
         if (message.attachments.size) {
             embed.addFields({
-                name: "Fichiers",
+                name: 'Fichiers',
                 value: message.attachments.map((attachment) => `([URL](${attachment.url})) \`${attachment.name}\``).join(',\n')
             })
         }
         if (message.interaction) {
             interactionEmbed.addFields({
-                    name: "Intéraction",
+                    name: 'Intéraction',
                     value: `${message.interaction.commandName} (${message.interaction.id})`,
                     inline: true
                 },
                 {
-                    name: "Auteur",
+                    name: 'Auteur',
                     value: `${message.interaction.user} (${message.interaction.user.id})`,
                     inline: true
                 })
