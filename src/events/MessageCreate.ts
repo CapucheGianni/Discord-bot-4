@@ -35,7 +35,7 @@ export default class MessageCreate extends EventModule {
             await client.database.addChannelFromMessage(message)
             await client.database.addUserFromMessage(message)
 
-            if (await this._botIsInMaintenance(client)) {
+            if (await this._botIsInMaintenance(client, message.author)) {
                 message.reply(`${client.user?.username} n'est pas disponible pour le moment`)
                 return
             }
@@ -59,7 +59,7 @@ export default class MessageCreate extends EventModule {
                 return
 
             const commandFromDb = await client.database.Command.findByPk(command.name)
-            if (!commandFromDb || !commandFromDb.get().enabled) {
+            if ((!commandFromDb || !commandFromDb.get().enabled) && message.author.id !== getSafeEnv(process.env.OWNER_ID, 'OWNER_ID')) {
                 await message.reply('Cette commande est désactivée.')
                 return
             }
@@ -110,10 +110,10 @@ export default class MessageCreate extends EventModule {
         return false
     }
 
-    private async _botIsInMaintenance(client: Bot): Promise<boolean> {
+    private async _botIsInMaintenance(client: Bot, user: User): Promise<boolean> {
         const bot = (await client.database.Bot.findByPk(client.user?.id))?.get()
 
-        return (isBot(bot) && bot.maintenance)
+        return (isBot(bot) && bot.maintenance && user.id !== getSafeEnv(process.env.OWNER_ID, 'OWNER_ID'))
     }
 
     private _hasPermissions(member: GuildMember, command: CommandModule): boolean {
