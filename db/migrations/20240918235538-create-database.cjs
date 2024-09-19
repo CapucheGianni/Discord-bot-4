@@ -228,7 +228,7 @@ module.exports = {
         allowNull: false
       },
       announcementChannelId: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
           model: 'AnnouncementChannel',
@@ -260,7 +260,7 @@ module.exports = {
         allowNull: false
       },
       embedId: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
           model: 'AnnouncementEmbed',
