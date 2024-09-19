@@ -26,8 +26,8 @@ const getUsers = async () => {
                 `INSERT INTO User (id, name, jokes, banned, lang, createdAt, updatedAt)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
-                name = VALUES(name)
-                jokes = VALUES(jokes)
+                name = VALUES(name),
+                jokes = VALUES(jokes),
                 updatedAt = VALUES(updatedAt)`,
                 [row.id, row.name, row.jokes, 0, 'en', new Date(), new Date()]
             )
@@ -45,8 +45,8 @@ const getChannels = async () => {
                 `INSERT INTO Channel (id, name, jokes, serverId, createdAt, updatedAt)
                 VALUES (?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
-                name = VALUES(name)
-                jokes = VALUES(jokes)
+                name = VALUES(name),
+                jokes = VALUES(jokes),
                 updatedAt = VALUES(updatedAt)`,
                 [row.id, row.name, row.jokes, row.serverId, new Date(), new Date()]
             )
