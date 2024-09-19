@@ -126,15 +126,18 @@ export default class Database {
             },
             jokes: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: true
+                defaultValue: true,
+                allowNull: false
             },
             banned: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             },
             lang: {
                 type: DataTypes.STRING(2),
-                defaultValue: 'en'
+                defaultValue: 'en',
+                allowNull: false
             }
         })
 
@@ -150,11 +153,13 @@ export default class Database {
             },
             prefix: {
                 type: DataTypes.STRING(5),
-                defaultValue: 'k!'
+                defaultValue: 'k!',
+                allowNull: false
             },
             jokes: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: true
+                defaultValue: true,
+                allowNull: false
             }
         })
 
@@ -170,7 +175,8 @@ export default class Database {
             },
             jokes: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: true
+                defaultValue: true,
+                allowNull: false
             }
         })
 
@@ -187,15 +193,18 @@ export default class Database {
             },
             dm: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             },
             isActivated: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: true
+                defaultValue: true,
+                allowNull: false
             },
             embedEnabled: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             },
             imageUrl: {
                 type: DataTypes.STRING,
@@ -227,7 +236,8 @@ export default class Database {
                             throw Error('Invalid color.')
                         }
                     }
-                }
+                },
+                allowNull: false
             },
             title: {
                 type: DataTypes.STRING(256),
@@ -235,7 +245,8 @@ export default class Database {
             },
             displayBody: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             },
             body: {
                 type: DataTypes.STRING(2048),
@@ -243,7 +254,8 @@ export default class Database {
             },
             displayImage: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             },
             imageUrl: {
                 type: DataTypes.STRING,
@@ -251,7 +263,8 @@ export default class Database {
             },
             displayFooter: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             },
             footer: {
                 type: DataTypes.STRING(2048),
@@ -259,7 +272,8 @@ export default class Database {
             },
             displayThumbnail: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             },
             thumbnailUrl: {
                 type: DataTypes.STRING,
@@ -267,7 +281,8 @@ export default class Database {
             },
             displayTimestamp: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             }
         }, {
             timestamps: false
@@ -291,7 +306,8 @@ export default class Database {
             },
             inline: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             }
         }, {
             timestamps: false
@@ -305,7 +321,8 @@ export default class Database {
             },
             enabled: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: true
+                defaultValue: true,
+                allowNull: false
             }
         })
 
@@ -317,7 +334,8 @@ export default class Database {
             },
             enabled: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: true
+                defaultValue: true,
+                allowNull: false
             }
         })
 
@@ -350,7 +368,8 @@ export default class Database {
             },
             isStreaming: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             },
             title: {
                 type: DataTypes.STRING(256),
@@ -362,7 +381,8 @@ export default class Database {
             },
             enabled: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: true
+                defaultValue: true,
+                allowNull: false
             }
         }, {
             timestamps: false
@@ -376,7 +396,8 @@ export default class Database {
             },
             maintenance: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
+                defaultValue: false,
+                allowNull: false
             }
         })
 
