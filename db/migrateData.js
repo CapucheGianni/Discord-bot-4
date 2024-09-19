@@ -119,12 +119,12 @@ const getWelcomeChannels = async () => {
 
 const migrateData = async () => {
     try {
-        getUsers()
-        getServers()
-        getChannels()
-        getLeaveChannels()
-        getWelcomeChannels()
-        getTwitchNotifs()
+        await getUsers()
+        await getServers()
+        await getChannels()
+        await getLeaveChannels()
+        await getWelcomeChannels()
+        await getTwitchNotifs()
     } catch (error) {
         console.error(error)
     } finally {
