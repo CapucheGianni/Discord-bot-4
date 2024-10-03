@@ -222,7 +222,8 @@ export default class TwitchInteraction extends InteractionModule {
                             if (newChannel && newChannel.isTextBased() && !newChannel.isDMBased()) {
                                 await client.database.Channel.upsert({
                                     id: newChannel.id,
-                                    name: newChannel.name
+                                    name: newChannel.name,
+                                    serverId: newChannel.guildId
                                 })
                             }
                         }
