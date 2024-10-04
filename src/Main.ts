@@ -7,10 +7,10 @@ import {
 import { config } from 'dotenv'
 import 'reflect-metadata'
 
-import { Bot } from './classes/Bot.js'
+import Bot from './classes/Bot.js'
 import Database from './classes/Database.js'
-import { Logger } from './classes/Logger.js'
-import { ModuleImports } from './classes/ModuleImports.js'
+import Logger from './classes/Logger.js'
+import ModuleImports from './classes/ModuleImports.js'
 import { getSafeEnv } from './utils/TypeGuards.js'
 
 config()

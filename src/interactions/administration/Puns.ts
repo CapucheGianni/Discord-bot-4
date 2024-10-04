@@ -15,8 +15,8 @@ import {
     InteractionResponse
 } from 'discord.js'
 
-import { Bot } from '../../classes/Bot.js'
-import { Logger } from '../../classes/Logger.js'
+import Bot from '../../classes/Bot.js'
+import Logger from '../../classes/Logger.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
 import { InteractionDecorator } from '../../utils/Decorators.js'
 

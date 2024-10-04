@@ -7,7 +7,7 @@ import {
     User
 } from 'discord.js'
 
-import { Bot } from '../../classes/Bot.js'
+import Bot from '../../classes/Bot.js'
 import { CommandModule } from '../../classes/ModuleImports.js'
 import { CommandDecorator } from '../../utils/Decorators.js'
 import { getSafeEnv, isTruthy } from '../../utils/TypeGuards.js'

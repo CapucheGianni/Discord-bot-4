@@ -25,8 +25,8 @@ import {
 } from 'discord.js'
 import { Model } from 'sequelize'
 
-import { Bot } from '../../classes/Bot.js'
-import { Logger } from '../../classes/Logger.js'
+import Bot from '../../classes/Bot.js'
+import Logger from '../../classes/Logger.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
 import { TAnnouncementChannel } from '../../types/Channel.js'
 import { TAnnouncementEmbed } from '../../types/Embed.js'

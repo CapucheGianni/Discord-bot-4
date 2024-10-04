@@ -24,8 +24,8 @@ import {
 } from 'discord.js'
 import { Model, Transaction } from 'sequelize'
 
-import { Bot } from '../../classes/Bot.js'
-import { Logger } from '../../classes/Logger.js'
+import Bot from '../../classes/Bot.js'
+import Logger from '../../classes/Logger.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
 import { TTwitch } from '../../types/Twitch.js'
 import { InteractionDecorator } from '../../utils/Decorators.js'

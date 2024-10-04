@@ -8,8 +8,8 @@ import {
 import { config } from 'dotenv'
 
 import Database from './Database.js'
-import { Logger } from './Logger.js'
-import { ModuleImports } from './ModuleImports.js'
+import Logger from './Logger.js'
+import ModuleImports from './ModuleImports.js'
 import { getSafeEnv } from '../utils/TypeGuards.js'
 
 import settings from '../../package.json' with { 'type': 'json' }
@@ -21,7 +21,7 @@ const logger: Logger = Logger.getInstance(
     getSafeEnv(process.env.HIDE_LOGS, 'HIDE_LOGS') === 'true'
 )
 
-export class Bot extends Client {
+export default class Bot extends Client {
     public cooldowns: Collection<string, Collection<string, number>>
     public set: Set<string>
     public version: string

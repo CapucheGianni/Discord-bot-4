@@ -3,7 +3,7 @@ import {
     EmbedBuilder,
 } from 'discord.js'
 
-import { Bot } from '../classes/Bot.js'
+import Bot from '../classes/Bot.js'
 import { EventModule } from '../classes/ModuleImports.js'
 import { EventDecorator } from '../utils/Decorators.js'
 import { getSafeEnv, isTruthy } from '../utils/TypeGuards.js'

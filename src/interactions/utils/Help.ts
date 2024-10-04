@@ -11,7 +11,7 @@ import {
 } from 'discord.js'
 import Fuse from 'fuse.js'
 
-import { Bot } from '../../classes/Bot.js'
+import Bot from '../../classes/Bot.js'
 import { InteractionModule } from '../../classes/ModuleImports.js'
 import { InteractionDecorator } from '../../utils/Decorators.js'
 import { getSafeEnv, isTruthy } from '../../utils/TypeGuards.js'

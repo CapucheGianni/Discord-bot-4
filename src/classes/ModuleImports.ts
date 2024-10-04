@@ -27,9 +27,9 @@ import {
 } from '../types/DiscordEvents.js'
 import { getMetadata } from '../utils/Decorators.js'
 
-import { Bot } from './Bot.js'
+import Bot from './Bot.js'
 import Database from './Database.js'
-import { Logger } from './Logger.js'
+import Logger from './Logger.js'
 
 const logger = Logger.getInstance('')
 
@@ -188,7 +188,7 @@ export abstract class InteractionModule extends Module {
     public abstract autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void>
 }
 
-export class ModuleImports {
+export default class ModuleImports {
     private _commands: Collection<string, CommandModule> = new Collection()
     private _interactions: Collection<string, InteractionModule> = new Collection()
     private _events: Collection<string, EventModule> = new Collection()

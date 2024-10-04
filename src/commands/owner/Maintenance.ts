@@ -1,7 +1,7 @@
 import { Message, MessageReaction } from "discord.js"
 
-import { Bot } from "../../classes/Bot.js"
-import { Logger } from "../../classes/Logger.js"
+import Bot from "../../classes/Bot.js"
+import Logger from "../../classes/Logger.js"
 import { CommandModule } from "../../classes/ModuleImports.js"
 import { CommandDecorator } from "../../utils/Decorators.js"
 

@@ -1,8 +1,8 @@
 import { Client, ColorResolvable, EmbedBuilder } from 'discord.js'
 
-import { Bot } from './Bot.js'
+import Bot from './Bot.js'
 
-export class Logger {
+export default class Logger {
     private static _instance: Logger
     private _logChannelId: string
     private _hideLogs: boolean

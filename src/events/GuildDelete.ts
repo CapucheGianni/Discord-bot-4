@@ -1,7 +1,7 @@
 import { Guild, EmbedBuilder } from 'discord.js'
 import { config } from 'dotenv'
 
-import { Bot } from '../classes/Bot.js'
+import Bot from '../classes/Bot.js'
 import { EventModule } from '../classes/ModuleImports.js'
 import { EventDecorator } from '../utils/Decorators.js'
 import { getSafeEnv } from '../utils/TypeGuards.js'

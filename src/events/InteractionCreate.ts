@@ -8,8 +8,8 @@ import {
     User
 } from 'discord.js'
 
-import { Bot } from '../classes/Bot.js'
-import { Logger } from '../classes/Logger.js'
+import Bot from '../classes/Bot.js'
+import Logger from '../classes/Logger.js'
 import { EventModule, InteractionModule } from '../classes/ModuleImports.js'
 import { EventDecorator } from '../utils/Decorators.js'
 import { isInteraction, isBot, getSafeEnv } from '../utils/TypeGuards.js'

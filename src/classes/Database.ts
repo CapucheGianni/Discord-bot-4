@@ -31,7 +31,7 @@ import {
     isServers
 } from '../utils/TypeGuards.js'
 
-import { Logger } from './Logger.js'
+import Logger from './Logger.js'
 
 config()
 const logger: Logger = Logger.getInstance('')
