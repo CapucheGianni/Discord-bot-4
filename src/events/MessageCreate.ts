@@ -189,7 +189,7 @@ export default class MessageCreate extends EventModule {
         if (!punsEndsWith || !punsEndsWith.length)
             return false
 
-        const matchingPuns = punsEndsWith.filter(pun => pun.toFind === lastWord)
+        const matchingPuns = punsEndsWith.filter(pun => pun.toFind === lastWord.toLowerCase())
 
         if (matchingPuns.length > 0) {
             const randomPun = matchingPuns[Math.floor(Math.random() * matchingPuns.length)]
@@ -210,7 +210,7 @@ export default class MessageCreate extends EventModule {
         if (!punsIncludes || !punsIncludes.length)
             return false
 
-        const matchingPuns = punsIncludes.filter(pun => messageAsArray.includes(pun.toFind))
+        const matchingPuns = punsIncludes.filter(pun => messageAsArray.map(word => word.toLowerCase()).includes(pun.toFind))
 
         if (matchingPuns.length > 0) {
             const randomPun = matchingPuns[Math.floor(Math.random() * matchingPuns.length)]
@@ -231,7 +231,7 @@ export default class MessageCreate extends EventModule {
         if (!punsStartsWith || !punsStartsWith.length)
             return false
 
-        const matchingPuns = punsStartsWith.filter(pun => pun.toFind === firstWord)
+        const matchingPuns = punsStartsWith.filter(pun => pun.toFind === firstWord.toLowerCase())
 
         if (matchingPuns.length > 0) {
             const randomPun = matchingPuns[Math.floor(Math.random() * matchingPuns.length)]

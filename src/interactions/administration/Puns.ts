@@ -387,7 +387,7 @@ export default class PunsInteraction extends InteractionModule {
         if (!(await this.checkPermissions(interaction, interaction.member as GuildMember, ['ManageGuild'])))
             return
         try {
-            const toFind = options.getString('tofind', true).trim()
+            const toFind = options.getString('tofind', true).trim().toLowerCase()
             const toAnswer = options.getString('toanswer', true).trim()
             const type = options.getString('type', true)
 
