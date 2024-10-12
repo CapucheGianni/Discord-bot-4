@@ -66,14 +66,9 @@ export default class Bot extends Client {
         const rest = new REST().setToken(getSafeEnv(process.env.TOKEN, 'TOKEN'))
 
         try {
-            const interactions = this._modules.interactions.map((interaction) => {
-                if (interaction.data) {
-                    const data = interaction.data.toJSON() as RESTPostAPIChatInputApplicationCommandsJSONBody & { contexts?: ApplicationIntegrationTypes[]; integration_types?: InteractionContextTypes[] }
-
-                    data.contexts = interaction.contexts
-                    data.integration_types = interaction.integration_types
-                    return data
-                }
+            const interactions = this._modules.interactions.filter(interaction => interaction.data && interaction.data.name).map((interaction) => {
+                if (interaction.data)
+                    return interaction.data.toJSON()
             })
 
             logger.simpleLog('Started refreshing application (/) commands.')

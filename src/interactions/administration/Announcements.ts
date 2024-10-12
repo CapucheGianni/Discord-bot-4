@@ -22,6 +22,8 @@ import {
     Message,
     ColorResolvable,
     resolveColor,
+    ApplicationIntegrationType,
+    InteractionContextType,
 } from 'discord.js'
 import { Model } from 'sequelize'
 
@@ -48,8 +50,6 @@ type AnnouncementType = 'welcome' | 'leave' | 'ban'
     cooldown: 5,
     category: 'administration',
     usage: 'announcements <welcome | leave | ban> <enable | configure>',
-    integration_types: [0],
-    contexts: [0],
     data: new SlashCommandBuilder()
         .setName('announcements')
         .setDescription('Configuration des annonces.')
@@ -102,7 +102,8 @@ type AnnouncementType = 'welcome' | 'leave' | 'ban'
             )
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
-        .setDMPermission(false)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall])
+        .setContexts([InteractionContextType.Guild])
 })
 export default class AnnouncementsInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
@@ -273,8 +274,10 @@ export default class AnnouncementsInteraction extends InteractionModule {
         collector.on('collect', async (collectedInteraction: ButtonInteraction | ChannelSelectMenuInteraction | StringSelectMenuInteraction) => {
             if (collectedInteraction.customId !== 'msgimg' && collectedInteraction.customId !== 'embedinfos' && collectedInteraction.customId !== 'addembedfield')
                 await collectedInteraction.deferUpdate()
-            switch (collectedInteraction.customId) {
-                case 'continue':
+
+            const collectedInteractionChannel = collectedInteraction.channel
+            const handlers: { [key: string]: () => Promise<void | Message | InteractionResponse> } = {
+                'continue': () => {
                     currentRowId += 2
                     rows[5].components[0].setDisabled(false)
                     if (currentRowId === 4) {
@@ -282,16 +285,19 @@ export default class AnnouncementsInteraction extends InteractionModule {
                         return response.edit({ components: [rows[currentRowId], rows[5]] })
                     }
                     return response.edit({ components: [rows[currentRowId], rows[currentRowId + 1], rows[5]] })
-                case 'back':
+                },
+                'back': () => {
                     currentRowId -= 2
                     rows[5].components[1].setDisabled(false)
                     if (!currentRowId)
                         rows[5].components[0].setDisabled(true)
                     return response.edit({ components: [rows[currentRowId], rows[currentRowId + 1], rows[5]] })
-                case 'cancel':
-                    collector.stop()
-                    return await collectedInteraction.channel?.send('Vous avez annulé l\'opération')
-                case 'register':
+                },
+                'cancel': async () => {collector.stop()
+                    if (collectedInteractionChannel?.isSendable())
+                        return collectedInteractionChannel.send('Vous avez annulé l\'opération')
+                },
+                'register': async () => {
                     try {
                         if (channel.get().channelId !== interaction.channelId) {
                             const newChannel = client.channels.cache.get(channel.get().channelId)
@@ -338,17 +344,19 @@ export default class AnnouncementsInteraction extends InteractionModule {
                                 })
                             }
                         }
-                        await collectedInteraction.channel?.send('Tous vos changements ont été enregistrés avec succès.')
+                        if (collectedInteractionChannel?.isSendable())
+                            await collectedInteractionChannel.send('Tous vos changements ont été enregistrés avec succès.')
                     } catch (error: any) {
                         logger.log(client, error, 'error')
                         await interaction.followUp({
                             content: 'Une erreur est survenue lors de la création du salon, si l\'erreur se répète veuillez contacter le développeur.',
                             ephemeral: true
                         })
-                        await response.edit({ components: [] })
                     }
+                    await response.edit({ components: [] })
                     return collector.stop()
-                default:
+                },
+                'default': async () => {
                     if (collectedInteraction.customId !== 'msgimg' && collectedInteraction.customId !== 'embedinfos' && collectedInteraction.customId !== 'addembedfield')
                         await response.edit({ components: [] })
 
@@ -367,12 +375,12 @@ export default class AnnouncementsInteraction extends InteractionModule {
                     } catch (error) {
                         logger.log(client, error, 'error')
                     }
-
+                }
             }
+            await (handlers[collectedInteraction.customId] || handlers['default'])()
         })
         collector.on('end', async () => {
             client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
-            await response.edit({ components: [] })
         })
     }
 

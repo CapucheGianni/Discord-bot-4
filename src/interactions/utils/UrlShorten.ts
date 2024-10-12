@@ -4,7 +4,9 @@ import {
     ChatInputCommandInteraction,
     PermissionsBitField,
     CommandInteractionOptionResolver,
-    InteractionResponse
+    InteractionResponse,
+    ApplicationIntegrationType,
+    InteractionContextType
 } from 'discord.js'
 
 import Bot from '../../classes/Bot.js'
@@ -19,8 +21,6 @@ import settings from '../../../settings.json' with { 'type': 'json' }
     cooldown: 3,
     category: 'utils',
     usage: 'urlshorten <url>',
-    integration_types: [0, 1],
-    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('urlshorten')
         .setDescription('Renvoie un nouveau lien pointant sur le lien choisi.')
@@ -30,6 +30,8 @@ import settings from '../../../settings.json' with { 'type': 'json' }
             .setRequired(true)
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
+        .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel])
 })
 export default class UrlShortenInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }

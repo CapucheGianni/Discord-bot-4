@@ -7,7 +7,9 @@ import {
     PermissionsBitField,
     Collection,
     InteractionResponse,
-    Interaction
+    Interaction,
+    ApplicationIntegrationType,
+    InteractionContextType
 } from 'discord.js'
 import Fuse from 'fuse.js'
 
@@ -22,8 +24,6 @@ import { getSafeEnv, isTruthy } from '../../utils/TypeGuards.js'
     cooldown: 3,
     category: 'utils',
     usage: 'help [interaction]',
-    integration_types: [0, 1],
-    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('help')
         .setDescription('Affiche les intéractions disponibles.')
@@ -33,6 +33,8 @@ import { getSafeEnv, isTruthy } from '../../utils/TypeGuards.js'
             .setAutocomplete(true)
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
+        .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel])
 })
 export default class Help extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> {

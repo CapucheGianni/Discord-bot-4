@@ -12,7 +12,9 @@ import {
     ActionRowBuilder,
     ComponentType,
     GuildMember,
-    InteractionResponse
+    InteractionResponse,
+    ApplicationIntegrationType,
+    InteractionContextType,
 } from 'discord.js'
 
 import Bot from '../../classes/Bot.js'
@@ -28,8 +30,6 @@ const logger = Logger.getInstance('')
     cooldown: 5,
     category: 'administration',
     usage: 'puns <configure <server | channel | user> | add | remove | list | find <byid | byname>',
-    integration_types: [0],
-    contexts: [0],
     data: new SlashCommandBuilder()
         .setName('puns')
         .setDescription('Configuration et liste des jeux de mots sur votre serveur.')
@@ -151,7 +151,8 @@ const logger = Logger.getInstance('')
             )
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
-        .setDMPermission(false)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall])
+        .setContexts([InteractionContextType.Guild])
 })
 export default class PunsInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }

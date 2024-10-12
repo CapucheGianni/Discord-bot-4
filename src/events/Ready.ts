@@ -32,7 +32,7 @@ export default class Ready extends EventModule {
             .setColor('#00FF00')
             .setTimestamp()
         const channel = client.channels.cache.get(getSafeEnv(process.env.LOG_CHANNEL_ID, 'LOG_CHANNEL_ID'))
-        if (!channel || !channel.isTextBased())
+        if (!channel || !channel.isTextBased() || !channel.isSendable())
             return
 
         channel.send({ embeds: [ embed ] })

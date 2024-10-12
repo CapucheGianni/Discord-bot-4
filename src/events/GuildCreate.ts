@@ -47,7 +47,7 @@ export default class GuildCreate extends EventModule {
             embed.setImage(server.bannerURL())
 
         const channel = client.channels.cache.get(getSafeEnv(process.env.LOG_CHANNEL_ID, 'LOG_CHANNEL_ID'))
-        if (!channel?.isTextBased())
+        if (!channel || !channel.isTextBased() || !channel.isSendable())
             return
 
         await client.database.Server.upsert({

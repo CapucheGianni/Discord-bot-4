@@ -4,7 +4,9 @@ import {
     ChatInputCommandInteraction,
     AutocompleteInteraction,
     PermissionsBitField,
-    InteractionResponse
+    InteractionResponse,
+    ApplicationIntegrationType,
+    InteractionContextType
 } from 'discord.js'
 
 import Bot from '../../classes/Bot.js'
@@ -18,12 +20,12 @@ import { isBot } from '../../utils/TypeGuards.js'
     cooldown: 1,
     category: 'utils',
     usage: 'botinfos',
-    integration_types: [0, 1],
-    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('botinfos')
         .setDescription('Affiche des informations utiles sur le bot.')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
+        .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel])
 })
 export default class BotInfosInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }

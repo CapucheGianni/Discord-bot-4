@@ -28,7 +28,7 @@ export default class GuildMemberRemoveEvent extends EventModule {
             return
 
         const channel = client.channels.cache.get(welcomeChannel.get().channelId)
-        if (!channel || !channel.isTextBased())
+        if (!channel || !channel.isTextBased() || !channel.isSendable())
             return
 
         const embed: EmbedBuilder = new EmbedBuilder()

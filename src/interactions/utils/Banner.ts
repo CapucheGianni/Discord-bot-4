@@ -5,7 +5,9 @@ import {
     PermissionsBitField,
     CommandInteractionOptionResolver,
     EmbedBuilder,
-    InteractionResponse
+    InteractionResponse,
+    ApplicationIntegrationType,
+    InteractionContextType
 } from 'discord.js'
 
 import Bot from '../../classes/Bot.js'
@@ -18,8 +20,6 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
     cooldown: 1,
     category: 'utils',
     usage: 'banner [user]',
-    integration_types: [0, 1],
-    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('banner')
         .setDescription('Affiche la bannière du membre voulu.')
@@ -32,6 +32,8 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
             .setDescription('Affiche la couleur de la bannière plutôt que l\'image.')
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
+        .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel])
 })
 export default class AvatarInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }

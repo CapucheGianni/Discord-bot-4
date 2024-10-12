@@ -35,8 +35,6 @@ interface interaction {
     cooldown: number
     category: TCategory
     usage: string,
-    integration_types: ApplicationIntegrationTypes[]
-    contexts: InteractionContextTypes[]
     data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder
 }
 

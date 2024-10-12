@@ -5,7 +5,9 @@ import {
     PermissionsBitField,
     CommandInteractionOptionResolver,
     GuildMember,
-    InteractionResponse
+    InteractionResponse,
+    ApplicationIntegrationType,
+    InteractionContextType
 } from 'discord.js'
 
 import Bot from '../../classes/Bot.js'
@@ -18,8 +20,6 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
     cooldown: 1,
     category: 'utils',
     usage: 'avatar [user]',
-    integration_types: [0, 1],
-    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('avatar')
         .setDescription('Affiche la photo de profil du membre voulu.')
@@ -28,6 +28,8 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
             .setDescription('L\'utilisateur voulu')
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
+        .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel])
 })
 export default class AvatarInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }

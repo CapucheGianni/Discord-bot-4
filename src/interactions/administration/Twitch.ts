@@ -20,7 +20,9 @@ import {
     ChannelSelectMenuInteraction,
     ModalBuilder,
     TextInputBuilder,
-    TextInputStyle
+    TextInputStyle,
+    ApplicationIntegrationType,
+    InteractionContextType
 } from 'discord.js'
 import { Model, Transaction } from 'sequelize'
 
@@ -38,8 +40,6 @@ const logger = Logger.getInstance('')
     cooldown: 5,
     category: 'administration',
     usage: 'twitch <set | remove | enable>',
-    integration_types: [0],
-    contexts: [0],
     data: new SlashCommandBuilder()
         .setName('twitch')
         .setDescription('Configuration des notifications twitch sur votre serveur.')
@@ -61,7 +61,8 @@ const logger = Logger.getInstance('')
             )
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
-        .setDMPermission(false)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall])
+        .setContexts([InteractionContextType.Guild])
 })
 export default class TwitchInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
@@ -198,23 +199,29 @@ export default class TwitchInteraction extends InteractionModule {
         collector.on('collect', async (collectedInteraction: ButtonInteraction | RoleSelectMenuInteraction | ChannelSelectMenuInteraction) => {
             if (collectedInteraction.customId !== 'inputs')
                 await collectedInteraction.deferUpdate()
-            switch (collectedInteraction.customId) {
-                case 'continue':
+
+            const collectedInteractionChannel = collectedInteraction.channel
+            const handlers: { [key: string]: () => Promise<void | Message | InteractionResponse> } = {
+                'continue': () => {
                     currentRowId++
                     rows[3].components[0].setDisabled(false)
                     if (currentRowId === 2)
                         rows[3].components[1].setDisabled(true)
                     return response.edit({ components: [rows[currentRowId], rows[3]] })
-                case 'back':
+                },
+                'back': () => {
                     currentRowId--
                     rows[3].components[1].setDisabled(false)
                     if (!currentRowId)
                         rows[3].components[0].setDisabled(true)
                     return response.edit({ components: [rows[currentRowId], rows[3]] })
-                case 'cancel':
+                },
+                'cancel': async () => {
                     collector.stop()
-                    return collectedInteraction.channel?.send('Vous avez annulé l\'opération')
-                case 'register':
+                    if (collectedInteractionChannel?.isSendable())
+                        return collectedInteractionChannel.send('Vous avez annulé l\'opération')
+                },
+                'register': async () => {
                     try {
                         if (notification.get().channelId !== interaction.channelId) {
                             const newChannel = client.channels.cache.get(notification.get().channelId)
@@ -228,7 +235,8 @@ export default class TwitchInteraction extends InteractionModule {
                             }
                         }
                         await notification.save()
-                        await collectedInteraction.channel?.send('Tous vos changements ont été enregistrés avec succès.')
+                        if (collectedInteractionChannel?.isSendable())
+                            await collectedInteractionChannel.send('Tous vos changements ont été enregistrés avec succès.')
                     } catch (error: any) {
                         logger.log(client, error, 'error')
                         await interaction.followUp({
@@ -238,7 +246,8 @@ export default class TwitchInteraction extends InteractionModule {
                         await response.edit({ components: [] })
                     }
                     return collector.stop()
-                default:
+                },
+                'default': async () => {
                     if (collectedInteraction.customId !== 'inputs')
                         await response.edit({ components: [] })
                     await this._handleRowInteractions(interaction, collectedInteraction, notification, rows)
@@ -266,7 +275,10 @@ export default class TwitchInteraction extends InteractionModule {
                         embeds: [embed],
                         components: [rows[currentRowId], rows[3]]
                     })
+                },
             }
+
+            await (handlers[collectedInteraction.customId] || handlers['default'])()
         })
         collector.on('end', async () => {
             client.set.delete(JSON.stringify({ command: interaction.commandName, guildId: interaction.guildId }))
@@ -275,76 +287,81 @@ export default class TwitchInteraction extends InteractionModule {
     }
 
     private async _handleRowInteractions(interaction: ChatInputCommandInteraction, collectedInteraction: ButtonInteraction | RoleSelectMenuInteraction | ChannelSelectMenuInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[]): Promise<void | Message | InteractionResponse> {
-        switch (collectedInteraction.customId) {
-            case 'inputs':
-                const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal')
-                const streamerModal = new TextInputBuilder().setCustomId('streamer').setLabel('Nom du streamer').setMinLength(4).setMaxLength(25).setStyle(TextInputStyle.Short).setValue(notification.get().streamer).setRequired(true)
-                const newMessageModal = new TextInputBuilder().setCustomId('baseMessage').setLabel('Nouveau message | Tags: ({streamer}, {game})').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().message || '').setRequired(false)
-                const updateMessageModal = new TextInputBuilder().setCustomId('updateMessage').setLabel('Message d\'update (tags: {streamer}, {game})').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().updateMessage || '').setRequired(false)
-                const streamerRow = new ActionRowBuilder<TextInputBuilder>().addComponents(streamerModal)
-                const newMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(newMessageModal)
-                const updateMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(updateMessageModal)
+        const handlers: { [key: string]: () => Promise<void | Message | InteractionResponse> } = {
+            'inputs': async () => {
+                const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal');
+                const streamerModal = new TextInputBuilder().setCustomId('streamer').setLabel('Nom du streamer').setMinLength(4).setMaxLength(25).setStyle(TextInputStyle.Short).setValue(notification.get().streamer).setRequired(true);
+                const newMessageModal = new TextInputBuilder().setCustomId('baseMessage').setLabel('Nouveau message').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().message || '').setRequired(false);
+                const updateMessageModal = new TextInputBuilder().setCustomId('updateMessage').setLabel('Message d\'update').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().updateMessage || '').setRequired(false);
+                const streamerRow = new ActionRowBuilder<TextInputBuilder>().addComponents(streamerModal);
+                const newMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(newMessageModal);
+                const updateMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(updateMessageModal);
 
-                modal.addComponents(streamerRow, newMessageRow, updateMessageRow)
-                await collectedInteraction.showModal(modal)
+                modal.addComponents(streamerRow, newMessageRow, updateMessageRow);
+                await collectedInteraction.showModal(modal);
 
                 try {
                     const collector = await interaction.awaitModalSubmit({
                         filter: i => i.user.id === interaction.user.id,
                         time: 1000 * 60 * 10,
                         idle: 1000 * 60 * 5
-                    })
-                    const streamer = collector.fields.getTextInputValue('streamer')
-                    const newMessage = collector.fields.getTextInputValue('baseMessage')
-                    const updateMessage = collector.fields.getTextInputValue('updateMessage')
+                    });
+                    const streamer = collector.fields.getTextInputValue('streamer');
+                    const newMessage = collector.fields.getTextInputValue('baseMessage');
+                    const updateMessage = collector.fields.getTextInputValue('updateMessage');
 
                     notification.set({
                         streamer: streamer,
                         message: newMessage,
                         updateMessage: updateMessage
-                    })
+                    });
                     return collector.reply({
                         content: 'Les données ont été enregistrées localement avec succès.',
                         ephemeral: true
-                    })
+                    });
                 } catch { }
-                return
-            case 'mention':
+            },
+            'mention': async () => {
                 if (!collectedInteraction.isRoleSelectMenu())
-                    return
-                const roles = collectedInteraction.values
-                const roleSelectMenu = rows[2].components[0] as RoleSelectMenuBuilder
+                    return;
+                const roles = collectedInteraction.values;
+                const roleSelectMenu = rows[2].components[0] as RoleSelectMenuBuilder;
 
-                roleSelectMenu.setDefaultRoles(roles)
-                notification.set({ roleId: roles.length > 0 ? roles[0] : null })
+                roleSelectMenu.setDefaultRoles(roles);
+                notification.set({ roleId: roles.length > 0 ? roles[0] : null });
                 return collectedInteraction.followUp({
                     content: 'La mention a été mise à jour localement avec succès.',
                     ephemeral: true
-                })
-            case 'channel':
+                });
+            },
+            'channel': async () => {
                 if (!collectedInteraction.isChannelSelectMenu())
-                    return
-                const channels = collectedInteraction.values
-                const channelSelectMenu = rows[1].components[0] as ChannelSelectMenuBuilder
+                    return;
+                const channels = collectedInteraction.values;
+                const channelSelectMenu = rows[1].components[0] as ChannelSelectMenuBuilder;
 
                 if (!channels.length) {
                     return collectedInteraction.followUp({
                         content: 'Veuillez spécifier un salon où envoyer les notifications twitch.',
                         ephemeral: true
-                    })
+                    });
                 }
-                channelSelectMenu.setDefaultChannels(channels)
-                notification.set({ channelId: channels[0] })
+                channelSelectMenu.setDefaultChannels(channels);
+                notification.set({ channelId: channels[0] });
                 return collectedInteraction.followUp({
                     content: 'Le salon a été mis à jour localement avec succès.',
                     ephemeral: true
-                })
-            case 'tags':
-                collectedInteraction.followUp({
+                });
+            },
+            'tags': async () => {
+                return collectedInteraction.followUp({
                     content: '**Liste des tags disponibles:**\n>>> `-` {streamer}\n`-` {game}',
                     ephemeral: true
-                })
-        }
+                });
+            }
+        };
+
+        await handlers[collectedInteraction.customId]()
     }
 
     private _createButtons(channelId: string, roleId: string | null): ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[] {

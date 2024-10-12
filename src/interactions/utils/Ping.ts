@@ -4,7 +4,9 @@ import {
     EmbedBuilder,
     AutocompleteInteraction,
     PermissionsBitField,
-    Message
+    Message,
+    ApplicationIntegrationType,
+    InteractionContextType
 } from 'discord.js'
 
 import Bot from '../../classes/Bot.js'
@@ -17,12 +19,12 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
     cooldown: 1,
     category: 'utils',
     usage: 'ping',
-    integration_types: [0, 1],
-    contexts: [0, 1, 2],
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Display the ping of the bot')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])
+        .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel])
 })
 export default class PingInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }

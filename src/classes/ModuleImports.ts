@@ -173,8 +173,6 @@ export abstract class InteractionModule extends Module {
     public cooldown!: number
     public category!: TCategory
     public usage!: string
-    public integration_types!: InteractionContextTypes[]
-    public contexts!: ApplicationIntegrationTypes[]
     public data!: SlashCommandBuilder
 
     constructor() {

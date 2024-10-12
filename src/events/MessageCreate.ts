@@ -102,8 +102,10 @@ export default class MessageCreate extends EventModule {
     }
 
     private _detectName(user: User, message: Message, prefix: string): boolean {
-        if (message.content.toLowerCase() === user.username.toLowerCase()) {
-            message.channel.send(`Bonjour!\n\nJe suis **${user.username}** le bot du goat __capuchegianni__.\nLe préfixe du bot est \`${prefix}\` mais il est tout à fait possible de le modifier.\nFaites \`/help prefix\` pour plus d'informations.`)
+        const channel = message.channel
+
+        if (message.content.toLowerCase() === user.username.toLowerCase() && channel.isSendable()) {
+            channel.send(`Bonjour!\n\nJe suis **${user.username}** le bot du goat __capuchegianni__.\nLe préfixe du bot est \`${prefix}\` mais il est tout à fait possible de le modifier.\nFaites \`/help prefix\` pour plus d'informations.`)
             return true
         }
         return false

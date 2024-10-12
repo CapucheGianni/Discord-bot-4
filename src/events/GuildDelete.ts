@@ -44,13 +44,12 @@ export default class GuildDelete extends EventModule {
             .setColor('#ff0000')
 
         const channel = client.channels.cache.get(getSafeEnv(process.env.LOG_CHANNEL_ID, 'LOG_CHANNEL_ID'))
-        if (!channel?.isTextBased())
+        if (!channel || !channel.isTextBased() || !channel.isSendable())
             return
 
         await client.database.Server.destroy({
             where: { id: server.id }
         })
-
         await channel.send({
             embeds: [embed]
         })

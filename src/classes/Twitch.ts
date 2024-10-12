@@ -133,7 +133,7 @@ export default class Twitch {
         const message = twitchNotification[type]?.replaceAll('{streamer}', data.user_name).replaceAll('{game}', data.game_name)
         const channel = client.channels.cache.get(twitchNotification.channelId)
 
-        if (!isTruthy(channel) || !channel.isTextBased())
+        if (!isTruthy(channel) || !channel.isTextBased() || !channel.isSendable())
             throw Error('Could not send the message in the picked channel.')
         await channel.send({
             content: twitchNotification.roleId ? `||<@${twitchNotification.roleId}>||\n\n${message}` : message,

@@ -64,7 +64,7 @@ export default class Logger {
     public logDiscordEmbed(client: Bot | Client, embed: EmbedBuilder): void {
         const channel = client.channels.cache.get(this._logChannelId)
 
-        if (!channel || !channel.isTextBased())
+        if (!channel || !channel.isTextBased() || !channel.isSendable())
             return
         channel.send({ embeds: [embed] })
     }
@@ -77,7 +77,7 @@ export default class Logger {
             .setTimestamp()
         const channel = client.channels.cache.get(this._logChannelId)
 
-        if (!channel || !channel.isTextBased())
+        if (!channel || !channel.isTextBased() || !channel.isSendable())
             return
         channel.send({ embeds: [embed] })
     }

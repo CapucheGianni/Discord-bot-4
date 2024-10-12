@@ -18,7 +18,7 @@ export default class MessageDelete extends EventModule {
         const interactionEmbed = new EmbedBuilder()
         const channel = client.channels.cache.get(getSafeEnv(process.env.LOG_CHANNEL_ID, 'LOG_CHANNEL_ID'))
 
-        if (!isTruthy(channel) || !channel.isTextBased())
+        if (!isTruthy(channel) || !channel.isTextBased() || !channel.isSendable())
             return
         if (!message.guild || !message.author || message.guildId !== '1124061621510221934')
             return
@@ -53,20 +53,20 @@ export default class MessageDelete extends EventModule {
                 value: message.attachments.map((attachment) => `([URL](${attachment.url})) \`${attachment.name}\``).join(',\n')
             })
         }
-        if (message.interaction) {
+        if (message.interactionMetadata) {
             interactionEmbed.addFields({
-                    name: 'Intéraction',
-                    value: `${message.interaction.commandName} (${message.interaction.id})`,
+                    name: 'Intéraction id',
+                    value: `${message.interactionMetadata.id}`,
                     inline: true
                 },
                 {
                     name: 'Auteur',
-                    value: `${message.interaction.user} (${message.interaction.user.id})`,
+                    value: `${message.interactionMetadata.user} (${message.interactionMetadata.user.id})`,
                     inline: true
                 })
                 .setFooter({
                     text: `Message supprimé | ${client.user?.username}`,
-                    iconURL: message.interaction.user.displayAvatarURL()
+                    iconURL: message.interactionMetadata.user.displayAvatarURL()
                 })
                 .setColor(`#ff0000`)
                 .setTimestamp()
@@ -78,7 +78,7 @@ export default class MessageDelete extends EventModule {
             .setTimestamp()
         }
         await channel.send({ embeds: [embed] })
-        if (message.interaction)
+        if (message.interactionMetadata)
             await channel.send({ embeds: [interactionEmbed] })
     }
 }

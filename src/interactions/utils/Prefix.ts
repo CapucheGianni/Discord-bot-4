@@ -5,7 +5,9 @@ import {
     PermissionsBitField,
     CommandInteractionOptionResolver,
     GuildMember,
-    InteractionResponse
+    InteractionResponse,
+    ApplicationIntegrationType,
+    InteractionContextType
 } from 'discord.js'
 
 import Bot from '../../classes/Bot.js'
@@ -18,8 +20,6 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
     cooldown: 3,
     category: 'utils',
     usage: 'prefix [prefix]',
-    integration_types: [0],
-    contexts: [0],
     data: new SlashCommandBuilder()
         .setName('prefix')
         .setDescription('Renvoie ou modifie le préfixe du serveur.')
@@ -29,7 +29,8 @@ import { InteractionDecorator } from '../../utils/Decorators.js'
             .setMaxLength(5)
         )
         .setDefaultMemberPermissions(PermissionsBitField.Flags.SendMessages)
-        .setDMPermission(false)
+        .setIntegrationTypes([ApplicationIntegrationType.GuildInstall])
+        .setContexts([InteractionContextType.Guild])
 })
 export default class PrefixInteraction extends InteractionModule {
     public async autoComplete(client: Bot, interaction: AutocompleteInteraction): Promise<void> { }
