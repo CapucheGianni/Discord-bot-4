@@ -136,7 +136,7 @@ export default class Twitch {
         if (!isTruthy(channel) || !channel.isTextBased() || !channel.isSendable())
             throw Error('Could not send the message in the picked channel.')
         await channel.send({
-            content: twitchNotification.roleId ? `||<@${twitchNotification.roleId}>||\n\n${message}` : message,
+            content: twitchNotification.roleId ? `||<@&${twitchNotification.roleId}>||\n\n${message}` : message,
             embeds: [embed],
             allowedMentions: { parse: ['roles'] }
         })
