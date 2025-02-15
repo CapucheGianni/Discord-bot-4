@@ -3,7 +3,6 @@ import {
     Client,
     REST,
     Routes,
-    RESTPostAPIChatInputApplicationCommandsJSONBody
 } from 'discord.js'
 import { config } from 'dotenv'
 
@@ -13,7 +12,7 @@ import ModuleImports from './ModuleImports.js'
 import { getSafeEnv } from '../utils/TypeGuards.js'
 
 import settings from '../../package.json' with { 'type': 'json' }
-import { ApplicationIntegrationTypes, InteractionContextTypes } from '../types/DiscordEvents.js'
+import { i18n } from 'i18next'
 
 config()
 const logger: Logger = Logger.getInstance(
@@ -27,14 +26,16 @@ export default class Bot extends Client {
     public version: string
     private _modules: ModuleImports
     private _database: Database
+    private _translations: i18n
 
-    constructor(client: Client, database: Database, modules: ModuleImports) {
+    constructor(client: Client, database: Database, modules: ModuleImports, translations: i18n) {
         super(client.options)
         this._database = database
         this.cooldowns = new Collection()
         this.set = new Set()
         this._modules = modules
         this.version = settings.version
+        this._translations = translations
     }
 
     public get getServerNumber(): number {
@@ -77,5 +78,9 @@ export default class Bot extends Client {
         } catch (error) {
             logger.simpleError(Error(`An error occured while refreshing application (/) commands: ${error}`))
         }
+    }
+
+    public get translations(): i18n {
+        return this._translations
     }
 }

@@ -1,6 +1,6 @@
 import i18next from 'i18next'
-import enTranslations from './locales/en/translations'
-import frTranslations from './locales/fr/translations'
+import enTranslations from './locales/en/translations.js'
+import frTranslations from './locales/fr/translations.js'
 
 const resources = {
     en: { translation: enTranslations },
@@ -8,7 +8,7 @@ const resources = {
 }
 
 await i18next.init({
-    debug: true,
+    debug: false,
     defaultNS: 'translation',
     fallbackLng: 'fr',
     resources,

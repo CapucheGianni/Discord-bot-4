@@ -1,4 +1,5 @@
 export default interface Resources {
-    'hello': string,
-    'bye': string
+    'error': {
+        'maintenance': string
+    }
 }

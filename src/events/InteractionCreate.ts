@@ -3,7 +3,6 @@ import {
     Interaction,
     ChatInputCommandInteraction,
     AutocompleteInteraction,
-    GuildMember,
     Collection,
     User
 } from 'discord.js'
@@ -30,13 +29,19 @@ export default class InteractionCreate extends EventModule {
     }
 
     private async _executeInteraction(client: Bot, interaction: ChatInputCommandInteraction): Promise<void> {
-        await client.database.addServerFromInteraction(interaction)
-        await client.database.addChannelFromInteraction(interaction)
-        await client.database.addUserFromInteraction(interaction)
+        if (!client.user)
+            return
 
         try {
+            await client.database.addServerFromInteraction(interaction)
+            await client.database.addChannelFromInteraction(interaction)
+            await client.database.addUserFromInteraction(interaction)
+
+            const userLang = await this.getUserLanguage(client, interaction.user.id)
+            const t = client.translations.getFixedT(userLang)
+
             if (await this._botIsInMaintenance(client, interaction.user)) {
-                interaction.reply(`${client.user?.username} n'est pas disponible pour le moment`)
+                interaction.reply(t('error.maintenance', { botName: client.user.username }))
                 return
             }
 
@@ -51,7 +56,7 @@ export default class InteractionCreate extends EventModule {
             }
 
             const interactionCommand = client.modules.interactions.get(interactionInDb.name)
-            if (!interactionCommand || !client.user) {
+            if (!interactionCommand) {
                 interaction.reply({ content: 'Une erreur est survenue lors de l\'exécution de l\'intéraction.' })
                 return
             }
@@ -71,7 +76,7 @@ export default class InteractionCreate extends EventModule {
                     ? `**Auteur:** ${interaction.user} (${interaction.user.id})\n**Salon:** ${interaction.channel} (${interaction.channelId})\n**Serveur:** ${interaction.guild} (${interaction.guildId})\n**Interaction:** ${interaction.commandName}`
                     : `**Auteur:** ${interaction.user} (${interaction.user.id})\n**Interaction:** ${interaction.commandName}`)
                 .setFooter({
-                    text: `Interaction exécutée par ${interaction.user.username} | ${client.user?.username}`,
+                    text: `Interaction exécutée par ${interaction.user.username} | ${client.user.username}`,
                     iconURL: interaction.user.displayAvatarURL()
                 })
                 .setTimestamp()
@@ -83,8 +88,8 @@ export default class InteractionCreate extends EventModule {
                 .setTitle(`Erreur lors de l'éxécution de l'intéraction ${interaction.commandName} ❌`)
                 .setDescription(`\`\`\`${error}\`\`\``)
                 .setFooter({
-                    text: `Intéraction exécutée par ${interaction.user.username} | ${client.user?.username}`,
-                    iconURL: client.user?.displayAvatarURL()
+                    text: `Intéraction exécutée par ${interaction.user.username} | ${client.user.username}`,
+                    iconURL: client.user.displayAvatarURL()
                 })
                 .setColor('#ff0000')
                 .setTimestamp()

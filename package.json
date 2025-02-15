@@ -8,7 +8,7 @@
    "type": "module",
    "main": "build/Main.js",
    "scripts": {
-      "build": "rimraf build && tsc",
+      "build": "rimraf build && tsc && tsc-alias",
       "start:dev": "npm run build && ts-node build/Main.js",
       "start:nobuild": "ts-node build/Main.js",
       "start:prod": "npm run build && pm2 start kaide"
@@ -19,10 +19,12 @@
       "fuse.js": "^7.0.0",
       "glob": "^10.4.5",
       "i18next": "^24.2.2",
+      "module-alias": "^2.2.3",
       "mysql2": "^3.11.3",
       "node-fetch": "^3.3.2",
       "reflect-metadata": "^0.2.2",
-      "sequelize": "^6.37.3"
+      "sequelize": "^6.37.3",
+      "tsc-alias": "^1.8.10"
    },
    "devDependencies": {
       "@types/glob": "^8.1.0",
@@ -34,5 +36,8 @@
    "engines": {
       "node": ">=16.0.0",
       "npm": ">=7.0.0"
+   },
+   "_moduleAliases": {
+      "@src": "build"
    }
 }

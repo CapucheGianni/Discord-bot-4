@@ -1,8 +1,9 @@
 import Resources from '@src/types/resources'
 
 const translations: Resources = {
-    'hello': 'Hello',
-    'bye': 'Bye bye'
+    error: {
+        'maintenance': '{{botName}} is not available for now.'
+    }
 }
 
 export default translations

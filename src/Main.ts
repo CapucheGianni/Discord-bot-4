@@ -12,6 +12,7 @@ import Database from './classes/Database.js'
 import Logger from './classes/Logger.js'
 import ModuleImports from './classes/ModuleImports.js'
 import { getSafeEnv } from './utils/TypeGuards.js'
+import i18next from '@src/i18n/i18n.js'
 
 config()
 
@@ -45,7 +46,7 @@ const start = async (): Promise<void> => {
 
     const database: Database = new Database()
     const modules: ModuleImports = new ModuleImports()
-    const bot: Bot = new Bot(client, database, modules)
+    const bot: Bot = new Bot(client, database, modules, i18next)
 
     await bot.modules.loadModules()
 

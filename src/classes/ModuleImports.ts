@@ -51,6 +51,14 @@ export abstract class Module {
         }
         return true
     }
+
+    public async getUserLanguage(client: Bot, userId: string): Promise<string> {
+        const user = await client.database.User.findByPk(userId)
+
+        if (!user || !user.get().lang)
+            return 'fr'
+        return user.get().lang
+    }
 }
 
 export abstract class CommandModule extends Module {

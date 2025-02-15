@@ -34,15 +34,18 @@ export default class MessageCreate extends EventModule {
             await client.database.addChannelFromMessage(message)
             await client.database.addUserFromMessage(message)
 
+            const userLang = await this.getUserLanguage(client, message.author.id)
+            const t = client.translations.getFixedT(userLang)
+
             if (await this._botIsInMaintenance(client, message.author)) {
-                message.reply(`${client.user?.username} n'est pas disponible pour le moment`)
+                message.reply(t('error.maintenance', { botName: client.user.username }))
                 return
             }
 
             const prefix: string = (await client.database.getGuild(message.guildId)).prefix
             if (this._detectName(client.user, message, prefix))
                 return
-            if (!message.content.startsWith(prefix) && !message.content.startsWith(client.user?.username.toLowerCase())) {
+            if (!message.content.startsWith(prefix) && !message.content.startsWith(client.user.username.toLowerCase())) {
                 puns.getPun(client, message)
                 return
             }
