@@ -24,13 +24,13 @@ import {
     ApplicationIntegrationType,
     InteractionContextType
 } from 'discord.js'
-import { Model, Transaction } from 'sequelize'
+import { Model } from 'sequelize'
 
-import Bot from '../../classes/Bot.js'
-import Logger from '../../classes/Logger.js'
-import { InteractionModule } from '../../classes/ModuleImports.js'
-import { TTwitch } from '../../types/Twitch.js'
-import { InteractionDecorator } from '../../utils/Decorators.js'
+import Bot from '@src/classes/Bot.js'
+import Logger from '@src/classes/Logger.js'
+import { InteractionModule } from '@src/classes/ModuleImports.js'
+import { TTwitch } from '@src/types/Twitch.js'
+import { InteractionDecorator } from '@src/utils/Decorators.js'
 
 const logger = Logger.getInstance('')
 

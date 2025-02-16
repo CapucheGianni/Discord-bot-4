@@ -15,21 +15,21 @@ import {
     Sequelize
 } from 'sequelize'
 
-import { TBot } from '../types/Bot'
-import { TAnnouncementChannel, TChannel } from '../types/Channel'
-import { TCommand } from '../types/Command'
-import { TAnnouncementEmbed, TEmbedField } from '../types/Embed'
-import { TServer } from '../types/Server'
-import { TInteraction } from '../types/Interaction'
-import { TPun } from '../types/Pun'
-import { TTwitch } from '../types/Twitch'
-import { TUser } from '../types/User'
+import { TBot } from '@src/types/Bot'
+import { TAnnouncementChannel, TChannel } from '@src/types/Channel'
+import { TCommand } from '@src/types/Command'
+import { TAnnouncementEmbed, TEmbedField } from '@src/types/Embed'
+import { TServer } from '@src/types/Server'
+import { TInteraction } from '@src/types/Interaction'
+import { TPun } from '@src/types/Pun'
+import { TTwitch } from '@src/types/Twitch'
+import { TUser } from '@src/types/User'
 import {
     getSafeEnv,
     isChannel,
     isServer,
     isServers
-} from '../utils/TypeGuards.js'
+} from '@src/utils/TypeGuards.js'
 
 import Logger from './Logger.js'
 

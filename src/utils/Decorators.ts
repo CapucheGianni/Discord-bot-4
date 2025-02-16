@@ -5,14 +5,12 @@ import {
     SlashCommandSubcommandsOnlyBuilder
 } from 'discord.js'
 
-import { CommandModule } from '../classes/ModuleImports.js'
-import { TCategory } from '../types/Command.js'
+import { CommandModule } from '@src/classes/ModuleImports.js'
+import { TCategory } from '@src/types/Command.js'
 import {
     TDiscordEvents,
-    TEventType,
-    InteractionContextTypes,
-    ApplicationIntegrationTypes
-} from '../types/DiscordEvents.js'
+    TEventType
+} from '@src/types/DiscordEvents.js'
 
 interface event {
     name: TDiscordEvents

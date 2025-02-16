@@ -3,10 +3,10 @@ import {
     EmbedBuilder
 } from 'discord.js'
 
-import Bot from '../../classes/Bot.js'
-import { CommandModule } from '../../classes/ModuleImports.js'
-import { CommandDecorator } from '../../utils/Decorators.js'
-import { isBot } from '../../utils/TypeGuards.js'
+import Bot from '@src/classes/Bot.js'
+import { CommandModule } from '@src/classes/ModuleImports.js'
+import { CommandDecorator } from '@src/utils/Decorators.js'
+import { isBot } from '@src/utils/TypeGuards.js'
 
 @CommandDecorator({
     name: 'botinfos',

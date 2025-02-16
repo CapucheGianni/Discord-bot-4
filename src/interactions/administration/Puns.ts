@@ -17,10 +17,10 @@ import {
     InteractionContextType,
 } from 'discord.js'
 
-import Bot from '../../classes/Bot.js'
-import Logger from '../../classes/Logger.js'
-import { InteractionModule } from '../../classes/ModuleImports.js'
-import { InteractionDecorator } from '../../utils/Decorators.js'
+import Bot from '@src/classes/Bot.js'
+import Logger from '@src/classes/Logger.js'
+import { InteractionModule } from '@src/classes/ModuleImports.js'
+import { InteractionDecorator } from '@src/utils/Decorators.js'
 
 const logger = Logger.getInstance('')
 

@@ -4,8 +4,8 @@ import { Model } from 'sequelize'
 
 import Bot from './Bot.js'
 import Logger from './Logger.js'
-import { TTwitch } from '../types/Twitch.js'
-import { isTruthy } from '../utils/TypeGuards.js'
+import { TTwitch } from '@src/types/Twitch.js'
+import { isTruthy } from '@src/utils/TypeGuards.js'
 
 import settings from '../../settings.json' with { 'type': 'json' }
 

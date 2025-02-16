@@ -9,7 +9,7 @@ import { config } from 'dotenv'
 import Database from './Database.js'
 import Logger from './Logger.js'
 import ModuleImports from './ModuleImports.js'
-import { getSafeEnv } from '../utils/TypeGuards.js'
+import { getSafeEnv } from '@src/utils/TypeGuards.js'
 
 import settings from '../../package.json' with { 'type': 'json' }
 import { i18n } from 'i18next'

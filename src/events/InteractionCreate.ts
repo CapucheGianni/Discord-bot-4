@@ -7,11 +7,11 @@ import {
     User
 } from 'discord.js'
 
-import Bot from '../classes/Bot.js'
-import Logger from '../classes/Logger.js'
-import { EventModule, InteractionModule } from '../classes/ModuleImports.js'
-import { EventDecorator } from '../utils/Decorators.js'
-import { isInteraction, isBot, getSafeEnv } from '../utils/TypeGuards.js'
+import Bot from '@src/classes/Bot.js'
+import Logger from '@src/classes/Logger.js'
+import { EventModule, InteractionModule } from '@src/classes/ModuleImports.js'
+import { EventDecorator } from '@src/utils/Decorators.js'
+import { isInteraction, isBot, getSafeEnv } from '@src/utils/TypeGuards.js'
 
 const logger = Logger.getInstance('')
 

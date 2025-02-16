@@ -27,13 +27,13 @@ import {
 } from 'discord.js'
 import { Model } from 'sequelize'
 
-import Bot from '../../classes/Bot.js'
-import Logger from '../../classes/Logger.js'
-import { InteractionModule } from '../../classes/ModuleImports.js'
-import { TAnnouncementChannel } from '../../types/Channel.js'
-import { TAnnouncementEmbed } from '../../types/Embed.js'
-import { InteractionDecorator } from '../../utils/Decorators.js'
-import { isString, isTruthy } from '../../utils/TypeGuards.js'
+import Bot from '@src/classes/Bot.js'
+import Logger from '@src/classes/Logger.js'
+import { InteractionModule } from '@src/classes/ModuleImports.js'
+import { TAnnouncementChannel } from '@src/types/Channel.js'
+import { TAnnouncementEmbed } from '@src/types/Embed.js'
+import { InteractionDecorator } from '@src/utils/Decorators.js'
+import { isString, isTruthy } from '@src/utils/TypeGuards.js'
 
 const logger = Logger.getInstance('')
 const responseByType = {

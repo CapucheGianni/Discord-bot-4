@@ -1,10 +1,10 @@
 import { EmbedBuilder, InteractionResponse, Message, GuildMember } from 'discord.js'
 import { config } from 'dotenv'
 
-import Bot from '../classes/Bot.js'
-import { EventModule } from '../classes/ModuleImports.js'
-import { EventDecorator } from '../utils/Decorators.js'
-import { isString, isTruthy } from '../utils/TypeGuards.js'
+import Bot from '@src/classes/Bot.js'
+import { EventModule } from '@src/classes/ModuleImports.js'
+import { EventDecorator } from '@src/utils/Decorators.js'
+import { isString, isTruthy } from '@src/utils/TypeGuards.js'
 
 config()
 

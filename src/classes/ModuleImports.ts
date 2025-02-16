@@ -18,14 +18,12 @@ import {
 } from 'discord.js'
 import { glob } from 'glob'
 
-import { TCategory } from '../types/Command.js'
+import { TCategory } from '@src/types/Command.js'
 import {
     TDiscordEvents,
-    TEventType,
-    InteractionContextTypes,
-    ApplicationIntegrationTypes
-} from '../types/DiscordEvents.js'
-import { getMetadata } from '../utils/Decorators.js'
+    TEventType
+} from '@src/types/DiscordEvents.js'
+import { getMetadata } from '@src/utils/Decorators.js'
 
 import Bot from './Bot.js'
 import Database from './Database.js'

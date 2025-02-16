@@ -13,10 +13,10 @@ import {
 } from 'discord.js'
 import Fuse from 'fuse.js'
 
-import Bot from '../../classes/Bot.js'
-import { InteractionModule } from '../../classes/ModuleImports.js'
-import { InteractionDecorator } from '../../utils/Decorators.js'
-import { getSafeEnv, isTruthy } from '../../utils/TypeGuards.js'
+import Bot from '@src/classes/Bot.js'
+import { InteractionModule } from '@src/classes/ModuleImports.js'
+import { InteractionDecorator } from '@src/utils/Decorators.js'
+import { getSafeEnv, isTruthy } from '@src/utils/TypeGuards.js'
 
 @InteractionDecorator({
     name: 'help',

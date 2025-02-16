@@ -6,16 +6,16 @@ import {
     Collection
 } from 'discord.js'
 
-import Bot from '../classes/Bot.js'
-import Logger from '../classes/Logger.js'
-import { CommandModule, EventModule } from '../classes/ModuleImports.js'
-import Puns from '../classes/Puns.js'
-import { EventDecorator } from '../utils/Decorators.js'
+import Bot from '@src/classes/Bot.js'
+import Logger from '@src/classes/Logger.js'
+import { CommandModule, EventModule } from '@src/classes/ModuleImports.js'
+import Puns from '@src/classes/Puns.js'
+import { EventDecorator } from '@src/utils/Decorators.js'
 import {
     getSafeEnv,
     isBot,
     isTruthy
-} from '../utils/TypeGuards.js'
+} from '@src/utils/TypeGuards.js'
 
 const logger = Logger.getInstance('')
 const puns = new Puns()

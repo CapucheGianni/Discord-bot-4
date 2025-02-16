@@ -1,16 +1,15 @@
 import {
     Message,
     EmbedBuilder,
-    PermissionsBitField,
     GuildMember,
     Collection,
     User
 } from 'discord.js'
 
-import Bot from '../../classes/Bot.js'
-import { CommandModule } from '../../classes/ModuleImports.js'
-import { CommandDecorator } from '../../utils/Decorators.js'
-import { getSafeEnv, isTruthy } from '../../utils/TypeGuards.js'
+import Bot from '@src/classes/Bot.js'
+import { CommandModule } from '@src/classes/ModuleImports.js'
+import { CommandDecorator } from '@src/utils/Decorators.js'
+import { getSafeEnv, isTruthy } from '@src/utils/TypeGuards.js'
 
 @CommandDecorator({
     name: 'help',

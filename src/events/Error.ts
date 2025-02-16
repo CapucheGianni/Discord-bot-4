@@ -1,7 +1,7 @@
-import Bot from '../classes/Bot.js'
-import { EventModule } from '../classes/ModuleImports.js'
-import { EventDecorator } from '../utils/Decorators.js'
-import Logger from '../classes/Logger.js'
+import Bot from '@src/classes/Bot.js'
+import { EventModule } from '@src/classes/ModuleImports.js'
+import { EventDecorator } from '@src/utils/Decorators.js'
+import Logger from '@src/classes/Logger.js'
 
 const logger = Logger.getInstance('')
 
