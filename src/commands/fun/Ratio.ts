@@ -71,10 +71,10 @@ export default class RatioCommand extends CommandModule {
                 return i.reply({ content: reply, ephemeral: true })
             })
             setTimeout(() => {
-                const channel = message.channel;
+                const channel = message.channel
 
                 if (!channel.isSendable())
-                    throw Error("Channel is not sendable.")
+                    throw Error('Channel is not sendable.')
                 msg.edit({ components: [] })
                 channel.send(ratioNbr > flopNbr ? `RATIOOOOOO ${userToRatio}` : `FLOOOOOOOOP ${user}`)
             }, 1000 * 60)

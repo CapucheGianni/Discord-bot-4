@@ -289,77 +289,77 @@ export default class TwitchInteraction extends InteractionModule {
     private async _handleRowInteractions(interaction: ChatInputCommandInteraction, collectedInteraction: ButtonInteraction | RoleSelectMenuInteraction | ChannelSelectMenuInteraction, notification: Model<TTwitch, any>, rows: ActionRowBuilder<ButtonBuilder | ChannelSelectMenuBuilder | RoleSelectMenuBuilder>[]): Promise<void | Message | InteractionResponse> {
         const handlers: { [key: string]: () => Promise<void | Message | InteractionResponse> } = {
             'inputs': async () => {
-                const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal');
-                const streamerModal = new TextInputBuilder().setCustomId('streamer').setLabel('Nom du streamer').setMinLength(4).setMaxLength(25).setStyle(TextInputStyle.Short).setValue(notification.get().streamer).setRequired(true);
-                const newMessageModal = new TextInputBuilder().setCustomId('baseMessage').setLabel('Nouveau message').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().message || '').setRequired(false);
-                const updateMessageModal = new TextInputBuilder().setCustomId('updateMessage').setLabel('Message d\'update').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().updateMessage || '').setRequired(false);
-                const streamerRow = new ActionRowBuilder<TextInputBuilder>().addComponents(streamerModal);
-                const newMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(newMessageModal);
-                const updateMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(updateMessageModal);
+                const modal = new ModalBuilder().setCustomId('modal').setTitle('Modal')
+                const streamerModal = new TextInputBuilder().setCustomId('streamer').setLabel('Nom du streamer').setMinLength(4).setMaxLength(25).setStyle(TextInputStyle.Short).setValue(notification.get().streamer).setRequired(true)
+                const newMessageModal = new TextInputBuilder().setCustomId('baseMessage').setLabel('Nouveau message').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().message || '').setRequired(false)
+                const updateMessageModal = new TextInputBuilder().setCustomId('updateMessage').setLabel('Message d\'update').setMaxLength(256).setStyle(TextInputStyle.Paragraph).setValue(notification.get().updateMessage || '').setRequired(false)
+                const streamerRow = new ActionRowBuilder<TextInputBuilder>().addComponents(streamerModal)
+                const newMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(newMessageModal)
+                const updateMessageRow = new ActionRowBuilder<TextInputBuilder>().addComponents(updateMessageModal)
 
-                modal.addComponents(streamerRow, newMessageRow, updateMessageRow);
-                await collectedInteraction.showModal(modal);
+                modal.addComponents(streamerRow, newMessageRow, updateMessageRow)
+                await collectedInteraction.showModal(modal)
 
                 try {
                     const collector = await interaction.awaitModalSubmit({
                         filter: i => i.user.id === interaction.user.id,
                         time: 1000 * 60 * 10,
                         idle: 1000 * 60 * 5
-                    });
-                    const streamer = collector.fields.getTextInputValue('streamer');
-                    const newMessage = collector.fields.getTextInputValue('baseMessage');
-                    const updateMessage = collector.fields.getTextInputValue('updateMessage');
+                    })
+                    const streamer = collector.fields.getTextInputValue('streamer')
+                    const newMessage = collector.fields.getTextInputValue('baseMessage')
+                    const updateMessage = collector.fields.getTextInputValue('updateMessage')
 
                     notification.set({
                         streamer: streamer,
                         message: newMessage,
                         updateMessage: updateMessage
-                    });
+                    })
                     return collector.reply({
                         content: 'Les données ont été enregistrées localement avec succès.',
                         ephemeral: true
-                    });
+                    })
                 } catch { }
             },
             'mention': async () => {
                 if (!collectedInteraction.isRoleSelectMenu())
-                    return;
-                const roles = collectedInteraction.values;
-                const roleSelectMenu = rows[2].components[0] as RoleSelectMenuBuilder;
+                    return
+                const roles = collectedInteraction.values
+                const roleSelectMenu = rows[2].components[0] as RoleSelectMenuBuilder
 
-                roleSelectMenu.setDefaultRoles(roles);
-                notification.set({ roleId: roles.length > 0 ? roles[0] : null });
+                roleSelectMenu.setDefaultRoles(roles)
+                notification.set({ roleId: roles.length > 0 ? roles[0] : null })
                 return collectedInteraction.followUp({
                     content: 'La mention a été mise à jour localement avec succès.',
                     ephemeral: true
-                });
+                })
             },
             'channel': async () => {
                 if (!collectedInteraction.isChannelSelectMenu())
-                    return;
-                const channels = collectedInteraction.values;
-                const channelSelectMenu = rows[1].components[0] as ChannelSelectMenuBuilder;
+                    return
+                const channels = collectedInteraction.values
+                const channelSelectMenu = rows[1].components[0] as ChannelSelectMenuBuilder
 
                 if (!channels.length) {
                     return collectedInteraction.followUp({
                         content: 'Veuillez spécifier un salon où envoyer les notifications twitch.',
                         ephemeral: true
-                    });
+                    })
                 }
-                channelSelectMenu.setDefaultChannels(channels);
-                notification.set({ channelId: channels[0] });
+                channelSelectMenu.setDefaultChannels(channels)
+                notification.set({ channelId: channels[0] })
                 return collectedInteraction.followUp({
                     content: 'Le salon a été mis à jour localement avec succès.',
                     ephemeral: true
-                });
+                })
             },
             'tags': async () => {
                 return collectedInteraction.followUp({
                     content: '**Liste des tags disponibles:**\n>>> `-` {streamer}\n`-` {game}',
                     ephemeral: true
-                });
+                })
             }
-        };
+        }
 
         await handlers[collectedInteraction.customId]()
     }

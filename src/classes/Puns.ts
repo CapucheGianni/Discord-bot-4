@@ -1,9 +1,9 @@
-import { Message } from "discord.js"
+import { Message } from 'discord.js'
 
-import Bot from "./Bot.js"
-import Logger from "./Logger.js"
+import Bot from './Bot.js'
+import Logger from './Logger.js'
 
-import { isUser, isChannel, isServer } from "../utils/TypeGuards.js"
+import { isUser, isChannel, isServer } from '../utils/TypeGuards.js'
 
 const logger = Logger.getInstance('')
 

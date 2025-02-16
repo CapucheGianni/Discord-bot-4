@@ -10,12 +10,12 @@ import {
     ButtonStyle,
     ComponentType,
     PermissionsBitField
-} from "discord.js";
+} from 'discord.js'
 
-import Bot from "../../classes/Bot.js";
-import Logger from "../../classes/Logger.js";
-import { InteractionModule } from "../../classes/ModuleImports.js";
-import { InteractionDecorator } from "../../utils/Decorators.js";
+import Bot from '../../classes/Bot.js'
+import Logger from '../../classes/Logger.js'
+import { InteractionModule } from '../../classes/ModuleImports.js'
+import { InteractionDecorator } from '../../utils/Decorators.js'
 
 const logger = Logger.getInstance('')
 
