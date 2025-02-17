@@ -37,15 +37,12 @@ export default class MessageCreate extends EventModule {
             const userLang = await this.getUserLanguage(client, message.author.id)
             const t = client.translations.getFixedT(userLang)
 
-            if (await this._botIsInMaintenance(client, message.author)) {
-                message.reply(t('error.maintenance', { botName: client.user.username }))
-                return
-            }
-
             const prefix: string = (await client.database.getGuild(message.guildId)).prefix
+            const maintenance = await this._botIsInMaintenance(client, message.author)
             if (this._detectName(client.user, message, prefix))
                 return
-            if (!message.content.startsWith(prefix) && !message.content.startsWith(client.user.username.toLowerCase())) {
+
+            if (!message.content.startsWith(prefix) && !message.content.startsWith(client.user.username.toLowerCase()) && maintenance) {
                 puns.getPun(client, message)
                 return
             }
@@ -59,6 +56,11 @@ export default class MessageCreate extends EventModule {
             const command = client.modules.commands.get(commandName) ?? client.modules.commands.find((cmd) => cmd.aliases.includes(commandName))
             if (!command)
                 return
+
+            if (maintenance) {
+                message.reply(t('error.maintenance', { botName: client.user.username }))
+                return
+            }
 
             const commandFromDb = await client.database.Command.findByPk(command.name)
             if ((!commandFromDb || !commandFromDb.get().enabled) && message.author.id !== getSafeEnv(process.env.OWNER_ID, 'OWNER_ID')) {
